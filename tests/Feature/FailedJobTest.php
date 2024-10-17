@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Jobs;
+namespace Tests\Feature;
 
 use App\Jobs\FailedJob;
 use Illuminate\Foundation\Testing\RefreshDatabase;
