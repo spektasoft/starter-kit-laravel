@@ -1,0 +1,24 @@
+{
+    "[blade]": {
+        "editor.autoClosingBrackets": "always",
+        "editor.defaultFormatter": "shufo.vscode-blade-formatter"
+    },
+    "[php]": {
+        "editor.defaultFormatter": "open-southeners.laravel-pint",
+    },
+    "blade.format.enable": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit",
+        "source.organizeImports": "explicit"
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.quickSuggestions": {
+        "strings": "on"
+    },
+    "emmet.triggerExpansionOnTab": true,
+    "files.associations": {
+        "*.css": "tailwindcss",
+        "./resources/**/livewire/**/*.blade.php": "php"
+    }
+}
