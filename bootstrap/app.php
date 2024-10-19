@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Middleware\Language;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,8 +15,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->append(Language::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (Throwable $e, Request $request) {
+            /** @var string */
+            $defaultLang = config('app.locale', 'en');
+            /** @var string */
+            $appName = config('app.name', 'Laravel');
+            $slug = Str::slug($appName, '_');
+            $cookieKey = $slug.'_lang';
+            /** @var string */
+            $lang = $request->cookie($cookieKey, $defaultLang);
+            app()->setLocale($lang);
+        });
     })->create();
