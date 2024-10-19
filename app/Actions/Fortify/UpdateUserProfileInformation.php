@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
+use Laravel\Fortify\Features;
 
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 {
@@ -51,6 +52,8 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             'email_verified_at' => null,
         ])->save();
 
-        $user->sendEmailVerificationNotification();
+        if (Features::enabled(Features::emailVerification())) {
+            $user->sendEmailVerificationNotification();
+        }
     }
 }

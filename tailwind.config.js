@@ -1,3 +1,4 @@
+import colors from "tailwindcss/colors";
 import defaultTheme from "tailwindcss/defaultTheme";
 import preset from "./vendor/filament/support/tailwind.config.preset";
 
@@ -17,6 +18,9 @@ export default {
 
     theme: {
         extend: {
+            colors: {
+                primary: colors["indigo"],
+            },
             fontFamily: {
                 sans: ["Figtree", ...defaultTheme.fontFamily.sans],
             },
