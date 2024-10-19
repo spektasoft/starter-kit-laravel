@@ -8,6 +8,7 @@ return [
         'open_language_switcher' => 'Buka Pengubah Bahasa',
     ],
     'menu' => [
+        'api_tokens' => 'Token API',
         'dashboard' => 'Dasbor',
         'guest' => 'Tamu',
         'home' => 'Beranda',

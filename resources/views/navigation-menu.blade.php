@@ -42,7 +42,12 @@
 
                 <!-- Menu -->
                 <div class="flex items-center gap-4">
-                    <x-navigation-menu.menu />
+                    @guest
+                        <x-navigation-menu.guest-menu />
+                    @endguest
+                    @auth
+                        <x-navigation-menu.user-menu />
+                    @endauth
                 </div>
             </div>
         </div>

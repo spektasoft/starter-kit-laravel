@@ -8,6 +8,7 @@ return [
         'open_language_switcher' => 'Open Language Switcher',
     ],
     'menu' => [
+        'api_tokens' => 'API Tokens',
         'dashboard' => 'Dashboard',
         'guest' => 'Guest',
         'home' => 'Home',
