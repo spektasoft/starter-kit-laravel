@@ -15,6 +15,7 @@ return [
         'login_register' => 'Login/Register',
         'login' => 'Login',
         'open_menu' => 'Open Menu',
+        'profile' => 'Profile',
         'title' => 'Menu',
     ],
 ];

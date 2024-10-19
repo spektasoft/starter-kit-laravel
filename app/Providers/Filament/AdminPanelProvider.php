@@ -61,6 +61,10 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-home')
                     ->url(fn () => route('home')),
                 MenuItem::make()
+                    ->label(fn () => __('navigation-menu.menu.profile'))
+                    ->icon('heroicon-o-user')
+                    ->url(fn () => route('profile.show')),
+                MenuItem::make()
                     ->label(fn () => __('navigation-menu.menu.api_tokens'))
                     ->icon('heroicon-o-key')
                     ->url(fn () => route('api-tokens.index')),

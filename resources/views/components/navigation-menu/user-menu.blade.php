@@ -13,8 +13,8 @@
     </x-slot>
 
     <x-filament::dropdown.list>
-        <x-filament::dropdown.list.item :href="route('profile.show')" :icon="'heroicon-m-user-circle'" tag="a">
-            {{ __('Profile') }}
+        <x-filament::dropdown.list.item :icon="'heroicon-m-user-circle'">
+            {{ $user->name }}
         </x-filament::dropdown.list.item>
     </x-filament::dropdown.list>
 
@@ -25,6 +25,10 @@
     <x-filament::dropdown.list>
         <x-filament::dropdown.list.item :href="route('filament.admin.pages.dashboard')" :icon="'heroicon-o-building-library'" tag="a">
             {{ __('navigation-menu.menu.dashboard') }}
+        </x-filament::dropdown.list.item>
+
+        <x-filament::dropdown.list.item :href="route('profile.show')" :icon="'heroicon-o-user'" tag="a">
+            {{ __('navigation-menu.menu.profile') }}
         </x-filament::dropdown.list.item>
 
         @if (Laravel\Jetstream\Jetstream::hasApiFeatures())

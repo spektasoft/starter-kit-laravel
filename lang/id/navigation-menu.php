@@ -15,6 +15,7 @@ return [
         'login_register' => 'Masuk/Daftar',
         'login' => 'Masuk',
         'open_menu' => 'Buka Menu',
+        'profile' => 'Profil',
         'title' => 'Menu',
     ],
 ];
