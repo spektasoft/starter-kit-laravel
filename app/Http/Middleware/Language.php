@@ -27,7 +27,7 @@ class Language
             app()->setLocale($lang);
             $url = $request->fullUrlWithoutQuery('lang');
 
-            return redirect($url)->withCookie(cookie($cookieKey, $lang));
+            return redirect($url)->withCookie(cookie()->forever($cookieKey, $lang));
         }
 
         /** @var string */
