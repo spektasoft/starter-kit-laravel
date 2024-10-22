@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\PersonalAccessToken;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Laravel\Jetstream\Features;
 use Laravel\Jetstream\Http\Livewire\ApiTokenManager;
@@ -22,6 +24,7 @@ class DeleteApiTokenTest extends TestCase
 
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
+        /** @var PersonalAccessToken */
         $token = $user->tokens()->create([
             'name' => 'Test Token',
             'token' => Str::random(40),
@@ -32,6 +35,8 @@ class DeleteApiTokenTest extends TestCase
             ->set(['apiTokenIdBeingDeleted' => $token->id])
             ->call('deleteApiToken');
 
-        $this->assertCount(0, $user->fresh()->tokens);
+        /** @var Collection<int, PersonalAccessToken> */
+        $tokens = $user->fresh()?->tokens;
+        $this->assertCount(0, $tokens);
     }
 }

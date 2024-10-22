@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class LoginTest extends TestCase
 {
-    public function test_login_can_be_rendered()
+    public function test_login_can_be_rendered(): void
     {
         Livewire::test(Login::class)
             ->assertStatus(200);
