@@ -11,14 +11,14 @@ class FailedJobTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_job_is_failed()
+    public function test_job_is_failed(): void
     {
         $job = (new FailedJob)->withFakeQueueInteractions();
         $job->handle();
         $job->assertFailed();
     }
 
-    public function test_job_is_dispatched_to_queue()
+    public function test_job_is_dispatched_to_queue(): void
     {
         Queue::fake();
         FailedJob::dispatch();

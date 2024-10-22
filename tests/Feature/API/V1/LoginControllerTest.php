@@ -11,7 +11,7 @@ class LoginControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_valid_credentials_return_token()
+    public function test_valid_credentials_return_token(): void
     {
         User::factory()->create([
             'email' => 'test@example.com',
@@ -30,7 +30,7 @@ class LoginControllerTest extends TestCase
         ]);
     }
 
-    public function test_invalid_credentials_return_error()
+    public function test_invalid_credentials_return_error(): void
     {
         User::factory()->create([
             'email' => 'test@example.com',
@@ -49,7 +49,7 @@ class LoginControllerTest extends TestCase
         ]);
     }
 
-    public function test_missing_fields_return_error()
+    public function test_missing_fields_return_error(): void
     {
         $response = $this->postJson(route('api.v1.login'), [
             'email' => 'test@example.com',
@@ -61,7 +61,7 @@ class LoginControllerTest extends TestCase
         ]);
     }
 
-    public function test_invalid_email_format_return_error()
+    public function test_invalid_email_format_return_error(): void
     {
         $response = $this->postJson(route('api.v1.login'), [
             'email' => 'invalid-email',

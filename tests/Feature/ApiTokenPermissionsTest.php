@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\PersonalAccessToken;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -20,7 +21,10 @@ class ApiTokenPermissionsTest extends TestCase
             $this->markTestSkipped('API support is not enabled.');
         }
 
-        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+        /** @var User */
+        $user = User::factory()->withPersonalTeam()->create();
+
+        $this->actingAs($user);
 
         $token = $user->tokens()->create([
             'name' => 'Test Token',
@@ -38,8 +42,10 @@ class ApiTokenPermissionsTest extends TestCase
             ]])
             ->call('updateApiToken');
 
-        $this->assertTrue($user->fresh()->tokens->first()->can('delete'));
-        $this->assertFalse($user->fresh()->tokens->first()->can('read'));
-        $this->assertFalse($user->fresh()->tokens->first()->can('missing-permission'));
+        /** @var PersonalAccessToken */
+        $token = $user->fresh()?->tokens->first();
+        $this->assertTrue($token->can('delete'));
+        $this->assertFalse($token->can('read'));
+        $this->assertFalse($token->can('missing-permission'));
     }
 }

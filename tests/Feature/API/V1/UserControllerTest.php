@@ -10,7 +10,7 @@ class UserControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_authenticated_user_can_access_their_own_data()
+    public function test_authenticated_user_can_access_their_own_data(): void
     {
         /** @var User */
         $user = User::factory()->create();
@@ -24,7 +24,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    public function test_authenticated_user_can_access_their_own_data_using_sanctum_token()
+    public function test_authenticated_user_can_access_their_own_data_using_sanctum_token(): void
     {
         /** @var User */
         $user = User::factory()->create();
@@ -40,7 +40,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    public function test_unauthenticated_user_cannot_access_their_own_data()
+    public function test_unauthenticated_user_cannot_access_their_own_data(): void
     {
         $response = $this->getJson(route('api.v1.user'));
         $response->assertUnauthorized();
