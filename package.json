@@ -3,7 +3,10 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite --host",
+        "dev": "vite",
+        "dev:host": "vite --host",
+        "serve": "concurrently \"php artisan serve\" \"npm run dev\"",
+        "serve:host": "concurrently \"php artisan serve --host 0.0.0.0\" \"npm run dev:host\"",
         "update": "npx npm-check-updates --interactive --format group"
     },
     "devDependencies": {

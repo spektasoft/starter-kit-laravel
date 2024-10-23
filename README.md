@@ -8,32 +8,36 @@ This starter kit is meant to be used with [Starter Kit Expo](https://github.com/
 
 ## Local Development
 
-1. In your `.env` file, make sure you use URL with `IP Address` instead of `localhost`:
+If you want to develop a universal app, follow the instructions below. Otherwise, you can run the Laravel `artisan serve` command as usual.
+
+To run a universal app:
+
+1. In your `.env` file, use URL with `IP Address` instead of `localhost`. Replace `IP Address` with your own:
 
     ```
     APP_URL={SERVER_IP_ADRESS_URL}
-    # http://192.168.1.1:8000
+    # Example: http://192.168.1.1:8000
     ```
 
     ```
     SANCTUM_STATEFUL_DOMAINS={CLIENT_IP_ADDRESS_URL}
     # Separated with a comma (,)
-    # http://192.168.1.1:8000,http://192.168.1.2:8081
+    # Example: http://192.168.1.1:8081,http://192.168.1.2:8081
     ```
 
     ```
     VITE_HOST={SERVER_IP_ADRESS}
-    # 192.168.1.1
+    # Example: 192.168.1.1 (without http)
     ```
 
     ```
     SESSION_DOMAIN={SERVER_IP_ADRESS}
-    # 192.168.1.1
+    # Example: 192.168.1.1 (without http)
     ```
 
-1. Run `artisan` with `--host`:
+1. Run this `npm` command:
     ```
-    php artisan serve --host 0.0.0.0
+    npm run serve:host
     ```
 
 ## License
