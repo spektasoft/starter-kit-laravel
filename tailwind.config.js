@@ -9,7 +9,7 @@ export default {
         "./app/Filament/**/*.php",
         "./lang/**/*.php",
         "./resources/views/**/*.blade.php",
-        "./resources/js/**/*.js",
+        "./resources/ts/**/*.ts",
         "./storage/framework/views/*.php",
         "./vendor/filament/**/*.blade.php",
         "./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php",

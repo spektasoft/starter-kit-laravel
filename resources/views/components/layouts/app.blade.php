@@ -57,7 +57,7 @@
     @stack('modals')
 
     @filamentScripts(withCore: true)
-    @vite('resources/js/app.js')
+    @vite('resources/ts/app.ts')
     @livewireScripts
 </body>
 
