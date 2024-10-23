@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'v1'], function () {
     Route::post('/login', LoginController::class)
-        ->middleware('guest:'.config('fortify.guard'))
         ->name('api.v1.login');
 
     Route::group(['middleware' => 'auth:sanctum'], function () {
@@ -16,7 +15,6 @@ Route::group(['prefix' => 'v1'], function () {
         })->name('api.v1.user');
 
         Route::post('/logout', LogoutController::class)
-            ->middleware('guest:'.config('fortify.guard'))
             ->name('api.v1.logout');
     });
 });
