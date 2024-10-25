@@ -56,6 +56,9 @@ class AdminPanelProvider extends PanelProvider
                 EnsureEmailIsVerified::class,
                 Authenticate::class,
             ])
+            ->plugins([
+                \Awcodes\Curator\CuratorPlugin::make(),
+            ])
             ->userMenuItems([
                 MenuItem::make()
                     ->label(fn () => __('navigation-menu.menu.home'))
