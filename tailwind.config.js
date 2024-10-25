@@ -7,6 +7,7 @@ export default {
     presets: [preset],
     content: [
         "./app/Filament/**/*.php",
+        "./app/Livewire/**/*.php",
         "./lang/**/*.php",
         "./resources/views/**/*.blade.php",
         "./resources/ts/**/*.ts",

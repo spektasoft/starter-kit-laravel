@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 use Laravel\Fortify\Features;
+use Laravel\Jetstream\Jetstream;
 
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 {
@@ -27,6 +28,11 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             /** @var \Illuminate\Http\UploadedFile */
             $photo = $input['photo'];
             $user->updateProfilePhoto($photo);
+        }
+
+        if (Jetstream::managesProfilePhotos()) {
+            $user->profilePhotoMedia()->associate($input['profile_photo_media_id'] ?? null);
+            $user->save();
         }
 
         if ($input['email'] !== $user->email) {

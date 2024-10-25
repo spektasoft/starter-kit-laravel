@@ -1,5 +1,5 @@
 <nav x-data="{ open: false }"
-    class="fixed left-0 z-50 w-full duration-500 bg-white dark:bg-gray-900 dark:border-gray-950/5 transition-top">
+    class="fixed left-0 z-10 w-full duration-500 bg-white dark:bg-gray-900 dark:border-gray-950/5 transition-top">
     <!-- Primary Navigation Menu -->
     <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">

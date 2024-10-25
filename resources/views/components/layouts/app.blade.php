@@ -54,7 +54,10 @@
         </main>
     </div>
 
+    <x-curator::modals.modal />
+
     @stack('modals')
+    @livewire('notifications')
 
     @filamentScripts(withCore: true)
     @vite('resources/ts/app.ts')
