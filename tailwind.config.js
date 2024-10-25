@@ -11,6 +11,7 @@ export default {
         "./resources/views/**/*.blade.php",
         "./resources/ts/**/*.ts",
         "./storage/framework/views/*.php",
+        "./vendor/awcodes/filament-curator/resources/**/*.blade.php",
         "./vendor/filament/**/*.blade.php",
         "./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php",
         "./vendor/laravel/jetstream/**/*.blade.php",
