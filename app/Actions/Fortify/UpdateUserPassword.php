@@ -3,6 +3,7 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\UpdatesUserPasswords;
@@ -28,5 +29,21 @@ class UpdateUserPassword implements UpdatesUserPasswords
         $user->forceFill([
             'password' => Hash::make($input['password']),
         ])->save();
+
+        if (request()->hasSession()) {
+            $authPassword = Auth::user()?->getAuthPassword();
+            $passwordHashWeb = 'password_hash_web';
+            if (request()->session()->get($passwordHashWeb, null) !== null) {
+                request()->session()->put([
+                    $passwordHashWeb => $authPassword,
+                ]);
+            }
+            $passwordHashSanctum = 'password_hash_sanctum';
+            if (request()->session()->get($passwordHashSanctum, null) !== null) {
+                request()->session()->put([
+                    $passwordHashSanctum => $authPassword,
+                ]);
+            }
+        }
     }
 }
