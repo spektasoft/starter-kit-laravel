@@ -37,10 +37,10 @@ return [
     'is_limited_to_directory' => false,
     'is_tenant_aware' => true,
     'tenant_ownership_relationship_name' => 'tenant',
-    'max_size' => 5000,
+    'max_size' => 100,
     'model' => \App\Models\Media::class,
     'min_size' => 0,
-    'path_generator' => null,
+    'path_generator' => Awcodes\Curator\PathGenerators\UserPathGenerator::class,
     'resources' => [
         'label' => 'Media',
         'plural_label' => 'Media',
@@ -57,8 +57,8 @@ return [
     'should_check_exists' => true,
     'visibility' => 'public',
     'tabs' => [
-        'display_curation' => true,
-        'display_upload_new' => true,
+        'display_curation' => false,
+        'display_upload_new' => false,
     ],
     'multi_select_key' => 'metaKey',
     'table' => [
