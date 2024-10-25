@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Jetstream\Features;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\Jetstream;
 use Laravel\Sanctum\HasApiTokens;
@@ -18,11 +19,11 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable implements HasAvatar, MustVerifyEmail
 {
     use HasApiTokens;
+
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
 
     use HasProfilePhoto;
-
     use HasUlids;
     use Notifiable;
     use TwoFactorAuthenticatable;
@@ -58,6 +59,26 @@ class User extends Authenticatable implements HasAvatar, MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Delete the user's profile photo.
+     *
+     * @return void
+     */
+    public function deleteProfilePhotoMedia()
+    {
+        if (! Features::managesProfilePhotos()) {
+            return;
+        }
+
+        if (is_null($this->profile_photo_media_id)) {
+            return;
+        }
+
+        $this->forceFill([
+            'profile_photo_media_id' => null,
+        ])->save();
     }
 
     public function getFilamentAvatarUrl(): ?string
