@@ -22,6 +22,7 @@ export default {
         extend: {
             colors: {
                 primary: colors["indigo"],
+                secondary: colors["emerald"],
             },
             fontFamily: {
                 sans: ["Figtree", ...defaultTheme.fontFamily.sans],
