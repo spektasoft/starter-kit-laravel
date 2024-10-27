@@ -16,6 +16,7 @@ export default {
         "./vendor/filament/**/*.blade.php",
         "./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php",
         "./vendor/laravel/jetstream/**/*.blade.php",
+        "<path-to-vendor>/awcodes/filament-tiptap-editor/resources/**/*.blade.php",
     ],
 
     theme: {
