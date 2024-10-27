@@ -23,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
     {
         FilamentColor::register([
             'primary' => Color::Indigo,
+            'secondary' => Color::Emerald,
         ]);
     }
 }
