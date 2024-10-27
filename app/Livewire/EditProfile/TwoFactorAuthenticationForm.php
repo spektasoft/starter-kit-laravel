@@ -15,6 +15,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Actions\ConfirmTwoFactorAuthentication;
 use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
 use Laravel\Fortify\Actions\EnableTwoFactorAuthentication;
@@ -66,6 +67,28 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
      * @var string|null
      */
     public $code;
+
+    /**
+     * Confirm two factor authentication for the user.
+     */
+    public function confirmTwoFactorAuthentication(ConfirmTwoFactorAuthentication $confirm): void
+    {
+        $this->resetErrorBag();
+
+        if ($this->code === null) {
+            throw ValidationException::withMessages([
+                'code' => [__('The provided two factor authentication code was invalid.')],
+            ])->errorBag('confirmTwoFactorAuthentication');
+        }
+
+        $confirm(Auth::user(), $this->code);
+
+        $this->showingQrCode = false;
+        $this->showingConfirmation = false;
+        $this->showingRecoveryCodes = true;
+
+        $this->dispatch('refresh-two-factor-authentication');
+    }
 
     /**
      * Mount the component.
@@ -175,28 +198,12 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
     }
 
     /**
-     * Confirm two factor authentication for the user.
-     */
-    public function confirmTwoFactorAuthentication(ConfirmTwoFactorAuthentication $confirm): void
-    {
-        if ($this->code === null) {
-            return;
-        }
-
-        $confirm(Auth::user(), $this->code);
-
-        $this->showingQrCode = false;
-        $this->showingConfirmation = false;
-        $this->showingRecoveryCodes = true;
-
-        $this->dispatch('refresh-two-factor-authentication');
-    }
-
-    /**
      * Enable two factor authentication for the user.
      */
     private function enableTwoFactorAuthentication(EnableTwoFactorAuthentication $enable): void
     {
+        $this->resetErrorBag();
+
         $enable(Auth::user());
 
         $this->showingQrCode = true;
@@ -213,6 +220,8 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
      */
     private function disableTwoFactorAuthentication(DisableTwoFactorAuthentication $disable): void
     {
+        $this->resetErrorBag();
+
         $disable(Auth::user());
 
         $this->showingQrCode = false;
@@ -247,9 +256,9 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
                         ->label(__('Code'))
                         ->numeric()
                         ->autocomplete('one-time-code')
-                        ->name('code')
                         ->model('code')
                         ->extraAttributes(['wire:keydown.enter' => 'confirmTwoFactorAuthentication'])
+                        ->extraInputAttributes(['name' => 'code'])
                 );
             }
         }
@@ -338,6 +347,8 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
      */
     public function regenerateRecoveryCodes(GenerateNewRecoveryCodes $generate): void
     {
+        $this->resetErrorBag();
+
         $generate(Auth::user());
 
         $this->showingRecoveryCodes = true;
