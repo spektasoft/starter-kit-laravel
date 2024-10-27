@@ -3,22 +3,36 @@
 namespace App\Livewire\Api;
 
 use App\Concerns\HasUser;
+use App\Models\PersonalAccessToken;
+use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\ComponentContainer;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Support\Enums\Alignment;
+use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Jetstream\Jetstream;
 use Livewire\Component;
 
 /**
  * @property Form $form
+ * @property Table $table
  */
-class ApiTokenManage extends Component implements HasForms
+class ApiTokenManage extends Component implements HasForms, HasTable
 {
     use HasUser;
     use InteractsWithForms;
+    use InteractsWithTable;
 
     /**
      * The plain text token value.
@@ -26,6 +40,20 @@ class ApiTokenManage extends Component implements HasForms
      * @var string|null
      */
     public $plainTextToken = null;
+
+    /**
+     * The token name.
+     *
+     * @var string|null
+     */
+    public $name = null;
+
+    /**
+     * The token permissions.
+     *
+     * @var string[]
+     */
+    public $permissions = [];
 
     /**
      * @var array<string, mixed> | null
@@ -42,6 +70,12 @@ class ApiTokenManage extends Component implements HasForms
         $data['permissions'] = Jetstream::$defaultPermissions;
 
         $this->form->fill($data);
+    }
+
+    public function closeModalTokenDisplay(): void
+    {
+        $this->plainTextToken = null;
+        $this->dispatch('close-modal', id: 'modal-token-display');
     }
 
     /**
@@ -75,6 +109,8 @@ class ApiTokenManage extends Component implements HasForms
         $this->form->fill();
 
         $this->openModalTokenDisplay();
+
+        $this->resetTable();
     }
 
     public function form(Form $form): Form
@@ -96,12 +132,11 @@ class ApiTokenManage extends Component implements HasForms
                     ]))
                     ->footerActions([
                         Forms\Components\Actions\Action::make('create')
-                            ->action('openModalTokenDisplay'),
+                            ->action('createApiToken'),
                     ])
                     ->footerActionsAlignment(Alignment::End)
                     ->aside(),
-            ])
-            ->statePath('data');
+            ]);
     }
 
     public function getTokenDisplayForm(): Form
@@ -119,14 +154,87 @@ class ApiTokenManage extends Component implements HasForms
             ]);
     }
 
-    public function closeModalTokenDisplay(): void
-    {
-        $this->plainTextToken = null;
-        $this->dispatch('close-modal', id: 'modal-token-display');
-    }
-
     public function openModalTokenDisplay(): void
     {
         $this->dispatch('open-modal', id: 'modal-token-display');
+    }
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->query(PersonalAccessToken::query()
+                ->where('tokenable_id', $this->user->id)
+                ->where('tokenable_type', User::class))
+            ->heading(__('Manage API Tokens'))
+            ->description(__('You may delete any of your existing tokens if they are no longer needed.'))
+            ->columns([
+                Tables\Columns\TextColumn::make('name')
+                    ->label(__('Name'))
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('abilities')
+                    ->label(__('Permissions'))
+                    ->badge(),
+                Tables\Columns\TextColumn::make('last_used_at')
+                    ->label(__('Last used'))
+                    ->since()
+                    ->dateTimeTooltip()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('Created'))
+                    ->since()
+                    ->dateTimeTooltip()
+                    ->sortable(),
+            ])
+            ->actions([
+                /**
+                 * @source https://github.com/ArtMin96/filament-jet/blob/22c19af19b02a5e694b4edea6c05a424d0a924b3/src/Http/Livewire/ApiTokensTable.php#L80
+                 *
+                 * @license MIT
+                 */
+                Action::make('permissions')
+                    ->icon('heroicon-o-lock-closed')
+                    ->action(function (Model $record, array $data) {
+                        $record->forceFill([
+                            'abilities' => Jetstream::validPermissions($data['abilities']),
+                        ])->save();
+
+                        Notification::make()
+                            ->title(__('Done.'))
+                            ->success()
+                            ->send();
+                    })
+                    ->label(__('Permissions'))
+                    ->modalHeading(__('API Token Permissions'))
+                    ->modalWidth('2xl')
+                    ->mountUsing(
+                        fn (ComponentContainer $form, Model $record) => $form->fill($record->toArray())
+                    )
+                    ->form([
+                        Forms\Components\CheckboxList::make('abilities')
+                            ->label(__('Permissions'))
+                            ->options(collect(Jetstream::$permissions)->mapWithKeys(function (string $permission) {
+                                return [$permission => $permission];
+                            }))
+                            ->afterStateHydrated(function ($component, $state) {
+                                $permissions = Jetstream::$permissions;
+
+                                $tokenPermissions = collect($permissions)
+                                    ->filter(function ($permission) use ($state) {
+                                        return in_array($permission, $state);
+                                    })
+                                    ->values()
+                                    ->toArray();
+
+                                $component->state($tokenPermissions);
+                            })
+                            ->columns(2),
+                    ])
+                    ->modalFooterActionsAlignment(Alignment::End),
+                DeleteAction::make(),
+            ])
+            ->bulkActions([
+                DeleteBulkAction::make(),
+            ]);
     }
 }

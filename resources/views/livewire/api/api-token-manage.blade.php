@@ -3,6 +3,10 @@
         {{ $this->form }}
     </x-form>
 
+    <div class="mx-4 mt-4 sm:mx-0">
+        {{ $this->table }}
+    </div>
+
     <x-filament::modal id="modal-token-display" :close-by-escaping="false" :close-by-clicking-away="false" :close-button="false" width="2xl">
         <x-slot name="heading">
             {{ __('API Token') }}
