@@ -19,7 +19,9 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
             $this->markTestSkipped('Two factor authentication is not enabled.');
         }
 
-        $this->actingAs($user = User::factory()->create());
+        /** @var User */
+        $user = User::factory()->create();
+        $this->actingAs($user);
 
         $this->withSession(['auth.password_confirmed_at' => time()]);
 
@@ -28,7 +30,7 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
 
         $user = $user->fresh();
 
-        $this->assertNotNull($user->two_factor_secret);
+        $this->assertNotNull($user?->two_factor_secret);
         $this->assertCount(8, $user->recoveryCodes());
     }
 
@@ -38,7 +40,9 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
             $this->markTestSkipped('Two factor authentication is not enabled.');
         }
 
-        $this->actingAs($user = User::factory()->create());
+        /** @var User */
+        $user = User::factory()->create();
+        $this->actingAs($user);
 
         $this->withSession(['auth.password_confirmed_at' => time()]);
 
@@ -46,12 +50,16 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
             ->call('enableTwoFactorAuthentication')
             ->call('regenerateRecoveryCodes');
 
+        /** @var User */
         $user = $user->fresh();
 
         $component->call('regenerateRecoveryCodes');
 
+        /** @var User */
+        $freshUser = $user->fresh();
+
         $this->assertCount(8, $user->recoveryCodes());
-        $this->assertCount(8, array_diff($user->recoveryCodes(), $user->fresh()->recoveryCodes()));
+        $this->assertCount(8, array_diff($user->recoveryCodes(), $freshUser->recoveryCodes()));
     }
 
     public function test_two_factor_authentication_can_be_disabled(): void
@@ -60,17 +68,23 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
             $this->markTestSkipped('Two factor authentication is not enabled.');
         }
 
-        $this->actingAs($user = User::factory()->create());
+        /** @var User */
+        $user = User::factory()->create();
+        $this->actingAs($user);
 
         $this->withSession(['auth.password_confirmed_at' => time()]);
 
         $component = Livewire::test(TwoFactorAuthenticationForm::class)
             ->call('enableTwoFactorAuthentication');
 
-        $this->assertNotNull($user->fresh()->two_factor_secret);
+        /** @var User */
+        $freshUser = $user->fresh();
+        $this->assertNotNull($freshUser->two_factor_secret);
 
         $component->call('disableTwoFactorAuthentication');
 
-        $this->assertNull($user->fresh()->two_factor_secret);
+        /** @var User */
+        $freshUser = $user->fresh();
+        $this->assertNull($freshUser->two_factor_secret);
     }
 }

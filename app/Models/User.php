@@ -4,16 +4,22 @@ namespace App\Models;
 
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Jetstream\Features;
 use Laravel\Jetstream\HasProfilePhoto;
+use Laravel\Jetstream\Jetstream;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements HasAvatar, MustVerifyEmail, FilamentUser
 {
     use HasApiTokens;
 
@@ -31,6 +37,7 @@ class User extends Authenticatable implements FilamentUser
      * The attributes that are mass assignable.
      */
     protected $fillable = [
+        'profile_photo_media_id',
         'name',
         'email',
         'password',
@@ -47,13 +54,6 @@ class User extends Authenticatable implements FilamentUser
     ];
 
     /**
-     * The accessors to append to the model's array form.
-     */
-    protected $appends = [
-        'profile_photo_url',
-    ];
-
-    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -64,5 +64,54 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Delete the user's profile photo.
+     *
+     * @return void
+     */
+    public function deleteProfilePhotoMedia()
+    {
+        if (! Features::managesProfilePhotos()) {
+            return;
+        }
+
+        if (is_null($this->profile_photo_media_id)) {
+            return;
+        }
+
+        $this->forceFill([
+            'profile_photo_media_id' => null,
+        ])->save();
+    }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        if (Jetstream::managesProfilePhotos()) {
+            return $this->profilePhotoMedia?->getSignedUrl();
+        }
+
+        return null;
+    }
+
+    /**
+     * Get all of the media for the User
+     *
+     * @return HasMany<Media, $this>
+     */
+    public function media(): HasMany
+    {
+        return $this->hasMany(Media::class, 'creator_id');
+    }
+
+    /**
+     * Get the profilePhotoMedia that owns the User
+     *
+     * @return BelongsTo<Media, $this>
+     */
+    public function profilePhotoMedia(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'profile_photo_media_id');
     }
 }

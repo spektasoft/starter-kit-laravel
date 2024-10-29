@@ -10,12 +10,10 @@
         </button>
     </x-slot>
     <x-filament::dropdown.list>
-        <x-filament::dropdown.list.item wire:navigate href="{{ request()->fullUrlWithQuery(['lang' => 'id']) }}"
-            tag="a">
+        <x-filament::dropdown.list.item href="{{ request()->fullUrlWithQuery(['lang' => 'id']) }}" tag="a">
             Bahasa Indonesia
         </x-filament::dropdown.list.item>
-        <x-filament::dropdown.list.item wire:navigate href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}"
-            tag="a">
+        <x-filament::dropdown.list.item href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}" tag="a">
             English
         </x-filament::dropdown.list.item>
     </x-filament::dropdown.list>

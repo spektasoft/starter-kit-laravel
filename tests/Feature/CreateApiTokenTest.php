@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\PersonalAccessToken;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Laravel\Jetstream\Features;
 use Laravel\Jetstream\Http\Livewire\ApiTokenManager;
 use Livewire\Livewire;
@@ -31,9 +33,14 @@ class CreateApiTokenTest extends TestCase
             ]])
             ->call('createApiToken');
 
-        $this->assertCount(1, $user->fresh()->tokens);
-        $this->assertEquals('Test Token', $user->fresh()->tokens->first()->name);
-        $this->assertTrue($user->fresh()->tokens->first()->can('read'));
-        $this->assertFalse($user->fresh()->tokens->first()->can('delete'));
+        /** @var Collection<int, PersonalAccessToken> */
+        $tokens = $user->fresh()?->tokens;
+        $this->assertCount(1, $tokens);
+
+        /** @var PersonalAccessToken */
+        $token = $tokens->first();
+        $this->assertEquals('Test Token', $token->name);
+        $this->assertTrue($token->can('read'));
+        $this->assertFalse($token->can('delete'));
     }
 }

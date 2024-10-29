@@ -1,7 +1,15 @@
+@import "/node_modules/cropperjs/dist/cropper.css";
+@import "/vendor/awcodes/filament-curator/resources/css/plugin.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 [x-cloak] {
     display: none;
+}
+
+/* Filament Curator media directory overflow fix */
+dl.grid.md\:grid-cols-3.gap-6 {
+    @apply overflow-auto md:overflow-hidden;
 }

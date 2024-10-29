@@ -27,7 +27,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite('resources/css/app.css')
 
     <!-- Styles -->
     @filamentStyles
@@ -35,33 +35,32 @@
     @livewireStyles
 </head>
 
-<body class="font-sans antialiased">
-    @auth
-        @livewire('navigation-menu')
-    @endauth
-    <div class="min-h-screen">
-        <div class="bg-white dark:bg-gray-900">
-            <!-- Page Heading -->
-            @if (isset($header))
-                <header class="shadow">
-                    <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endif
+<body class="font-sans antialiased text-black bg-white dark:text-white dark:bg-gray-900">
+    @livewire('navigation-menu')
+    <div class="pt-16">
+        <!-- Page Heading -->
+        @if (isset($header))
+            <header class="shadow">
+                <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    {{ $header }}
+                </div>
+            </header>
+        @endif
 
-            <!-- Page Content -->
-            <main class="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
-                <x-banner />
-                <div class="flex-grow">{{ $slot }}</div>
-            </main>
-        </div>
+        <!-- Page Content -->
+        <main class="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
+            <x-banner />
+            <div class="flex-grow">{{ $slot }}</div>
+        </main>
     </div>
 
+    <x-curator::modals.modal />
+
     @stack('modals')
+    @livewire('notifications')
 
     @filamentScripts(withCore: true)
-    @vite('resources/js/app.js')
+    @vite('resources/ts/app.ts')
     @livewireScripts
 </body>
 
