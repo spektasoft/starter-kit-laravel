@@ -5,9 +5,11 @@ namespace App\Http\Controllers\API\V1;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
 use Laravel\Fortify\Events\RecoveryCodeReplaced;
+use Laravel\Fortify\Fortify;
 
 class TwoFactorChallengeController
 {
@@ -15,11 +17,11 @@ class TwoFactorChallengeController
     {
         try {
             $request->validate([
-                'email' => 'required|email',
+                Fortify::username() => 'required',
             ]);
 
             /** @var string */
-            $email = $request->email;
+            $username = $request->{Fortify::username()};
             /** @var string */
             $code = $request->code;
             /** @var string */
@@ -27,11 +29,15 @@ class TwoFactorChallengeController
             /** @var string */
             $deviceName = $request->device_name;
 
-            $user = User::where('email', $email)->first();
+            if (config('fortify.lowercase_usernames')) {
+                $username = Str::lower($username);
+            }
+
+            $user = User::where(Fortify::username(), $username)->first();
 
             if (! $user) {
                 throw ValidationException::withMessages([
-                    'email' => ['The provided credentials are incorrect.'],
+                    Fortify::username() => ['The provided credentials are incorrect.'],
                 ]);
             }
 
@@ -72,18 +78,14 @@ class TwoFactorChallengeController
         /** @var string */
         $secret = decrypt($twoFactorSecret);
 
-        return tap(app(TwoFactorAuthenticationProvider::class)->verify($secret, $code), function ($result) {
-            return $result;
-        });
+        return app(TwoFactorAuthenticationProvider::class)->verify($secret, $code);
     }
 
     private function verifyAndReplaceValidRecoveryCode(User $user, string $recoveryCode): bool
     {
         /** @var string | null */
-        $code = tap(collect($user->recoveryCodes())->first(function ($code) use ($recoveryCode) {
+        $code = collect($user->recoveryCodes())->first(function ($code) use ($recoveryCode) {
             return hash_equals($code, $recoveryCode) ? $code : null;
-        }), function ($code) {
-            return $code;
         });
 
         if ($code === null) {
