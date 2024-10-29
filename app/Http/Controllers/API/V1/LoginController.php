@@ -6,7 +6,11 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Laravel\Fortify\Features;
+use Laravel\Fortify\Fortify;
+use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class LoginController
 {
@@ -14,24 +18,36 @@ class LoginController
     {
         try {
             $request->validate([
-                'email' => 'required|email',
+                Fortify::username() => 'required',
                 'password' => 'required',
                 'device_name' => 'required',
             ]);
 
             /** @var string */
-            $email = $request->email;
+            $username = $request->{Fortify::username()};
             /** @var string */
             $password = $request->password;
             /** @var string */
             $device_name = $request->device_name;
 
-            $user = User::where('email', $email)->first();
+            if (config('fortify.lowercase_usernames')) {
+                $username = Str::lower($username);
+            }
+
+            $user = User::where(Fortify::username(), $username)->first();
 
             if (! $user || ! Hash::check($password, $user->password)) {
                 throw ValidationException::withMessages([
-                    'email' => ['The provided credentials are incorrect.'],
+                    Fortify::username() => ['The provided credentials are incorrect.'],
                 ]);
+            }
+
+            if (Features::enabled(Features::twoFactorAuthentication())) {
+                if ($user->two_factor_secret &&
+                ! is_null($user->two_factor_confirmed_at) &&
+                in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user))) {
+                    return response()->json(['two_factor' => true]);
+                }
             }
 
             $token = $user->createToken($device_name, ['*'])->plainTextToken;
