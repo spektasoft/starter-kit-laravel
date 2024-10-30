@@ -8,7 +8,6 @@ use Tests\TestCase;
 
 class ApiTokenManageTest extends TestCase
 {
-    /** @test */
     public function test_API_token_manager_can_be_rendered(): void
     {
         Livewire::test(ApiTokenManage::class)

@@ -8,7 +8,6 @@ use Tests\TestCase;
 
 class UpdatePasswordFormTest extends TestCase
 {
-    /** @test */
     public function test_update_password_form_can_be_rendered(): void
     {
         Livewire::test(UpdatePasswordForm::class)

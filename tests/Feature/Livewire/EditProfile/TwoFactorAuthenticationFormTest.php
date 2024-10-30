@@ -8,7 +8,6 @@ use Tests\TestCase;
 
 class TwoFactorAuthenticationFormTest extends TestCase
 {
-    /** @test */
     public function test_two_factor_authentication_form_can_be_rendered(): void
     {
         Livewire::test(TwoFactorAuthenticationForm::class)
