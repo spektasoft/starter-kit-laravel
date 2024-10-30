@@ -30,10 +30,12 @@ class LogoutOtherBrowserSessionsForm extends Component implements HasForms
         return $form
             ->schema([
                 Section::make()
+                    ->key('section')
                     ->heading(__('Browser Sessions'))
                     ->description(__('Manage and log out your active sessions on other browsers and devices.'))
                     ->schema([
                         ComponentsView::make('browser-sessions')
+                            ->key('browser-sessions')
                             ->view('components.browser-sessions'),
                     ])
                     ->footerActions([
