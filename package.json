@@ -5,8 +5,6 @@
         "build": "vite build",
         "dev": "vite",
         "dev:host": "vite --host",
-        "serve": "concurrently \"php artisan serve\" \"npm run dev\"",
-        "serve:host": "concurrently \"php artisan serve --host 0.0.0.0\" \"npm run dev:host\"",
         "update": "npx npm-check-updates --interactive --format group",
         "lint": "eslint . --ext ts && tsc --noEmit --strict"
     },
