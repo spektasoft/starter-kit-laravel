@@ -2,16 +2,53 @@
 
 namespace Tests\Feature\Livewire\EditProfile;
 
-use Laravel\Jetstream\Http\Livewire\UpdateProfileInformationForm;
+use App\Livewire\EditProfile\UpdateProfileInformationForm;
+use App\Models\User;
+use Filament\Forms\Form;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
 
 class UpdateProfileInformationFormTest extends TestCase
 {
-    /** @test */
+    use RefreshDatabase;
+
     public function test_update_profile_information_form_can_be_rendered(): void
     {
+        /** @var User */
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
         Livewire::test(UpdateProfileInformationForm::class)
             ->assertStatus(200);
+    }
+
+    public function test_current_profile_information_is_available(): void
+    {
+        /** @var User */
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        /** @var Form */
+        $form = Livewire::test(UpdateProfileInformationForm::class)->instance()->form;
+
+        $this->assertEquals($user->name, $form->getState()['name']);
+        $this->assertEquals($user->email, $form->getState()['email']);
+    }
+
+    public function test_profile_information_can_be_updated(): void
+    {
+        /** @var User */
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        Livewire::test(UpdateProfileInformationForm::class)
+            ->fillForm(['name' => 'Test Name', 'email' => 'test@example.com'])
+            ->call('updateProfileInformation');
+
+        /** @var User */
+        $freshUser = $user->fresh();
+        $this->assertEquals('Test Name', $freshUser->name);
+        $this->assertEquals('test@example.com', $freshUser->email);
     }
 }

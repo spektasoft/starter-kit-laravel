@@ -12,6 +12,8 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 use Laravel\Jetstream\Contracts\DeletesUsers;
 use Livewire\Component;
 
@@ -28,7 +30,7 @@ class DeleteUserForm extends Component implements HasForms
                     ->heading(__('Delete Account'))
                     ->description(__('Permanently delete your account.'))
                     ->schema([
-                        View::make('browser-sessions')
+                        View::make('delete-account')
                             ->view('components.raw', ['html' => '<div class="max-w-xl text-sm text-gray-600 dark:text-gray-400">'.__('Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.').'</div>']),
                     ])
                     ->footerActions([
@@ -40,7 +42,8 @@ class DeleteUserForm extends Component implements HasForms
                                 $this->deleteUser(
                                     app(Request::class),
                                     app(DeletesUsers::class),
-                                    app(StatefulGuard::class)
+                                    app(StatefulGuard::class),
+                                    $data['current_password']
                                 );
                             }),
                     ])
@@ -52,9 +55,15 @@ class DeleteUserForm extends Component implements HasForms
     /**
      * Delete the current user.
      */
-    public function deleteUser(Request $request, DeletesUsers $deleter, StatefulGuard $auth): void
+    public function deleteUser(Request $request, DeletesUsers $deleter, StatefulGuard $auth, string $password): void
     {
         $this->resetErrorBag();
+
+        if (! Hash::check($password, $this->user->password)) {
+            throw ValidationException::withMessages([
+                'password' => [__('This password does not match our records.')],
+            ]);
+        }
 
         /** @var User */
         $freshUser = $this->user->fresh();
