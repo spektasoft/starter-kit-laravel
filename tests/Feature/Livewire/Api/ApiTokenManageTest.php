@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Livewire\API;
+namespace Tests\Feature\Livewire\Api;
 
 use App\Livewire\Api\ApiTokenManage;
 use App\Models\PersonalAccessToken;
@@ -128,5 +128,41 @@ class ApiTokenManageTest extends TestCase
         $this->assertTrue($token->can('delete'));
         $this->assertFalse($token->can('read'));
         $this->assertFalse($token->can('missing-permission'));
+    }
+
+    public function test_api_tokens_can_be_deleted(): void
+    {
+        if (! Features::hasApiFeatures()) {
+            $this->markTestSkipped('API support is not enabled.');
+        }
+
+        /** @var User */
+        $user = User::factory()->withPersonalTeam()->create();
+
+        $this->actingAs($user);
+
+        $user->tokens()->create([
+            'name' => 'Test Token',
+            'token' => Str::random(40),
+            'abilities' => ['create', 'read'],
+        ]);
+
+        /** @var Table */
+        $table = Livewire::test(ApiTokenManage::class)->instance()->getTable();
+
+        /** @var Action */
+        $action = collect($table->getActions())->first(function ($action) {
+            if ($action instanceof ActionGroup) {
+                return false;
+            }
+
+            return $action->getName() === 'delete';
+        });
+
+        $action->call();
+
+        /** @var Collection<int, PersonalAccessToken> */
+        $tokens = $user->fresh()?->tokens;
+        $this->assertCount(0, $tokens);
     }
 }
