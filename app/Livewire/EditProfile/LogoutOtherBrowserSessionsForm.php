@@ -17,6 +17,8 @@ use Filament\Notifications\Notification;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 use Laravel\Jetstream\Agent;
 use Livewire\Component;
 
@@ -93,6 +95,12 @@ class LogoutOtherBrowserSessionsForm extends Component implements HasForms
         }
 
         $this->resetErrorBag();
+
+        if (! Hash::check($password, $this->user->password)) {
+            throw ValidationException::withMessages([
+                'password' => [__('This password does not match our records.')],
+            ]);
+        }
 
         $guard->logoutOtherDevices($password);
 
