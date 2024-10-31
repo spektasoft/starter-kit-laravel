@@ -5,7 +5,6 @@ namespace App\Livewire\EditProfile;
 use App\Concerns\HasUser;
 use App\Filament\Actions\PasswordConfirmationAction;
 use App\Models\User;
-use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
@@ -15,6 +14,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Actions\ConfirmTwoFactorAuthentication;
 use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
@@ -25,6 +25,8 @@ use Livewire\Component;
 
 /**
  * @property Form $form
+ *
+ * @method void refresh()
  */
 class TwoFactorAuthenticationForm extends Component implements HasForms
 {
@@ -69,6 +71,21 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
     public $code;
 
     /**
+     * Mount the component.
+     *
+     * @return void
+     */
+    public function mount()
+    {
+        /** @var User */
+        $user = Auth::user();
+        if (Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm') &&
+            is_null($user->two_factor_confirmed_at)) {
+            app(DisableTwoFactorAuthentication::class)(Auth::user());
+        }
+    }
+
+    /**
      * Confirm two factor authentication for the user.
      */
     public function confirmTwoFactorAuthentication(ConfirmTwoFactorAuthentication $confirm): void
@@ -91,18 +108,45 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
     }
 
     /**
-     * Mount the component.
-     *
-     * @return void
+     * Disable two factor authentication for the user.
      */
-    public function mount()
+    public function disableTwoFactorAuthentication(DisableTwoFactorAuthentication $disable, ?string $password = null): void
     {
-        /** @var User */
-        $user = Auth::user();
-        if (Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm') &&
-            is_null($user->two_factor_confirmed_at)) {
-            app(DisableTwoFactorAuthentication::class)(Auth::user());
+        $this->resetErrorBag();
+
+        if ($this->user->two_factor_confirmed_at) {
+            $this->confirmPassword($password);
         }
+
+        $disable($this->user);
+
+        $this->showingQrCode = false;
+        $this->showingConfirmation = false;
+        $this->showingRecoveryCodes = false;
+
+        $this->dispatch('refresh-two-factor-authentication');
+    }
+
+    /**
+     * Enable two factor authentication for the user.
+     */
+    public function enableTwoFactorAuthentication(EnableTwoFactorAuthentication $enable, ?string $password): void
+    {
+        $this->resetErrorBag();
+
+        $this->confirmPassword($password);
+
+        $enable(Auth::user());
+
+        $this->showingQrCode = true;
+
+        if (Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm')) {
+            $this->showingConfirmation = true;
+        } else {
+            $this->showingRecoveryCodes = true;
+        }
+
+        $this->dispatch('refresh-two-factor-authentication');
     }
 
     public function form(Form $form): Form
@@ -118,8 +162,8 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
                         View::make('instruction')
                             ->view('components.two-factor-authentication-form.instruction'),
                         ...$this->getComponents(),
-                        Actions::make($this->getFooterActions()),
                     ])
+                    ->footerActions($this->getFooterActions())
                     ->aside(),
             ]);
     }
@@ -184,6 +228,20 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
         }
     }
 
+    /**
+     * Generate new recovery codes for the user.
+     */
+    public function regenerateRecoveryCodes(GenerateNewRecoveryCodes $generate, ?string $password): void
+    {
+        $this->resetErrorBag();
+
+        $this->confirmPassword($password);
+
+        $generate(Auth::user());
+
+        $this->showingRecoveryCodes = true;
+    }
+
     public function showTwoFactorQrCodeSvg(): string
     {
         if (! $this->getEnabledProperty()) {
@@ -197,38 +255,26 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
         }
     }
 
-    /**
-     * Enable two factor authentication for the user.
-     */
-    private function enableTwoFactorAuthentication(EnableTwoFactorAuthentication $enable): void
+    private function confirmPassword(?string $password): void
     {
-        $this->resetErrorBag();
+        if (! $this->isConfirmPasswordNeeded()) {
+            return;
+        }
 
-        $enable(Auth::user());
-
-        $this->showingQrCode = true;
-
-        if (Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm')) {
-            $this->showingConfirmation = true;
-        } else {
-            $this->showingRecoveryCodes = true;
+        if (! $password || ! Hash::check($password, $this->user->password)) {
+            throw ValidationException::withMessages([
+                'password' => [__('This password does not match our records.')],
+            ]);
         }
     }
 
-    /**
-     * Disable two factor authentication for the user.
-     */
-    private function disableTwoFactorAuthentication(DisableTwoFactorAuthentication $disable): void
+    private function getProbablePasswordConfirmationAction(string $name): Action
     {
-        $this->resetErrorBag();
+        if (! $this->isConfirmPasswordNeeded()) {
+            return Action::make($name);
+        }
 
-        $disable(Auth::user());
-
-        $this->showingQrCode = false;
-        $this->showingConfirmation = false;
-        $this->showingRecoveryCodes = false;
-
-        $this->dispatch('refresh-two-factor-authentication');
+        return PasswordConfirmationAction::make($name);
     }
 
     /**
@@ -282,25 +328,25 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
         $actions = collect();
 
         if (! $this->getEnabledProperty()) {
-            $actions->push(PasswordConfirmationAction::make('enable')
+            $actions->push($this->getProbablePasswordConfirmationAction('enable')
                 ->label(__('Enable'))
-                ->action(function (array $data): void {
-                    $this->enableTwoFactorAuthentication(
-                        app(EnableTwoFactorAuthentication::class)
-                    );
-                }));
+                ->action(fn (array $data) => $this->enableTwoFactorAuthentication(
+                    app(EnableTwoFactorAuthentication::class),
+                    $this->isConfirmPasswordNeeded() ? $data['current_password'] : null)
+                )
+            );
         } else {
             if ($this->showingRecoveryCodes) {
-                $actions->push(PasswordConfirmationAction::make('regenerateRecoveryCodes')
+                $actions->push($this->getProbablePasswordConfirmationAction('regenerateRecoveryCodes')
                     ->label(__('Regenerate Recovery Codes'))
-                    ->action(function (array $data) {
-                        $this->regenerateRecoveryCodes(app(GenerateNewRecoveryCodes::class));
-                    }));
+                    ->action(fn (array $data) => $this->regenerateRecoveryCodes(app(GenerateNewRecoveryCodes::class),
+                        $this->isConfirmPasswordNeeded() ? $data['current_password'] : null)));
                 $actions->push(Action::make('hideRecoveryCodes')
                     ->label(__('Close'))
                     ->color('secondary')
-                    ->action(function (array $data) {
+                    ->action(function () {
                         $this->showingRecoveryCodes = false;
+                        $this->showingQrCode = false;
                         $this->dispatch('refresh-two-factor-authentication');
                     }));
             } elseif ($this->showingConfirmation) {
@@ -312,10 +358,13 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
                         );
                     }));
             } else {
-                $actions->push(PasswordConfirmationAction::make('showRecoveryCodes')
+                $actions->push($this->getProbablePasswordConfirmationAction('showRecoveryCodes')
                     ->label(__('Show Recovery Codes'))
                     ->action(function (array $data) {
+                        $this->confirmPassword(
+                            $this->isConfirmPasswordNeeded() ? $data['current_password'] : null);
                         $this->showingRecoveryCodes = true;
+                        $this->dispatch('refresh-two-factor-authentication');
                     }));
             }
 
@@ -323,15 +372,14 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
                 $actions->push(Action::make('cancel')
                     ->label(__('Cancel'))
                     ->color('secondary')
-                    ->action(function (array $data) {
-                        $this->disableTwoFactorAuthentication(app(DisableTwoFactorAuthentication::class));
-                    }));
+                    ->action(fn () => $this->disableTwoFactorAuthentication(app(DisableTwoFactorAuthentication::class))));
             } else {
                 if (! $this->showingRecoveryCodes) {
-                    $actions->push(PasswordConfirmationAction::make('disable')
+                    $actions->push($this->getProbablePasswordConfirmationAction('disable')
                         ->label(__('Disable'))
                         ->color('danger')
-                        ->action(fn () => $this->disableTwoFactorAuthentication(app(DisableTwoFactorAuthentication::class))));
+                        ->action(fn (array $data) => $this->disableTwoFactorAuthentication(app(DisableTwoFactorAuthentication::class),
+                            $this->isConfirmPasswordNeeded() ? $data['current_password'] : null)));
                 }
             }
         }
@@ -342,15 +390,8 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
         return $arr;
     }
 
-    /**
-     * Generate new recovery codes for the user.
-     */
-    public function regenerateRecoveryCodes(GenerateNewRecoveryCodes $generate): void
+    private function isConfirmPasswordNeeded(): bool
     {
-        $this->resetErrorBag();
-
-        $generate(Auth::user());
-
-        $this->showingRecoveryCodes = true;
+        return Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword');
     }
 }
