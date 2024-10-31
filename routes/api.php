@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\API\V1\LoginController;
-use App\Http\Controllers\API\V1\LogoutController;
-use App\Http\Controllers\API\V1\TwoFactorChallengeController;
+use App\Http\Controllers\Api\V1\LoginController;
+use App\Http\Controllers\Api\V1\LogoutController;
+use App\Http\Controllers\Api\V1\TwoFactorChallengeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
