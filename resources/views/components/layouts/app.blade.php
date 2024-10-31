@@ -26,12 +26,9 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    <!-- Scripts -->
-    @vite('resources/css/app.css')
-
     <!-- Styles -->
     @filamentStyles
-    @vite('resources/css/app.css')
+    @vite(['resources/css/app.css'])
     @livewireStyles
 </head>
 
@@ -60,7 +57,7 @@
     @livewire('notifications')
 
     @filamentScripts(withCore: true)
-    @vite('resources/ts/app.ts')
+    @vite(['resources/ts/app.ts'])
     @livewireScripts
 </body>
 
