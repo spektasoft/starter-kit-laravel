@@ -6,6 +6,10 @@
 
 This starter kit is meant to be used with [Starter Kit Expo](https://github.com/spektasoft/starter-kit-expo).
 
+## Important Notice
+
+ULIDs are used as the default ID type.
+
 ## Local Development
 
 1. Download this repository and extract it anywhere in your local environment.
