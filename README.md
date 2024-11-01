@@ -6,11 +6,39 @@
 
 This starter kit is meant to be used with [Starter Kit Expo](https://github.com/spektasoft/starter-kit-expo).
 
+## Important Notice
+
+ULIDs are used as the default ID type.
+
 ## Local Development
 
-If you want to develop a universal app, follow the instructions below. Otherwise, you can run the Laravel `artisan serve` command as usual.
+1. Download this repository and extract it anywhere in your local environment.
 
-To run a universal app:
+1. Create the `.env` file:
+
+    ```
+    cp .env.example .env
+    ```
+
+1. Generate the `APP_KEY`:
+
+    ```
+    php artisan key:generate
+    ```
+
+1. Create the symbolic link for storage:
+
+    ```
+    php artisan storage:link
+    ```
+
+1. Run the app:
+
+    ```
+    composer run dev
+    ```
+
+To develop a universal app, follow the additional instructions below:
 
 1. In your `.env` file, use URL with `IP Address` instead of `localhost`. Replace `IP Address` with your own:
 
@@ -35,9 +63,9 @@ To run a universal app:
     # Example: 192.168.1.1 (without http)
     ```
 
-1. Run this `npm` command:
+1. Run the app:
     ```
-    npm run serve:host
+    composer run dev:host
     ```
 
 ## License
