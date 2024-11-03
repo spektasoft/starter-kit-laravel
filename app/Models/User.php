@@ -15,6 +15,7 @@ use Laravel\Jetstream\Features;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\Jetstream;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements HasAvatar, MustVerifyEmail
 {
@@ -27,6 +28,7 @@ class User extends Authenticatable implements HasAvatar, MustVerifyEmail
     use HasUlids;
     use Notifiable;
     use TwoFactorAuthenticatable;
+    use HasRoles;
 
     /**
      * The attributes that are mass assignable.

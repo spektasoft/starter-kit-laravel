@@ -59,6 +59,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 \Awcodes\Curator\CuratorPlugin::make(),
+                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make()
             ])
             ->userMenuItems([
                 MenuItem::make()
