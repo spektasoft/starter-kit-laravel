@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "413e4b9435bfb369bdc703740862d35e",
+    "content-hash": "f60104058d4cca22b443b10331d918b2",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -120,16 +120,16 @@
         },
         {
             "name": "awcodes/filament-curator",
-            "version": "v3.6.9",
+            "version": "v3.6.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/awcodes/filament-curator.git",
-                "reference": "67c448a520ed93ca4fd5c6de9f1e8152d22a6c96"
+                "reference": "b16efa26067386f697da68ea56eb2875704e59bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/awcodes/filament-curator/zipball/67c448a520ed93ca4fd5c6de9f1e8152d22a6c96",
-                "reference": "67c448a520ed93ca4fd5c6de9f1e8152d22a6c96",
+                "url": "https://api.github.com/repos/awcodes/filament-curator/zipball/b16efa26067386f697da68ea56eb2875704e59bc",
+                "reference": "b16efa26067386f697da68ea56eb2875704e59bc",
                 "shasum": ""
             },
             "require": {
@@ -189,7 +189,7 @@
             ],
             "support": {
                 "issues": "https://github.com/awcodes/filament-curator/issues",
-                "source": "https://github.com/awcodes/filament-curator/tree/v3.6.9"
+                "source": "https://github.com/awcodes/filament-curator/tree/v3.6.10"
             },
             "funding": [
                 {
@@ -197,7 +197,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-08-24T16:59:10+00:00"
+            "time": "2024-11-01T15:13:58+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -2905,16 +2905,16 @@
         },
         {
             "name": "laravel-lang/actions",
-            "version": "1.8.5",
+            "version": "1.8.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Laravel-Lang/actions.git",
-                "reference": "bc59d4a92e13d35d07a45265552a830c47fbe878"
+                "reference": "39d0617db1dab74a86b99acdd75597d7c10d525a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Laravel-Lang/actions/zipball/bc59d4a92e13d35d07a45265552a830c47fbe878",
-                "reference": "bc59d4a92e13d35d07a45265552a830c47fbe878",
+                "url": "https://api.github.com/repos/Laravel-Lang/actions/zipball/39d0617db1dab74a86b99acdd75597d7c10d525a",
+                "reference": "39d0617db1dab74a86b99acdd75597d7c10d525a",
                 "shasum": ""
             },
             "require": {
@@ -2966,9 +2966,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Laravel-Lang/actions/issues",
-                "source": "https://github.com/Laravel-Lang/actions/tree/1.8.5"
+                "source": "https://github.com/Laravel-Lang/actions/tree/1.8.6"
             },
-            "time": "2024-09-07T11:55:41+00:00"
+            "time": "2024-11-03T10:44:10+00:00"
         },
         {
             "name": "laravel-lang/attributes",
@@ -3318,16 +3318,16 @@
         },
         {
             "name": "laravel-lang/lang",
-            "version": "15.8.1",
+            "version": "15.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Laravel-Lang/lang.git",
-                "reference": "361a2b1bbf8078811e4cf2ea52c4e132d6a6f162"
+                "reference": "88dbca09821a7e49edf5a1a53160a2ec21ceb389"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Laravel-Lang/lang/zipball/361a2b1bbf8078811e4cf2ea52c4e132d6a6f162",
-                "reference": "361a2b1bbf8078811e4cf2ea52c4e132d6a6f162",
+                "url": "https://api.github.com/repos/Laravel-Lang/lang/zipball/88dbca09821a7e49edf5a1a53160a2ec21ceb389",
+                "reference": "88dbca09821a7e49edf5a1a53160a2ec21ceb389",
                 "shasum": ""
             },
             "require": {
@@ -3377,7 +3377,7 @@
                 "issues": "https://github.com/Laravel-Lang/lang/issues",
                 "source": "https://github.com/Laravel-Lang/lang"
             },
-            "time": "2024-10-02T14:08:06+00:00"
+            "time": "2024-11-03T10:29:41+00:00"
         },
         {
             "name": "laravel-lang/locale-list",
@@ -10240,16 +10240,16 @@
         },
         {
             "name": "larastan/larastan",
-            "version": "v2.9.9",
+            "version": "v2.9.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/larastan/larastan.git",
-                "reference": "148faa138f0d8acb7d85f4a55693d3e13b6048d2"
+                "reference": "9e7233d88f4f10796fadb8a2d85c5f2b55277c76"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/larastan/larastan/zipball/148faa138f0d8acb7d85f4a55693d3e13b6048d2",
-                "reference": "148faa138f0d8acb7d85f4a55693d3e13b6048d2",
+                "url": "https://api.github.com/repos/larastan/larastan/zipball/9e7233d88f4f10796fadb8a2d85c5f2b55277c76",
+                "reference": "9e7233d88f4f10796fadb8a2d85c5f2b55277c76",
                 "shasum": ""
             },
             "require": {
@@ -10319,7 +10319,7 @@
             ],
             "support": {
                 "issues": "https://github.com/larastan/larastan/issues",
-                "source": "https://github.com/larastan/larastan/tree/v2.9.9"
+                "source": "https://github.com/larastan/larastan/tree/v2.9.10"
             },
             "funding": [
                 {
@@ -10339,7 +10339,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2024-10-15T19:41:22+00:00"
+            "time": "2024-10-19T23:04:40+00:00"
         },
         {
             "name": "laravel/pail",
