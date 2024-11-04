@@ -21,6 +21,7 @@ use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
 use Laravel\Fortify\Actions\EnableTwoFactorAuthentication;
 use Laravel\Fortify\Actions\GenerateNewRecoveryCodes;
 use Laravel\Fortify\Features;
+use Laravel\Fortify\Fortify;
 use Livewire\Component;
 
 /**
@@ -257,7 +258,7 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
 
     private function confirmPassword(?string $password): void
     {
-        if (! $this->isConfirmPasswordNeeded()) {
+        if (! Fortify::confirmsTwoFactorAuthentication()) {
             return;
         }
 
@@ -270,7 +271,7 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
 
     private function getProbablePasswordConfirmationAction(string $name): Action
     {
-        if (! $this->isConfirmPasswordNeeded()) {
+        if (! Fortify::confirmsTwoFactorAuthentication()) {
             return Action::make($name);
         }
 
@@ -332,7 +333,7 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
                 ->label(__('Enable'))
                 ->action(fn (array $data) => $this->enableTwoFactorAuthentication(
                     app(EnableTwoFactorAuthentication::class),
-                    $this->isConfirmPasswordNeeded() ? $data['current_password'] : null)
+                    Fortify::confirmsTwoFactorAuthentication() ? $data['current_password'] : null)
                 )
             );
         } else {
@@ -340,7 +341,7 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
                 $actions->push($this->getProbablePasswordConfirmationAction('regenerateRecoveryCodes')
                     ->label(__('Regenerate Recovery Codes'))
                     ->action(fn (array $data) => $this->regenerateRecoveryCodes(app(GenerateNewRecoveryCodes::class),
-                        $this->isConfirmPasswordNeeded() ? $data['current_password'] : null)));
+                        Fortify::confirmsTwoFactorAuthentication() ? $data['current_password'] : null)));
                 $actions->push(Action::make('hideRecoveryCodes')
                     ->label(__('Close'))
                     ->color('secondary')
@@ -362,7 +363,7 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
                     ->label(__('Show Recovery Codes'))
                     ->action(function (array $data) {
                         $this->confirmPassword(
-                            $this->isConfirmPasswordNeeded() ? $data['current_password'] : null);
+                            Fortify::confirmsTwoFactorAuthentication() ? $data['current_password'] : null);
                         $this->showingRecoveryCodes = true;
                         $this->dispatch('refresh-two-factor-authentication');
                     }));
@@ -379,7 +380,7 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
                         ->label(__('Disable'))
                         ->color('danger')
                         ->action(fn (array $data) => $this->disableTwoFactorAuthentication(app(DisableTwoFactorAuthentication::class),
-                            $this->isConfirmPasswordNeeded() ? $data['current_password'] : null)));
+                            Fortify::confirmsTwoFactorAuthentication() ? $data['current_password'] : null)));
                 }
             }
         }
@@ -388,10 +389,5 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
         $arr = $actions->toArray();
 
         return $arr;
-    }
-
-    private function isConfirmPasswordNeeded(): bool
-    {
-        return Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword');
     }
 }

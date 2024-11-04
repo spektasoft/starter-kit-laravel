@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\V1;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
 use Laravel\Fortify\Events\RecoveryCodeReplaced;
@@ -17,11 +16,11 @@ class TwoFactorChallengeController
     {
         try {
             $request->validate([
-                Fortify::username() => 'required',
+                'login_id' => 'required',
             ]);
 
             /** @var string */
-            $username = $request->{Fortify::username()};
+            $loginId = $request->login_id;
             /** @var string */
             $code = $request->code;
             /** @var string */
@@ -29,11 +28,7 @@ class TwoFactorChallengeController
             /** @var string */
             $deviceName = $request->device_name;
 
-            if (config('fortify.lowercase_usernames')) {
-                $username = Str::lower($username);
-            }
-
-            $user = User::where(Fortify::username(), $username)->first();
+            $user = User::find($loginId);
 
             if (! $user) {
                 throw ValidationException::withMessages([

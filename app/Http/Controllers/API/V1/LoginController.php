@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
@@ -42,12 +41,17 @@ class LoginController
                 ]);
             }
 
-            if (Features::enabled(Features::twoFactorAuthentication())) {
+            if (Fortify::confirmsTwoFactorAuthentication()) {
                 if ($user->two_factor_secret &&
                 ! is_null($user->two_factor_confirmed_at) &&
                 in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user))) {
-                    return response()->json(['two_factor' => true]);
+                    return $this->twoFactorChallengeResponse($user);
                 }
+            }
+
+            if ($user->two_factor_secret &&
+            in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user))) {
+                return $this->twoFactorChallengeResponse($user);
             }
 
             $token = $user->createToken($device_name, ['*'])->plainTextToken;
@@ -64,5 +68,13 @@ class LoginController
                 'errors' => ['An unexpected error occurred.'],
             ], 500);
         }
+    }
+
+    private function twoFactorChallengeResponse(User $user): JsonResponse
+    {
+        return response()->json([
+            'login_id' => $user->getKey(),
+            'two_factor' => true,
+        ]);
     }
 }
