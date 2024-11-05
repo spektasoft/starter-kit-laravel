@@ -6,6 +6,7 @@ use App\Http\Resources\User\UserCollection;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -67,5 +68,19 @@ class UserController
                 'errors' => ['An unexpected error occurred.'],
             ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function destroy(User $user): JsonResponse
+    {
+        if (! request()->expectsJson()) {
+            abort(Response::HTTP_FORBIDDEN);
+        }
+
+        $user->delete();
+
+        return response()->json(
+            ['message' => 'User deleted successfully!'],
+            JsonResponse::HTTP_OK
+        );
     }
 }

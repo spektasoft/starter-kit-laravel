@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class UserControllerTest extends TestCase
@@ -73,7 +74,7 @@ class UserControllerTest extends TestCase
         $token = $user->createToken('test-token')->plainTextToken;
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$token,
-        ])->postJson(route('api.v1.users.create'), [
+        ])->postJson(route('api.v1.users.store'), [
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => 'password',
@@ -148,5 +149,21 @@ class UserControllerTest extends TestCase
 
         $response->assertStatus(JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
         $response->assertJsonStructure(['errors' => ['email']]);
+    }
+
+    public function test_delete_a_user(): void
+    {
+        /** @var User */
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $targetedUser = User::factory()->create();
+        $this->assertDatabaseHas('users', ['id' => $targetedUser->id]);
+
+        $response = $this->deleteJson(route('api.v1.users.destroy', $targetedUser->id));
+
+        $response->assertStatus(JsonResponse::HTTP_OK);
+        $response->assertJson(['message' => 'User deleted successfully!']);
+        $this->assertDatabaseMissing('users', ['id' => $targetedUser->id]);
     }
 }
