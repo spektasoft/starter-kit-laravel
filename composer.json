@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "adhocore/jwt": "^1.1",
         "awcodes/filament-curator": "^3.6.10",
         "bezhansalleh/filament-shield": "^3.2.6",
         "filament/filament": "^3.2.122",

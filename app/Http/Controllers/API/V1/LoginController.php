@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Contracts\Jwt;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,7 +14,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class LoginController
 {
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(Request $request, Jwt $jwt): JsonResponse
     {
         try {
             $request->validate([
@@ -45,13 +46,13 @@ class LoginController
                 if ($user->two_factor_secret &&
                 ! is_null($user->two_factor_confirmed_at) &&
                 in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user))) {
-                    return $this->twoFactorChallengeResponse($user);
+                    return $this->twoFactorChallengeResponse($user, $jwt);
                 }
             }
 
             if ($user->two_factor_secret &&
             in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user))) {
-                return $this->twoFactorChallengeResponse($user);
+                return $this->twoFactorChallengeResponse($user, $jwt);
             }
 
             $token = $user->createToken($device_name, ['*'])->plainTextToken;
@@ -70,10 +71,15 @@ class LoginController
         }
     }
 
-    private function twoFactorChallengeResponse(User $user): JsonResponse
+    private function twoFactorChallengeResponse(User $user, Jwt $jwt): JsonResponse
     {
+        $payload = [
+            'uid' => $user->getKey(),
+        ];
+        $loginId = $jwt->encode($payload);
+
         return response()->json([
-            'login_id' => $user->getKey(),
+            'login_id' => $loginId,
             'two_factor' => true,
         ]);
     }
