@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Ahc\Jwt\JWTException;
+use App\Contracts\Jwt;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
 use Laravel\Fortify\Events\RecoveryCodeReplaced;
@@ -12,7 +15,7 @@ use Laravel\Fortify\Fortify;
 
 class TwoFactorChallengeController
 {
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(Request $request, Jwt $jwt): JsonResponse
     {
         try {
             $request->validate([
@@ -22,13 +25,15 @@ class TwoFactorChallengeController
             /** @var string */
             $loginId = $request->login_id;
             /** @var string */
-            $code = $request->code;
+            $code = $request->code ?? '';
             /** @var string */
-            $recoveryCode = $request->recovery_code;
+            $recoveryCode = $request->recovery_code ?? '';
             /** @var string */
             $deviceName = $request->device_name;
 
-            $user = User::find($loginId);
+            /** @var string|null */
+            $id = $jwt->decode($loginId)['uid'];
+            $user = User::find($id);
 
             if (! $user) {
                 throw ValidationException::withMessages([
@@ -49,11 +54,17 @@ class TwoFactorChallengeController
         } catch (ValidationException $e) {
             return response()->json([
                 'errors' => $e->errors(),
-            ], 422);
+            ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (JWTException $e) {
+            return response()->json([
+                'errors' => $e->getMessage(),
+            ], JsonResponse::HTTP_UNAUTHORIZED);
         } catch (\Exception $e) {
+            Log::error($e);
+
             return response()->json([
                 'errors' => ['An unexpected error occurred.'],
-            ], 500);
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
