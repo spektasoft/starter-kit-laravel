@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
+use Laravel\Fortify\Fortify;
 use Laravel\Fortify\RecoveryCode;
 use PragmaRX\Google2FA\Google2FA;
 use Tests\TestCase;
@@ -121,8 +122,8 @@ class TwoFactorChallengeControllerTest extends TestCase
             'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
                 return RecoveryCode::generate();
             }))),
-            'two_factor_confirmed_at' => now(),
-        ]);
+        ] + (Fortify::confirmsTwoFactorAuthentication() ? ['two_factor_confirmed_at' => now()] : [])
+        );
         $response = $this->postJson(route('api.v1.login'), [
             'email' => $user->email,
             'password' => 'password',
