@@ -74,12 +74,6 @@ class UserController
 
     public function update(User $user, Request $request): JsonResponse
     {
-        if (config('fortify.lowercase_usernames')) {
-            $request->merge([
-                Fortify::username() => Str::lower($request->{Fortify::username()}),
-            ]);
-        }
-
         $input = $request->all();
 
         Validator::make($input, [
@@ -88,23 +82,31 @@ class UserController
             'password' => ['nullable', 'string', Password::default()],
         ])->validate();
 
-        $name = $input['name'] ?? null;
-        $email = $input['email'] ?? null;
-        $password = $input['password'] ?? null;
-
-        if ($name) {
-            $user->name = $name;
+        if (config('fortify.lowercase_usernames')) {
+            $request->merge([
+                Fortify::username() => Str::lower($request->{Fortify::username()}),
+            ]);
         }
 
-        if ($email) {
-            $user->email = $email;
+        $dataToUpdate = [];
+
+        if (isset($input['name'])) {
+            $dataToUpdate['name'] = $input['name'];
         }
 
-        if ($password) {
-            $user->password = Hash::make($password);
+        if (isset($input['email'])) {
+            $dataToUpdate['email'] = $input['email'];
         }
 
-        $user->save();
+        if (isset($input['password'])) {
+            $dataToUpdate['password'] = Hash::make($input['password']);
+        }
+
+        try {
+            $user->update($dataToUpdate);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to update user.'], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
         return response()->json(
             ['message' => 'User updated successfully!'],
