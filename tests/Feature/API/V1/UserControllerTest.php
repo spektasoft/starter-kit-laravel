@@ -67,6 +67,32 @@ class UserControllerTest extends TestCase
         $this->assertCount($count, (array) $response->json('data'));
     }
 
+    public function test_show_user(): void
+    {
+        /** @var User */
+        $user = User::factory()->create([
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+        ]);
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson(route('api.v1.users.show', $user->id));
+
+        $response->assertStatus(JsonResponse::HTTP_OK);
+
+        $response->assertJsonStructure([
+            'id',
+            'name',
+            'email',
+        ]);
+
+        $response->assertJson([
+            'id' => $user->id,
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+        ]);
+    }
+
     public function test_create_user_success(): void
     {
         /** @var User */

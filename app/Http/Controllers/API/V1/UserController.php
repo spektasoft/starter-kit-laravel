@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Resources\User\UserCollection;
+use App\Http\Resources\User\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,6 +33,14 @@ class UserController
         } else {
             abort(403);
         }
+    }
+
+    public function show(User $user): JsonResponse
+    {
+        return response()->json(
+            new UserResource($user),
+            JsonResponse::HTTP_OK
+        );
     }
 
     public function store(Request $request): JsonResponse
