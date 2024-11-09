@@ -7,7 +7,6 @@ use App\Http\Resources\User\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -20,19 +19,15 @@ class UserController
 {
     public function index(): UserCollection
     {
-        if (request()->expectsJson()) {
-            /** @var string */
-            $tableSortColumn = request()->input('tableSortColumn') ?? 'id';
-            /** @var string */
-            $tableSortDirection = request()->input('tableSortDirection') ?? 'asc';
+        /** @var string */
+        $tableSortColumn = request()->input('tableSortColumn') ?? 'id';
+        /** @var string */
+        $tableSortDirection = request()->input('tableSortDirection') ?? 'asc';
 
-            $users = User::orderBy($tableSortColumn, $tableSortDirection)
-                ->paginate();
+        $users = User::orderBy($tableSortColumn, $tableSortDirection)
+            ->paginate();
 
-            return new UserCollection($users);
-        } else {
-            abort(403);
-        }
+        return new UserCollection($users);
     }
 
     public function show(User $user): JsonResponse
@@ -125,10 +120,6 @@ class UserController
 
     public function destroy(User $user): JsonResponse
     {
-        if (! request()->expectsJson()) {
-            abort(Response::HTTP_FORBIDDEN);
-        }
-
         $user->delete();
 
         return response()->json(
