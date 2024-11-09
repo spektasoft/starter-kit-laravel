@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
-use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Fortify;
 
 class UserController
@@ -40,40 +39,30 @@ class UserController
 
     public function store(Request $request): JsonResponse
     {
-        try {
-            if (config('fortify.lowercase_usernames')) {
-                $request->merge([
-                    Fortify::username() => Str::lower($request->{Fortify::username()}),
-                ]);
-            }
-
-            $input = $request->all();
-
-            Validator::make($input, [
-                'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users',
-                'password' => 'required|string|min:8',
-            ])->validate();
-
-            User::create([
-                'name' => $input['name'],
-                'email' => $input['email'],
-                'password' => Hash::make($input['password']),
+        if (config('fortify.lowercase_usernames')) {
+            $request->merge([
+                Fortify::username() => Str::lower($request->{Fortify::username()}),
             ]);
-
-            return response()->json(
-                ['message' => 'User created successfully!'],
-                JsonResponse::HTTP_CREATED
-            );
-        } catch (ValidationException $e) {
-            return response()->json([
-                'errors' => $e->errors(),
-            ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
-        } catch (\Exception $e) {
-            return response()->json([
-                'errors' => ['An unexpected error occurred.'],
-            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
+
+        $input = $request->all();
+
+        Validator::make($input, [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+        ])->validate();
+
+        User::create([
+            'name' => $input['name'],
+            'email' => $input['email'],
+            'password' => Hash::make($input['password']),
+        ]);
+
+        return response()->json(
+            ['message' => 'User created successfully!'],
+            JsonResponse::HTTP_CREATED
+        );
     }
 
     public function update(User $user, Request $request): JsonResponse
