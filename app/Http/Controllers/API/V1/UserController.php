@@ -10,6 +10,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Fortify;
 
@@ -68,6 +70,46 @@ class UserController
                 'errors' => ['An unexpected error occurred.'],
             ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function update(User $user, Request $request): JsonResponse
+    {
+        if (config('fortify.lowercase_usernames')) {
+            $request->merge([
+                Fortify::username() => Str::lower($request->{Fortify::username()}),
+            ]);
+        }
+
+        $input = $request->all();
+
+        Validator::make($input, [
+            'name' => ['nullable', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'password' => ['nullable', 'string', Password::default()],
+        ])->validate();
+
+        $name = $input['name'] ?? null;
+        $email = $input['email'] ?? null;
+        $password = $input['password'] ?? null;
+
+        if ($name) {
+            $user->name = $name;
+        }
+
+        if ($email) {
+            $user->email = $email;
+        }
+
+        if ($password) {
+            $user->password = Hash::make($password);
+        }
+
+        $user->save();
+
+        return response()->json(
+            ['message' => 'User updated successfully!'],
+            JsonResponse::HTTP_ACCEPTED
+        );
     }
 
     public function destroy(User $user): JsonResponse

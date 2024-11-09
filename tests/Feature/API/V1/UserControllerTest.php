@@ -151,6 +151,108 @@ class UserControllerTest extends TestCase
         $response->assertJsonStructure(['errors' => ['email']]);
     }
 
+    public function test_update_user(): void
+    {
+        $existingUser = User::create([
+            'name' => 'Existing User',
+            'email' => 'test@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
+        /** @var User */
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->putJson(route('api.v1.users.update', ['user' => $existingUser->id]), [
+            'name' => 'Edit Existing User',
+            'email' => 'testedit@example.com',
+            'password' => 'newpassword',
+        ]);
+
+        $response->assertStatus(JsonResponse::HTTP_ACCEPTED);
+
+        /** @var User */
+        $freshUser = $existingUser->fresh();
+        $this->assertEquals($freshUser->name, 'Edit Existing User');
+        $this->assertEquals($freshUser->email, 'testedit@example.com');
+        $this->assertTrue(Hash::check('newpassword', $freshUser->password));
+    }
+
+    public function test_update_user_name_only(): void
+    {
+        $existingUser = User::create([
+            'name' => 'Existing User',
+            'email' => 'test@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
+        /** @var User */
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->putJson(route('api.v1.users.update', ['user' => $existingUser->id]), [
+            'name' => 'Edit Existing User',
+        ]);
+
+        $response->assertStatus(JsonResponse::HTTP_ACCEPTED);
+
+        /** @var User */
+        $freshUser = $existingUser->fresh();
+        $this->assertEquals($freshUser->name, 'Edit Existing User');
+        $this->assertEquals($freshUser->email, 'test@example.com');
+        $this->assertTrue(Hash::check('password', $freshUser->password));
+    }
+
+    public function test_update_user_email_only(): void
+    {
+        $existingUser = User::create([
+            'name' => 'Existing User',
+            'email' => 'test@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
+        /** @var User */
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->putJson(route('api.v1.users.update', ['user' => $existingUser->id]), [
+            'email' => 'testedit@example.com',
+        ]);
+
+        $response->assertStatus(JsonResponse::HTTP_ACCEPTED);
+
+        /** @var User */
+        $freshUser = $existingUser->fresh();
+        $this->assertEquals($freshUser->name, 'Existing User');
+        $this->assertEquals($freshUser->email, 'testedit@example.com');
+        $this->assertTrue(Hash::check('password', $freshUser->password));
+    }
+
+    public function test_update_user_password_only(): void
+    {
+        $existingUser = User::create([
+            'name' => 'Existing User',
+            'email' => 'test@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
+        /** @var User */
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->putJson(route('api.v1.users.update', ['user' => $existingUser->id]), [
+            'password' => 'newpassword',
+        ]);
+
+        $response->assertStatus(JsonResponse::HTTP_ACCEPTED);
+
+        /** @var User */
+        $freshUser = $existingUser->fresh();
+        $this->assertEquals($freshUser->name, 'Existing User');
+        $this->assertEquals($freshUser->email, 'test@example.com');
+        $this->assertTrue(Hash::check('newpassword', $freshUser->password));
+    }
+
     public function test_delete_a_user(): void
     {
         /** @var User */
