@@ -15,4 +15,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             return redirect(route('profile.show'));
         }
     })->name('user');
+
+    require __DIR__.'/web/user.php';
 });

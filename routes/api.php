@@ -24,5 +24,7 @@ Route::group(['prefix' => 'v1'], function () {
 
         Route::post('/logout', LogoutController::class)
             ->name('api.v1.logout');
+
+        require __DIR__.'/api/user.php';
     });
 });
