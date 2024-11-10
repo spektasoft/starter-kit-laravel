@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\SetLocaleFromHeader;
 use App\Http\Middleware\SetLocaleFromQueryAndSession;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -15,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->append(SetLocaleFromHeader::class);
         $middleware->web(append: [SetLocaleFromQueryAndSession::class]);
         $middleware->statefulApi();
     })
