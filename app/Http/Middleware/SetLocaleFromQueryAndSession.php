@@ -4,10 +4,9 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
-class Language
+class SetLocaleFromQueryAndSession
 {
     /**
      * Handle an incoming request.
@@ -16,24 +15,27 @@ class Language
      */
     public function handle(Request $request, Closure $next): Response
     {
+        /** @var array<string,string> */
+        $supportedLocales = config('app.supported_locales', []);
+
         /** @var string|null */
         $lang = $request->query('lang');
-        /** @var string */
-        $appName = config('app.name', 'Laravel');
-        $slug = Str::slug($appName, '_');
-        $cookieKey = $slug.'_lang';
 
-        if (isset($lang)) {
+        if ($lang && in_array($lang, $supportedLocales)) {
+            session(['locale' => $lang]);
             app()->setLocale($lang);
-            $url = $request->fullUrlWithoutQuery('lang');
 
-            return redirect($url)->withCookie(cookie()->forever($cookieKey, $lang));
+            return redirect($request->fullUrlWithoutQuery('lang'));
         }
 
         /** @var string */
         $defaultLang = config('app.locale', 'en');
         /** @var string */
-        $lang = $request->cookie($cookieKey, $defaultLang);
+        $lang = session('locale', $defaultLang);
+        if (! in_array($lang, $supportedLocales)) {
+            $lang = $defaultLang;
+        }
+        session()->put('locale', $lang);
         app()->setLocale($lang);
 
         return $next($request);
