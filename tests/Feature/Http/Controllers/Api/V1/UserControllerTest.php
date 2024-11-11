@@ -66,11 +66,10 @@ class UserControllerTest extends TestCase
 
         /** @var User */
         $user = User::first();
-        $user->givePermissionTo('view_all_user');
+        $user->givePermissionTo('view_any_user');
         Sanctum::actingAs($user, ['read']);
 
         $response = $this->getJson(route('api.v1.users.index'));
-
         $response->assertStatus(JsonResponse::HTTP_OK);
         $this->assertCount($count, (array) $response->json('data'));
     }

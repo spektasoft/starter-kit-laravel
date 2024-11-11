@@ -26,7 +26,7 @@ class UserController extends Controller
     public function index()
     {
         Authorizer::authorizeToken('read');
-        Authorizer::authorize('view_all_user', User::class);
+        Authorizer::authorize('view_any_user', User::class);
 
         /** @var string */
         $tableSortColumn = request()->input('tableSortColumn') ?? 'id';

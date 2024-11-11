@@ -87,21 +87,6 @@ class UserPolicyTest extends TestCase
         $this->assertFalse($this->policy->view($user, $otherUser));
     }
 
-    public function test_viewAll_grants_access_to_users_with_permission(): void
-    {
-        $user = User::factory()->create();
-        $user->givePermissionTo('view_all_user');
-
-        $this->assertTrue($this->policy->viewAll($user));
-    }
-
-    public function test_viewAll_denies_access_to_users_without_permission(): void
-    {
-        $user = User::factory()->create();
-
-        $this->assertFalse($this->policy->viewAll($user));
-    }
-
     public function test_create_grants_access_to_users_with_permission(): void
     {
         $user = User::factory()->create();
