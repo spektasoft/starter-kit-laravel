@@ -5,4 +5,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/user', [UserController::class, 'me'])->name('user');
 Route::get('/user/permissions', [UserController::class, 'myPermissions'])->name('user.permissions');
-Route::resource('/users', UserController::class);
+Route::apiResource('/users', UserController::class);

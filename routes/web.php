@@ -7,5 +7,5 @@ Route::get('/', function () {
 })->name('home');
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    require __DIR__.'/web/user.php';
+    require __DIR__.'/resources/user.php';
 });
