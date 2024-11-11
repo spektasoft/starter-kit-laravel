@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Controller;
 use App\Http\Resources\User\UserCollection;
 use App\Http\Resources\User\UserResource;
 use App\Models\User;
+use App\Utils\Authorizer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -14,10 +16,13 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Fortify\Fortify;
 
-class UserController
+class UserController extends Controller
 {
     public function index(): UserCollection
     {
+        Authorizer::authorizeToken('read');
+        Authorizer::authorize('view_all_user', User::class);
+
         /** @var string */
         $tableSortColumn = request()->input('tableSortColumn') ?? 'id';
         /** @var string */
@@ -31,6 +36,9 @@ class UserController
 
     public function show(User $user): JsonResponse
     {
+        Authorizer::authorizeToken('read');
+        Authorizer::authorize('view_user', $user);
+
         return response()->json(
             new UserResource($user),
             JsonResponse::HTTP_OK
@@ -39,6 +47,9 @@ class UserController
 
     public function store(Request $request): JsonResponse
     {
+        Authorizer::authorizeToken('create');
+        Authorizer::authorize('create_user', User::class);
+
         if (config('fortify.lowercase_usernames')) {
             $request->merge([
                 Fortify::username() => Str::lower($request->{Fortify::username()}),
@@ -67,6 +78,9 @@ class UserController
 
     public function update(User $user, Request $request): JsonResponse
     {
+        Authorizer::authorizeToken('update');
+        Authorizer::authorize('update_user', $user);
+
         $input = $request->all();
 
         Validator::make($input, [
@@ -109,6 +123,9 @@ class UserController
 
     public function destroy(User $user): JsonResponse
     {
+        Authorizer::authorizeToken('delete');
+        Authorizer::authorize('delete_user', $user);
+
         $user->delete();
 
         return response()->json(

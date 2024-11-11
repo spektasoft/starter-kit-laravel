@@ -18,11 +18,8 @@ class UserPolicyTest extends TestCase
      */
     private $policy;
 
-    public function setUp(): void
+    public static function setUpPermissions(): void
     {
-        parent::setUp();
-        $this->policy = new UserPolicy;
-
         $permissionNames = [
             'view_any_user',
             'view_user',
@@ -48,6 +45,14 @@ class UserPolicyTest extends TestCase
         });
 
         Permission::insert($permissions->toArray());
+    }
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->policy = new UserPolicy;
+
+        static::setUpPermissions();
     }
 
     public function test_viewAny_grants_access_to_users_with_permission(): void
