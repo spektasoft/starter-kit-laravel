@@ -112,4 +112,17 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Super Users
+    |--------------------------------------------------------------------------
+    |
+    | This configuration option defines the list of username(s) that have
+    | Super User privileges. Super Users have unlimited control of the
+    | admin panel, including access to all features and settings.
+    |
+    */
+
+    'super_users' => explode(',', env('AUTH_SUPER_USERS', '')),
+
 ];
