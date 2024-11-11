@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Api\V1;
+namespace Tests\Feature\Http\Controllers\Api\V1;
 
 use App\Contracts\Jwt;
 use App\Models\User;
