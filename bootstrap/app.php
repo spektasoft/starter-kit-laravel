@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureJsonRequest;
 use App\Http\Middleware\Language;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -17,6 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(Language::class);
         $middleware->statefulApi();
+
+        $middleware->alias([
+            'json' => EnsureJsonRequest::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (Throwable $e, Request $request) {
