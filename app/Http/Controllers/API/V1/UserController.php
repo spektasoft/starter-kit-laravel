@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Data\PermissionData;
 use App\Data\UserData;
 use App\Http\Controllers\Controller;
-use App\Models\Permission;
 use App\Models\User;
 use App\Utils\Authorizer;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\AbstractPaginator;
@@ -142,14 +141,54 @@ class UserController extends Controller
         );
     }
 
-    /**
-     * @return PermissionData[]
-     */
-    public function myPermissions()
+    public function can(Request $request): JsonResponse
     {
-        /** @var Permission[] */
-        $permissions = User::auth()?->permissions;
+        $request->validate([
+            'permission' => 'required',
+            'resource' => 'required',
+            'id' => 'nullable',
+        ]);
 
-        return PermissionData::collect($permissions);
+        /** @var string */
+        $permission = $request->input('permission');
+        /** @var string */
+        $resource = $request->input('resource');
+        /** @var string|null */
+        $id = $request->input('id');
+
+        $model = $this->guessModelFromResource($resource);
+        if ($id) {
+            $model = $model::find($id);
+        }
+
+        if (User::auth()?->cannot($permission, $model)) {
+            return response()->json(
+                ['message' => 'Permission denies!'],
+                JsonResponse::HTTP_FORBIDDEN
+            );
+        }
+
+        return response()->json(
+            ['message' => 'Permission granted!'],
+            JsonResponse::HTTP_OK
+        );
+    }
+
+    /**
+     * @return class-string
+     */
+    private function guessModelFromResource(string $resource)
+    {
+        if (substr($resource, -1) === 's') {
+            $resource = substr($resource, 0, -1);
+        }
+
+        $modelName = 'App\\Models\\'.ucfirst($resource);
+
+        if (class_exists($modelName)) {
+            return $modelName;
+        }
+
+        throw new ModelNotFoundException;
     }
 }

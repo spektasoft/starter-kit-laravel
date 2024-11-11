@@ -26,14 +26,6 @@ class UserPolicy
     }
 
     /**
-     * Determine whether the user can view the model.
-     */
-    public function viewAll(User $user): bool
-    {
-        return $user->can('view_all_user');
-    }
-
-    /**
      * Determine whether the user can create models.
      */
     public function create(User $user): bool

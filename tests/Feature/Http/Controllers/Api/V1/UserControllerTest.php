@@ -312,26 +312,29 @@ class UserControllerTest extends TestCase
         $this->assertDatabaseMissing('users', ['id' => $targetedUser->id]);
     }
 
-    public function test_return_current_user_permissions(): void
+    public function test_current_user_permission_granted(): void
+    {
+        /** @var User */
+        $user = User::factory()->create();
+        $user->givePermissionTo('view_all_user');
+        $this->actingAs($user);
+        $response = $this->postJson(route('api.v1.user.can'), [
+            'permission' => 'view_all_user',
+            'resource' => 'users',
+        ]);
+        $response->assertSuccessful();
+    }
+
+    public function test_current_user_permission_denied(): void
     {
         /** @var User */
         $user = User::factory()->create();
         $user->givePermissionTo('view_any_user');
         $this->actingAs($user);
-        $response = $this->getJson(route('api.v1.user.permissions'));
-        $response->assertSuccessful();
-        $response->assertJsonStructure([
-            '*' => [
-                'id',
-                'name',
-                'guard_name',
-            ],
+        $response = $this->postJson(route('api.v1.user.can'), [
+            'permission' => 'view_all_user',
+            'resource' => 'users',
         ]);
-        $response->assertJsonFragment([
-            'name' => 'view_any_user',
-        ]);
-        $response->assertJsonMissing([
-            'name' => 'view_user',
-        ]);
+        $response->assertForbidden();
     }
 }
