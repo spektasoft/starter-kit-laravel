@@ -15,7 +15,7 @@ class EnsureJsonRequest
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->isJson()) {
+        if (! $request->wantsJson()) {
             return response()->json(['error' => __('The given data was invalid.')], Response::HTTP_UNSUPPORTED_MEDIA_TYPE);
         }
 
