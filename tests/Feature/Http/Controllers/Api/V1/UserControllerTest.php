@@ -24,9 +24,11 @@ class UserControllerTest extends TestCase
     {
         /** @var User */
         $user = User::factory()->create();
+        $user->givePermissionTo('view_all_user');
         $this->actingAs($user);
         $response = $this->getJson(route('api.v1.user'));
         $response->assertSuccessful();
+
         $response->assertJson([
             'id' => $user->id,
             'name' => $user->name,

@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Data\UserData;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\User\UserCollection;
-use App\Http\Resources\User\UserResource;
 use App\Models\User;
 use App\Utils\Authorizer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\Enumerable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -18,7 +19,10 @@ use Laravel\Fortify\Fortify;
 
 class UserController extends Controller
 {
-    public function index(): UserCollection
+    /**
+     * @return AbstractPaginator<UserData>|Enumerable<string|int, UserData>
+     */
+    public function index()
     {
         Authorizer::authorizeToken('read');
         Authorizer::authorize('view_all_user', User::class);
@@ -31,18 +35,20 @@ class UserController extends Controller
         $users = User::orderBy($tableSortColumn, $tableSortDirection)
             ->paginate();
 
-        return new UserCollection($users);
+        return UserData::collect($users);
     }
 
-    public function show(User $user): JsonResponse
+    public function me(): UserData
+    {
+        return UserData::from(User::auth());
+    }
+
+    public function show(User $user): UserData
     {
         Authorizer::authorizeToken('read');
         Authorizer::authorize('view_user', $user);
 
-        return response()->json(
-            new UserResource($user),
-            JsonResponse::HTTP_OK
-        );
+        return UserData::from($user);
     }
 
     public function store(Request $request): JsonResponse
