@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Data\PermissionData;
 use App\Data\UserData;
 use App\Http\Controllers\Controller;
+use App\Models\Permission;
 use App\Models\User;
 use App\Utils\Authorizer;
 use Illuminate\Http\JsonResponse;
@@ -138,5 +140,16 @@ class UserController extends Controller
             ['message' => 'User deleted successfully!'],
             JsonResponse::HTTP_OK
         );
+    }
+
+    /**
+     * @return PermissionData[]
+     */
+    public function myPermissions()
+    {
+        /** @var Permission[] */
+        $permissions = User::auth()?->permissions;
+
+        return PermissionData::collect($permissions);
     }
 }

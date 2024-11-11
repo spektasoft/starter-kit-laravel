@@ -24,11 +24,9 @@ class UserControllerTest extends TestCase
     {
         /** @var User */
         $user = User::factory()->create();
-        $user->givePermissionTo('view_all_user');
         $this->actingAs($user);
         $response = $this->getJson(route('api.v1.user'));
         $response->assertSuccessful();
-
         $response->assertJson([
             'id' => $user->id,
             'name' => $user->name,
@@ -312,5 +310,28 @@ class UserControllerTest extends TestCase
         $response->assertStatus(JsonResponse::HTTP_OK);
         $response->assertJson(['message' => 'User deleted successfully!']);
         $this->assertDatabaseMissing('users', ['id' => $targetedUser->id]);
+    }
+
+    public function test_return_current_user_permissions(): void
+    {
+        /** @var User */
+        $user = User::factory()->create();
+        $user->givePermissionTo('view_any_user');
+        $this->actingAs($user);
+        $response = $this->getJson(route('api.v1.user.permissions'));
+        $response->assertSuccessful();
+        $response->assertJsonStructure([
+            '*' => [
+                'id',
+                'name',
+                'guard_name',
+            ],
+        ]);
+        $response->assertJsonFragment([
+            'name' => 'view_any_user',
+        ]);
+        $response->assertJsonMissing([
+            'name' => 'view_user',
+        ]);
     }
 }
