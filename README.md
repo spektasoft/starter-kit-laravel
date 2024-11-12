@@ -20,6 +20,14 @@ ULIDs are used as the default ID type.
     cp .env.example .env
     ```
 
+1. Assign Super User(s) by assigning `Fortify` username(s) (default to email) in `.env` file:
+
+    ```
+    AUTH_SUPER_USERS={FORTIFY_USERNAMES}
+    # Separated with a comma (,)
+    # Example: admin@example.com,su@example.com
+    ```
+
 1. Generate the `APP_KEY`:
 
     ```

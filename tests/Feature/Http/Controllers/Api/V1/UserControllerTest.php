@@ -1,17 +1,24 @@
 <?php
 
-namespace Tests\Feature\Api\V1;
+namespace Tests\Feature\Http\Controllers\Api\V1;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
+use Tests\Feature\Policies\UserPolicyTest;
 use Tests\TestCase;
 
 class UserControllerTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        UserPolicyTest::setUpPermissions();
+    }
 
     public function test_authenticated_user_can_access_their_own_data(): void
     {
@@ -59,11 +66,11 @@ class UserControllerTest extends TestCase
 
         /** @var User */
         $user = User::first();
-        $this->actingAs($user);
+        $user->givePermissionTo('view_any_user');
+        Sanctum::actingAs($user, ['read']);
 
         $response = $this->getJson(route('api.v1.users.index'));
-
-        $response->assertStatus(200);
+        $response->assertStatus(JsonResponse::HTTP_OK);
         $this->assertCount($count, (array) $response->json('data'));
     }
 
@@ -74,7 +81,8 @@ class UserControllerTest extends TestCase
             'name' => 'John Doe',
             'email' => 'john@example.com',
         ]);
-        Sanctum::actingAs($user);
+        $user->givePermissionTo('view_user');
+        Sanctum::actingAs($user, ['read']);
 
         $response = $this->getJson(route('api.v1.users.show', $user->id));
 
@@ -97,7 +105,8 @@ class UserControllerTest extends TestCase
     {
         /** @var User */
         $user = User::factory()->create();
-        $token = $user->createToken('test-token')->plainTextToken;
+        $user->givePermissionTo('create_user');
+        $token = $user->createToken('test-token', ['create'])->plainTextToken;
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$token,
         ])->postJson(route('api.v1.users.store'), [
@@ -117,7 +126,8 @@ class UserControllerTest extends TestCase
     {
         /** @var User */
         $user = User::factory()->create();
-        $token = $user->createToken('test-token')->plainTextToken;
+        $user->givePermissionTo('create_user');
+        $token = $user->createToken('test-token', ['create'])->plainTextToken;
         $client = $this->withHeaders([
             'Authorization' => 'Bearer '.$token,
         ]);
@@ -161,7 +171,8 @@ class UserControllerTest extends TestCase
 
         /** @var User */
         $user = User::factory()->create();
-        $token = $user->createToken('test-token')->plainTextToken;
+        $user->givePermissionTo('create_user');
+        $token = $user->createToken('test-token', ['create'])->plainTextToken;
         $client = $this->withHeaders([
             'Authorization' => 'Bearer '.$token,
         ]);
@@ -187,7 +198,8 @@ class UserControllerTest extends TestCase
 
         /** @var User */
         $user = User::factory()->create();
-        Sanctum::actingAs($user);
+        $user->givePermissionTo('update_user');
+        Sanctum::actingAs($user, ['update']);
 
         $response = $this->putJson(route('api.v1.users.update', ['user' => $existingUser->id]), [
             'name' => 'Edit Existing User',
@@ -214,7 +226,8 @@ class UserControllerTest extends TestCase
 
         /** @var User */
         $user = User::factory()->create();
-        Sanctum::actingAs($user);
+        $user->givePermissionTo('update_user');
+        Sanctum::actingAs($user, ['update']);
 
         $response = $this->putJson(route('api.v1.users.update', ['user' => $existingUser->id]), [
             'name' => 'Edit Existing User',
@@ -239,7 +252,8 @@ class UserControllerTest extends TestCase
 
         /** @var User */
         $user = User::factory()->create();
-        Sanctum::actingAs($user);
+        $user->givePermissionTo('update_user');
+        Sanctum::actingAs($user, ['update']);
 
         $response = $this->putJson(route('api.v1.users.update', ['user' => $existingUser->id]), [
             'email' => 'testedit@example.com',
@@ -264,7 +278,8 @@ class UserControllerTest extends TestCase
 
         /** @var User */
         $user = User::factory()->create();
-        Sanctum::actingAs($user);
+        $user->givePermissionTo('update_user');
+        Sanctum::actingAs($user, ['update']);
 
         $response = $this->putJson(route('api.v1.users.update', ['user' => $existingUser->id]), [
             'password' => 'newpassword',
@@ -283,7 +298,8 @@ class UserControllerTest extends TestCase
     {
         /** @var User */
         $user = User::factory()->create();
-        Sanctum::actingAs($user);
+        $user->givePermissionTo('delete_user');
+        Sanctum::actingAs($user, ['delete']);
 
         $targetedUser = User::factory()->create();
         $this->assertDatabaseHas('users', ['id' => $targetedUser->id]);
@@ -293,5 +309,31 @@ class UserControllerTest extends TestCase
         $response->assertStatus(JsonResponse::HTTP_OK);
         $response->assertJson(['message' => 'User deleted successfully!']);
         $this->assertDatabaseMissing('users', ['id' => $targetedUser->id]);
+    }
+
+    public function test_current_user_permission_granted(): void
+    {
+        /** @var User */
+        $user = User::factory()->create();
+        $user->givePermissionTo('view_all_user');
+        $this->actingAs($user);
+        $response = $this->postJson(route('api.v1.user.can'), [
+            'permission' => 'view_all_user',
+            'resource' => 'users',
+        ]);
+        $response->assertSuccessful();
+    }
+
+    public function test_current_user_permission_denied(): void
+    {
+        /** @var User */
+        $user = User::factory()->create();
+        $user->givePermissionTo('view_any_user');
+        $this->actingAs($user);
+        $response = $this->postJson(route('api.v1.user.can'), [
+            'permission' => 'view_all_user',
+            'resource' => 'users',
+        ]);
+        $response->assertForbidden();
     }
 }

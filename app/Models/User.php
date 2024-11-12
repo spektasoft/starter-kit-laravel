@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Fortify\Fortify;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\Features;
 use Laravel\Jetstream\HasProfilePhoto;
@@ -25,10 +27,10 @@ class User extends Authenticatable implements HasAvatar, MustVerifyEmail
     use HasFactory;
 
     use HasProfilePhoto;
+    use HasRoles;
     use HasUlids;
     use Notifiable;
     use TwoFactorAuthenticatable;
-    use HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -50,6 +52,16 @@ class User extends Authenticatable implements HasAvatar, MustVerifyEmail
         'two_factor_secret',
     ];
 
+    public static function auth(): ?User
+    {
+        $user = Auth::user();
+        if ($user instanceof User) {
+            return $user;
+        }
+
+        return null;
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -61,6 +73,21 @@ class User extends Authenticatable implements HasAvatar, MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Determine if the entity has the given abilities.
+     *
+     * @param  array<string>|string  $abilities
+     * @param  array|mixed  $arguments
+     */
+    public function can($abilities, $arguments = []): bool
+    {
+        if ($this->isSuperUser()) {
+            return true;
+        }
+
+        return parent::can($abilities, $arguments);
     }
 
     /**
@@ -90,6 +117,18 @@ class User extends Authenticatable implements HasAvatar, MustVerifyEmail
         }
 
         return null;
+    }
+
+    public function isSuperUser(): bool
+    {
+        /** @var string[] */
+        $superUsers = config('auth.super_users', []);
+
+        if (blank($superUsers)) {
+            return false;
+        }
+
+        return in_array($this->{Fortify::username()}, $superUsers);
     }
 
     /**

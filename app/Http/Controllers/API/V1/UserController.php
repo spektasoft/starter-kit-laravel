@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Resources\User\UserCollection;
-use App\Http\Resources\User\UserResource;
+use App\Data\UserData;
+use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Utils\Authorizer;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\Enumerable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -14,10 +18,16 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Fortify\Fortify;
 
-class UserController
+class UserController extends Controller
 {
-    public function index(): UserCollection
+    /**
+     * @return AbstractPaginator<UserData>|Enumerable<string|int, UserData>
+     */
+    public function index()
     {
+        Authorizer::authorizeToken('read');
+        Authorizer::authorize('view_any_user', User::class);
+
         /** @var string */
         $tableSortColumn = request()->input('tableSortColumn') ?? 'id';
         /** @var string */
@@ -26,19 +36,27 @@ class UserController
         $users = User::orderBy($tableSortColumn, $tableSortDirection)
             ->paginate();
 
-        return new UserCollection($users);
+        return UserData::collect($users);
     }
 
-    public function show(User $user): JsonResponse
+    public function me(): UserData
     {
-        return response()->json(
-            new UserResource($user),
-            JsonResponse::HTTP_OK
-        );
+        return UserData::from(User::auth());
+    }
+
+    public function show(User $user): UserData
+    {
+        Authorizer::authorizeToken('read');
+        Authorizer::authorize('view_user', $user);
+
+        return UserData::from($user);
     }
 
     public function store(Request $request): JsonResponse
     {
+        Authorizer::authorizeToken('create');
+        Authorizer::authorize('create_user', User::class);
+
         if (config('fortify.lowercase_usernames')) {
             $request->merge([
                 Fortify::username() => Str::lower($request->{Fortify::username()}),
@@ -67,6 +85,9 @@ class UserController
 
     public function update(User $user, Request $request): JsonResponse
     {
+        Authorizer::authorizeToken('update');
+        Authorizer::authorize('update_user', $user);
+
         $input = $request->all();
 
         Validator::make($input, [
@@ -109,11 +130,65 @@ class UserController
 
     public function destroy(User $user): JsonResponse
     {
+        Authorizer::authorizeToken('delete');
+        Authorizer::authorize('delete_user', $user);
+
         $user->delete();
 
         return response()->json(
             ['message' => 'User deleted successfully!'],
             JsonResponse::HTTP_OK
         );
+    }
+
+    public function can(Request $request): JsonResponse
+    {
+        $request->validate([
+            'permission' => 'required',
+            'resource' => 'required',
+            'id' => 'nullable',
+        ]);
+
+        /** @var string */
+        $permission = $request->input('permission');
+        /** @var string */
+        $resource = $request->input('resource');
+        /** @var string|null */
+        $id = $request->input('id');
+
+        $model = $this->guessModelFromResource($resource);
+        if ($id) {
+            $model = $model::find($id);
+        }
+
+        if (User::auth()?->cannot($permission, $model)) {
+            return response()->json(
+                ['message' => 'Permission denies!'],
+                JsonResponse::HTTP_FORBIDDEN
+            );
+        }
+
+        return response()->json(
+            ['message' => 'Permission granted!'],
+            JsonResponse::HTTP_OK
+        );
+    }
+
+    /**
+     * @return class-string
+     */
+    private function guessModelFromResource(string $resource)
+    {
+        if (substr($resource, -1) === 's') {
+            $resource = substr($resource, 0, -1);
+        }
+
+        $modelName = 'App\\Models\\'.ucfirst($resource);
+
+        if (class_exists($modelName)) {
+            return $modelName;
+        }
+
+        throw new ModelNotFoundException;
     }
 }
