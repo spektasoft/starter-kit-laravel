@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\ArtisanController;
 use App\Http\Controllers\Api\V1\LoginController;
 use App\Http\Controllers\Api\V1\LogoutController;
 use App\Http\Controllers\Api\V1\TwoFactorChallengeController;
@@ -24,4 +25,17 @@ Route::group(['middleware' => ['json'], 'prefix' => 'v1'], function () {
             require __DIR__.'/resources/user.php';
         });
     });
+
+    Route::name('api.v1.')
+        ->middleware(['verify.api.artisan', 'verify.api.key'])
+        ->group(function () {
+            Route::post('artisan/key-generate', [ArtisanController::class, 'keyGenerate'])
+                ->name('artisan.key.generate');
+            Route::post('artisan/migrate', [ArtisanController::class, 'migrate'])
+                ->name('artisan.migrate');
+            Route::post('artisan/optimize', [ArtisanController::class, 'optimize'])
+                ->name('artisan.optimize');
+            Route::post('artisan/storage-link', [ArtisanController::class, 'storageLink'])
+                ->name('artisan.storage.link');
+        });
 });
