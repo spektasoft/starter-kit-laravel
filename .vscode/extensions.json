@@ -11,6 +11,7 @@
         "dbaeumer.vscode-eslint",
         "EditorConfig.EditorConfig",
         "esbenp.prettier-vscode",
+        "formulahendry.code-runner",
         "heybourn.headwind",
         "humao.rest-client",
         "ikappas.composer",
