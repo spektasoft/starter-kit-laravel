@@ -28,6 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->brandLogo(fn () => view('components.application-mark', ['attributes' => '']))
             ->colors([
                 'primary' => Color::Indigo,
                 'secondary' => Color::Emerald,
@@ -59,7 +60,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 \Awcodes\Curator\CuratorPlugin::make(),
-                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make()
+                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
             ])
             ->userMenuItems([
                 MenuItem::make()
