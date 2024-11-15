@@ -76,6 +76,13 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-key')
                     ->url(fn () => route('api-tokens.index')),
             ])
+            ->spa()
+            ->spaUrlExceptions(fn () => [
+                route('home'),
+                route('profile.show'),
+                route('api-tokens.index'),
+                url('*?lang=*'),
+            ])
             ->viteTheme('resources/css/app.css');
     }
 }
