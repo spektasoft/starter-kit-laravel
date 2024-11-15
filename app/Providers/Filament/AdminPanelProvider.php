@@ -83,6 +83,7 @@ class AdminPanelProvider extends PanelProvider
                 route('api-tokens.index'),
                 url('*?lang=*'),
             ])
+            ->unsavedChangesAlerts()
             ->viteTheme('resources/css/app.css');
     }
 }
