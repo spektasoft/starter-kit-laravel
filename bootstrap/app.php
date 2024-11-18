@@ -1,14 +1,13 @@
 <?php
 
 use App\Http\Middleware\EnsureJsonRequest;
-use App\Http\Middleware\Language;
+use App\Http\Middleware\SetLocaleFromHeader;
+use App\Http\Middleware\SetLocaleFromQueryAndSession;
 use App\Http\Middleware\VerifyApiArtisan;
 use App\Http\Middleware\VerifyApiKey;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,7 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->append(Language::class);
+        $middleware->append(SetLocaleFromHeader::class);
+        $middleware->web(append: [SetLocaleFromQueryAndSession::class]);
         $middleware->statefulApi();
 
         $middleware->alias([
@@ -28,15 +28,5 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function (Throwable $e, Request $request) {
-            /** @var string */
-            $defaultLang = config('app.locale', 'en');
-            /** @var string */
-            $appName = config('app.name', 'Laravel');
-            $slug = Str::slug($appName, '_');
-            $cookieKey = $slug.'_lang';
-            /** @var string */
-            $lang = $request->cookie($cookieKey, $defaultLang);
-            app()->setLocale($lang);
-        });
+        //
     })->create();
