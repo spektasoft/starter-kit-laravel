@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Middleware\EnsureJsonRequest;
 use App\Http\Middleware\SetLocaleFromHeader;
 use App\Http\Middleware\SetLocaleFromQueryAndSession;
+use App\Http\Middleware\VerifyApiArtisan;
+use App\Http\Middleware\VerifyApiKey;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,6 +20,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(SetLocaleFromHeader::class);
         $middleware->web(append: [SetLocaleFromQueryAndSession::class]);
         $middleware->statefulApi();
+
+        $middleware->alias([
+            'json' => EnsureJsonRequest::class,
+            'verify.api.artisan' => VerifyApiArtisan::class,
+            'verify.api.key' => VerifyApiKey::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -4,9 +4,10 @@
         "editor.defaultFormatter": "shufo.vscode-blade-formatter"
     },
     "[php]": {
-        "editor.defaultFormatter": "open-southeners.laravel-pint",
+        "editor.defaultFormatter": "open-southeners.laravel-pint"
     },
     "blade.format.enable": true,
+    "code-runner.executorMap": { "typescript": "npx tsx $fullFileName" },
     "editor.codeActionsOnSave": {
         "source.fixAll": "explicit",
         "source.organizeImports": "explicit"

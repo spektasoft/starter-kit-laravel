@@ -12,11 +12,9 @@
         </button>
     </x-slot>
 
-    <x-filament::dropdown.list>
-        <x-filament::dropdown.list.item :icon="'heroicon-m-user-circle'">
-            {{ $user->name }}
-        </x-filament::dropdown.list.item>
-    </x-filament::dropdown.list>
+    <x-filament::dropdown.header :icon="'heroicon-m-user-circle'">
+        {{ $user->name }}
+    </x-filament::dropdown.header>
 
     <x-filament::dropdown.list>
         <x-filament-panels::theme-switcher />

@@ -18,6 +18,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\ComponentAttributeBag;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -28,6 +29,11 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->brandLogo(fn () => view('components.application-mark', [
+                'attributes' => new ComponentAttributeBag([
+                    'class' => 'block w-auto h-9',
+                ]),
+            ]))
             ->colors([
                 'primary' => Color::Indigo,
                 'secondary' => Color::Emerald,
@@ -59,7 +65,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 \Awcodes\Curator\CuratorPlugin::make(),
-                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make()
+                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
             ])
             ->userMenuItems([
                 MenuItem::make()
@@ -75,6 +81,14 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-key')
                     ->url(fn () => route('api-tokens.index')),
             ])
+            ->spa()
+            ->spaUrlExceptions(fn () => [
+                route('home'),
+                route('profile.show'),
+                route('api-tokens.index'),
+                url('*?lang=*'),
+            ])
+            ->unsavedChangesAlerts()
             ->viteTheme('resources/css/app.css');
     }
 }
