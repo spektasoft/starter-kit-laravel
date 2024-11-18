@@ -32,7 +32,9 @@ class QueueServiceProvider extends IlluminateQueueServiceProvider
         $config = $this->app->make('config')['queue.failed'];
         if (isset($config['driver']) && $config['driver'] === 'database-uuids-ulids') {
             $this->app->singleton('queue.failer', function ($app) {
-                $inner_config = $app['config']['queue.failed'];
+                /** @var array<string, array<string, array<string, string>>> */
+                $mApp = $app;
+                $inner_config = $mApp['config']['queue.failed'];
 
                 return new DatabaseUuidUlidFailedJobProvider(
                     $this->app->make('db'), $inner_config['database'], $inner_config['table']

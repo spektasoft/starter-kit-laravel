@@ -4,7 +4,6 @@ namespace Tests\Feature\Livewire\EditProfile;
 
 use App\Livewire\EditProfile\UpdateProfileInformationForm;
 use App\Models\User;
-use Filament\Forms\Form;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -29,8 +28,9 @@ class UpdateProfileInformationFormTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        /** @var Form */
-        $form = Livewire::test(UpdateProfileInformationForm::class)->instance()->form;
+        /** @var UpdateProfileInformationForm */
+        $component = Livewire::test(UpdateProfileInformationForm::class)->instance();
+        $form = $component->form;
 
         $this->assertEquals($user->name, $form->getState()['name']);
         $this->assertEquals($user->email, $form->getState()['email']);
@@ -42,9 +42,9 @@ class UpdateProfileInformationFormTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        Livewire::test(UpdateProfileInformationForm::class)
-            ->fillForm(['name' => 'Test Name', 'email' => 'test@example.com'])
-            ->call('updateProfileInformation');
+        $testable = Livewire::test(UpdateProfileInformationForm::class);
+        $testable->fillForm(['name' => 'Test Name', 'email' => 'test@example.com']);
+        $testable->call('updateProfileInformation');
 
         /** @var User */
         $freshUser = $user->fresh();

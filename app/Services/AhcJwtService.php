@@ -34,7 +34,10 @@ class AhcJwtService implements Jwt
 
     public function decode(string $token, bool $verify = true)
     {
-        return $this->jwt->decode($token, $verify);
+        /** @var array<string, mixed> */
+        $payloads = $this->jwt->decode($token, $verify);
+
+        return $payloads;
     }
 
     public function setTestTimestamp(?int $timestamp = null): void

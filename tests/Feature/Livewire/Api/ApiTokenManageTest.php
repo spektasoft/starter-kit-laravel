@@ -7,7 +7,6 @@ use App\Models\PersonalAccessToken;
 use App\Models\User;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Table;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -53,9 +52,9 @@ class ApiTokenManageTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        Livewire::test(ApiTokenManage::class)
-            ->assertFormExists()
-            ->assertFormFieldExists('name');
+        $testable = Livewire::test(ApiTokenManage::class);
+        $testable->assertFormExists();
+        $testable->assertFormFieldExists('name');
     }
 
     public function test_api_tokens_can_be_created(): void
@@ -66,15 +65,15 @@ class ApiTokenManageTest extends TestCase
 
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
-        Livewire::test(ApiTokenManage::class)
-            ->fillForm([
-                'name' => 'Test Token',
-                'permissions' => [
-                    'read',
-                    'update',
-                ],
-            ])
-            ->call('createApiToken');
+        $testable = Livewire::test(ApiTokenManage::class);
+        $testable->fillForm([
+            'name' => 'Test Token',
+            'permissions' => [
+                'read',
+                'update',
+            ],
+        ]);
+        $testable->call('createApiToken');
 
         /** @var Collection<int, PersonalAccessToken> */
         $tokens = $user->fresh()?->tokens;
@@ -104,8 +103,9 @@ class ApiTokenManageTest extends TestCase
             'abilities' => ['create', 'read'],
         ]);
 
-        /** @var Table */
-        $table = Livewire::test(ApiTokenManage::class)->instance()->getTable();
+        /** @var ApiTokenManage */
+        $component = Livewire::test(ApiTokenManage::class)->instance();
+        $table = $component->getTable();
 
         /** @var Action */
         $action = collect($table->getActions())->first(function ($action) {
@@ -147,8 +147,9 @@ class ApiTokenManageTest extends TestCase
             'abilities' => ['create', 'read'],
         ]);
 
-        /** @var Table */
-        $table = Livewire::test(ApiTokenManage::class)->instance()->getTable();
+        /** @var ApiTokenManage */
+        $component = Livewire::test(ApiTokenManage::class)->instance();
+        $table = $component->getTable();
 
         /** @var Action */
         $action = collect($table->getActions())->first(function ($action) {

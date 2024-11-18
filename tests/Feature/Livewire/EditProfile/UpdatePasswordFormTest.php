@@ -26,13 +26,13 @@ class UpdatePasswordFormTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        Livewire::test(UpdatePasswordForm::class)
-            ->fillForm([
-                'current_password' => 'password',
-                'password' => 'new-password',
-                'password_confirmation' => 'new-password',
-            ])
-            ->call('updatePassword');
+        $testable = Livewire::test(UpdatePasswordForm::class);
+        $testable->fillForm([
+            'current_password' => 'password',
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ]);
+        $testable->call('updatePassword');
 
         /** @var User */
         $freshUser = $user->fresh();
@@ -45,14 +45,14 @@ class UpdatePasswordFormTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        Livewire::test(UpdatePasswordForm::class)
-            ->fillForm([
-                'current_password' => 'wrong-password',
-                'password' => 'new-password',
-                'password_confirmation' => 'new-password',
-            ])
-            ->call('updatePassword')
-            ->assertHasErrors(['data.current_password']);
+        $testable = Livewire::test(UpdatePasswordForm::class);
+        $testable->fillForm([
+            'current_password' => 'wrong-password',
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ]);
+        $testable->call('updatePassword');
+        $testable->assertHasErrors(['data.current_password']);
 
         /** @var User */
         $freshUser = $user->fresh();
@@ -65,14 +65,14 @@ class UpdatePasswordFormTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        Livewire::test(UpdatePasswordForm::class)
-            ->fillForm([
-                'current_password' => 'password',
-                'password' => 'new-password',
-                'password_confirmation' => 'wrong-password',
-            ])
-            ->call('updatePassword')
-            ->assertHasErrors(['data.password']);
+        $testable = Livewire::test(UpdatePasswordForm::class);
+        $testable->fillForm([
+            'current_password' => 'password',
+            'password' => 'new-password',
+            'password_confirmation' => 'wrong-password',
+        ]);
+        $testable->call('updatePassword');
+        $testable->assertHasErrors(['data.password']);
 
         /** @var User */
         $freshUser = $user->fresh();

@@ -67,7 +67,7 @@ class Register extends Component implements HasForms
                             ->required()
                             ->autocomplete('new-password')
                             ->rule(Password::default())
-                            ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                            ->dehydrateStateUsing(fn (string $state) => Hash::make($state))
                             ->same('passwordConfirmation')
                             ->validationAttribute(__('filament-panels::pages/auth/register.form.password.validation_attribute'))
                             ->extraInputAttributes(['name' => 'password']),

@@ -55,14 +55,14 @@ class TwoFactorAuthenticationFormTest extends TestCase
         ]);
         $this->actingAs($user);
 
-        $component = Livewire::test(TwoFactorAuthenticationForm::class)
-            ->call('enableTwoFactorAuthentication', 'password')
-            ->call('regenerateRecoveryCodes', 'password');
+        $testable = Livewire::test(TwoFactorAuthenticationForm::class);
+        $testable->call('enableTwoFactorAuthentication', 'password');
+        $testable->call('regenerateRecoveryCodes', 'password');
 
         /** @var User */
         $user = $user->fresh();
 
-        $component->call('regenerateRecoveryCodes', 'password');
+        $testable->call('regenerateRecoveryCodes', 'password');
 
         /** @var User */
         $freshUser = $user->fresh();
@@ -81,14 +81,14 @@ class TwoFactorAuthenticationFormTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $component = Livewire::test(TwoFactorAuthenticationForm::class)
-            ->call('enableTwoFactorAuthentication', 'password');
+        $testable = Livewire::test(TwoFactorAuthenticationForm::class);
+        $testable->call('enableTwoFactorAuthentication', 'password');
 
         /** @var User */
         $freshUser = $user->fresh();
         $this->assertNotNull($freshUser->two_factor_secret);
 
-        $component->call('disableTwoFactorAuthentication', 'password');
+        $testable->call('disableTwoFactorAuthentication', 'password');
 
         /** @var User */
         $freshUser = $user->fresh();
