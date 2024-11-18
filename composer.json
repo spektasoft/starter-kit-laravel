@@ -14,7 +14,7 @@
         "bezhansalleh/filament-shield": "^3.3.4",
         "filament/filament": "^3.2.124",
         "laravel-lang/common": "^6.4",
-        "laravel/framework": "^11.31.0",
+        "laravel/framework": "^11.32.0",
         "laravel/jetstream": "^5.3.2",
         "laravel/sanctum": "^4.0.3",
         "laravel/tinker": "^2.10",
