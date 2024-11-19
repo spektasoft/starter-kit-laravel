@@ -66,6 +66,7 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 \Awcodes\Curator\CuratorPlugin::make(),
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
+                \ShuvroRoy\FilamentSpatieLaravelBackup\FilamentSpatieLaravelBackupPlugin::make(),
             ])
             ->userMenuItems([
                 MenuItem::make()
