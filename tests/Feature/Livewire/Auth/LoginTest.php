@@ -19,10 +19,10 @@ class LoginTest extends TestCase
 
     public function test_login_has_form_and_fields(): void
     {
-        Livewire::test(Login::class)
-            ->assertFormExists()
-            ->assertFormFieldExists('email')
-            ->assertFormFieldExists('password')
-            ->assertFormFieldExists('remember');
+        $testable = Livewire::test(Login::class);
+        $testable->assertFormExists();
+        $testable->assertFormFieldExists('email');
+        $testable->assertFormFieldExists('password');
+        $testable->assertFormFieldExists('remember');
     }
 }

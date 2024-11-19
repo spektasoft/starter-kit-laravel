@@ -56,20 +56,15 @@ class ApiTokenManage extends Component implements HasForms, HasTable
     public $permissions = [];
 
     /**
-     * @var array<string, mixed> | null
-     */
-    public ?array $data = [];
-
-    /**
      * Mount the component.
      *
      * @return void
      */
     public function mount()
     {
-        $data['permissions'] = Jetstream::$defaultPermissions;
-
-        $this->form->fill($data);
+        /** @var string[] */
+        $defaultPermissions = Jetstream::$defaultPermissions;
+        $this->permissions = $defaultPermissions;
     }
 
     public function closeModalTokenDisplay(): void
@@ -125,9 +120,11 @@ class ApiTokenManage extends Component implements HasForms, HasTable
                             ->label(__('Token Name')),
                         Jetstream::hasPermissions() ? Forms\Components\CheckboxList::make('permissions')
                             ->label(__('Permissions'))
-                            ->options(collect(Jetstream::$permissions)->mapWithKeys(function (string $permission) {
-                                return [$permission => $permission];
-                            }))
+                            ->options(
+                                collect($this->getPermissions())->mapWithKeys(function (string $permission) {
+                                    return [$permission => $permission];
+                                })
+                            )
                             ->columns(2) : null,
                     ]))
                     ->footerActions([
@@ -195,8 +192,10 @@ class ApiTokenManage extends Component implements HasForms, HasTable
                 Action::make('permissions')
                     ->icon('heroicon-o-lock-closed')
                     ->action(function (Model $record, array $data) {
+                        /** @var string[] */
+                        $abilities = $data['abilities'];
                         $record->forceFill([
-                            'abilities' => Jetstream::validPermissions($data['abilities']),
+                            'abilities' => Jetstream::validPermissions($abilities),
                         ])->save();
 
                         Notification::make()
@@ -208,20 +207,25 @@ class ApiTokenManage extends Component implements HasForms, HasTable
                     ->modalHeading(__('API Token Permissions'))
                     ->modalWidth('2xl')
                     ->mountUsing(
-                        fn (ComponentContainer $form, Model $record) => $form->fill($record->toArray())
-                    )
+                        function (ComponentContainer $form, Model $record) {
+                            /** @var ?array<string, mixed> */
+                            $data = $record->toArray();
+                            $form->fill($data);
+                        })
                     ->form([
                         Forms\Components\CheckboxList::make('abilities')
                             ->label(__('Permissions'))
-                            ->options(collect(Jetstream::$permissions)->mapWithKeys(function (string $permission) {
+                            ->options(collect($this->getPermissions())->mapWithKeys(function (string $permission) {
                                 return [$permission => $permission];
                             }))
-                            ->afterStateHydrated(function ($component, $state) {
-                                $permissions = Jetstream::$permissions;
+                            ->afterStateHydrated(function (Forms\Components\Component $component, $state) {
+                                /** @var string[] */
+                                $mState = $state;
+                                $permissions = $this->getPermissions();
 
                                 $tokenPermissions = collect($permissions)
-                                    ->filter(function ($permission) use ($state) {
-                                        return in_array($permission, $state);
+                                    ->filter(function ($permission) use ($mState) {
+                                        return in_array($permission, $mState);
                                     })
                                     ->values()
                                     ->toArray();
@@ -236,5 +240,16 @@ class ApiTokenManage extends Component implements HasForms, HasTable
             ->bulkActions([
                 DeleteBulkAction::make(),
             ]);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getPermissions()
+    {
+        /** @var string[] */
+        $permissions = Jetstream::$permissions;
+
+        return $permissions;
     }
 }

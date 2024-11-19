@@ -7,7 +7,6 @@ use App\Models\User;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Form;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithSession;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -24,9 +23,9 @@ class LogoutOtherBrowserSessionsTest extends TestCase
 
     public function test_form_and_components_exist(): void
     {
-        Livewire::test(LogoutOtherBrowserSessionsForm::class)
-            ->assertFormExists()
-            ->assertFormComponentExists('browser-sessions');
+        $testable = Livewire::test(LogoutOtherBrowserSessionsForm::class);
+        $testable->assertFormExists();
+        $testable->assertFormComponentExists('browser-sessions');
     }
 
     public function test_can_be_logged_out(): void
@@ -35,9 +34,10 @@ class LogoutOtherBrowserSessionsTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        /** @var Form */
-        $form = Livewire::test(LogoutOtherBrowserSessionsForm::class)
-            ->instance()->form;
+        /** @var LogoutOtherBrowserSessionsForm */
+        $component = Livewire::test(LogoutOtherBrowserSessionsForm::class)
+            ->instance();
+        $form = $component->form;
 
         /** @var Section */
         $section = $form->getComponent(function (Component $component) {

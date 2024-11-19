@@ -58,9 +58,10 @@ class DeleteUserFormTest extends TestCase
 
     private function getDeleteAction(): Action
     {
-        $livewire = Livewire::test(DeleteUserForm::class);
+        /** @var DeleteUserForm */
+        $component = Livewire::test(DeleteUserForm::class)->instance();
         /** @var Form */
-        $form = $livewire->instance()->form;
+        $form = $component->form;
         /** @var Section */
         $section = collect($form->getFlatComponents())->first(fn ($component) => $component instanceof Section);
         /** @var Action */

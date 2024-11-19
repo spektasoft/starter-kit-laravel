@@ -67,6 +67,7 @@ class UpdatePasswordForm extends Component implements HasForms
 
     public function mount(): void
     {
+        /** @var ?array<string, mixed> */
         $data = $this->user->withoutRelations()->toArray();
         $this->form->fill($data);
     }

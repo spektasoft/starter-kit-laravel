@@ -17,6 +17,9 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Jetstream\Contracts\DeletesUsers;
 use Livewire\Component;
 
+/**
+ * @property Form $form
+ */
 class DeleteUserForm extends Component implements HasForms
 {
     use HasUser;
@@ -30,7 +33,7 @@ class DeleteUserForm extends Component implements HasForms
                     ->heading(__('Delete Account'))
                     ->description(__('Permanently delete your account.'))
                     ->schema([
-                        View::make('delete-account')
+                        View::make('delete-account') // @phpstan-ignore-line
                             ->view('components.raw', ['html' => '<div class="max-w-xl text-sm text-gray-600 dark:text-gray-400">'.__('Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.').'</div>']),
                     ])
                     ->footerActions([
@@ -39,11 +42,13 @@ class DeleteUserForm extends Component implements HasForms
                             ->color('danger')
                             ->modalDescription(__('Are you sure you want to delete your account? Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.'))
                             ->action(function (array $data): void {
+                                /** @var string */
+                                $currentPassword = $data['current_password'];
                                 $this->deleteUser(
                                     app(Request::class),
                                     app(DeletesUsers::class),
                                     app(StatefulGuard::class),
-                                    $data['current_password']
+                                    $currentPassword
                                 );
                             }),
                     ])

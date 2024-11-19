@@ -22,6 +22,9 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Jetstream\Agent;
 use Livewire\Component;
 
+/**
+ * @property Form $form
+ */
 class LogoutOtherBrowserSessionsForm extends Component implements HasForms
 {
     use HasUser;
@@ -36,7 +39,7 @@ class LogoutOtherBrowserSessionsForm extends Component implements HasForms
                     ->heading(__('Browser Sessions'))
                     ->description(__('Manage and log out your active sessions on other browsers and devices.'))
                     ->schema([
-                        ComponentsView::make('browser-sessions')
+                        ComponentsView::make('browser-sessions') // @phpstan-ignore-line
                             ->key('browser-sessions')
                             ->view('components.browser-sessions'),
                     ])
@@ -44,9 +47,11 @@ class LogoutOtherBrowserSessionsForm extends Component implements HasForms
                         PasswordConfirmationAction::make('logout_other_browser_sessions')
                             ->label(__('Log Out Other Browser Sessions'))
                             ->action(function (array $data): void {
+                                /** @var string */
+                                $currentPassword = $data['current_password'];
                                 $this->logoutOtherBrowserSessions(
                                     app(StatefulGuard::class),
-                                    $data['current_password']
+                                    $currentPassword
                                 );
                             }),
                     ])
@@ -63,7 +68,10 @@ class LogoutOtherBrowserSessionsForm extends Component implements HasForms
     public function getSessionsProperty()
     {
         if (config('session.driver') !== 'database') {
-            return collect();
+            /** @var array<int, SessionData> */
+            $emptyArray = [];
+
+            return collect($emptyArray);
         }
 
         return collect(

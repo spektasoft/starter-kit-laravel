@@ -57,11 +57,7 @@ class UserController extends Controller
         Authorizer::authorizeToken('create');
         Authorizer::authorize('create_user', User::class);
 
-        if (config('fortify.lowercase_usernames')) {
-            $request->merge([
-                Fortify::username() => Str::lower($request->{Fortify::username()}),
-            ]);
-        }
+        $request = $this->normalizeRequest($request);
 
         $input = $request->all();
 
@@ -71,10 +67,13 @@ class UserController extends Controller
             'password' => 'required|string|min:8',
         ])->validate();
 
+        /** @var string */
+        $password = $input['password'];
+
         User::create([
             'name' => $input['name'],
             'email' => $input['email'],
-            'password' => Hash::make($input['password']),
+            'password' => Hash::make($password),
         ]);
 
         return response()->json(
@@ -96,11 +95,7 @@ class UserController extends Controller
             'password' => ['nullable', 'string', Password::default()],
         ])->validate();
 
-        if (config('fortify.lowercase_usernames')) {
-            $request->merge([
-                Fortify::username() => Str::lower($request->{Fortify::username()}),
-            ]);
-        }
+        $request = $this->normalizeRequest($request);
 
         $dataToUpdate = [];
 
@@ -113,7 +108,9 @@ class UserController extends Controller
         }
 
         if (isset($input['password'])) {
-            $dataToUpdate['password'] = Hash::make($input['password']);
+            /** @var string */
+            $password = $input['password'];
+            $dataToUpdate['password'] = Hash::make($password);
         }
 
         try {
@@ -190,5 +187,18 @@ class UserController extends Controller
         }
 
         throw new ModelNotFoundException;
+    }
+
+    private function normalizeRequest(Request $request): Request
+    {
+        if (config('fortify.lowercase_usernames')) {
+            /** @var string */
+            $username = $request->{Fortify::username()};
+            $request->merge([
+                Fortify::username() => Str::lower($username),
+            ]);
+        }
+
+        return $request;
     }
 }

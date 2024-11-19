@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e39dc9ae779f43c45514e902e76a5faf",
+    "content-hash": "fd2801c904c4c48fe95da0621e697d69",
     "packages": [
         {
             "name": "adhocore/jwt",
@@ -924,16 +924,16 @@
         },
         {
             "name": "anourvalar/eloquent-serialize",
-            "version": "1.2.25",
+            "version": "1.2.26",
             "source": {
                 "type": "git",
                 "url": "https://github.com/AnourValar/eloquent-serialize.git",
-                "reference": "6d7a868ae4218b9d7796334ff9a17e1539bad48a"
+                "reference": "756c1232ff0d02321fd90f4fe3c221d6a7b8d697"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/AnourValar/eloquent-serialize/zipball/6d7a868ae4218b9d7796334ff9a17e1539bad48a",
-                "reference": "6d7a868ae4218b9d7796334ff9a17e1539bad48a",
+                "url": "https://api.github.com/repos/AnourValar/eloquent-serialize/zipball/756c1232ff0d02321fd90f4fe3c221d6a7b8d697",
+                "reference": "756c1232ff0d02321fd90f4fe3c221d6a7b8d697",
                 "shasum": ""
             },
             "require": {
@@ -984,9 +984,9 @@
             ],
             "support": {
                 "issues": "https://github.com/AnourValar/eloquent-serialize/issues",
-                "source": "https://github.com/AnourValar/eloquent-serialize/tree/1.2.25"
+                "source": "https://github.com/AnourValar/eloquent-serialize/tree/1.2.26"
             },
-            "time": "2024-09-16T12:59:37+00:00"
+            "time": "2024-11-16T12:29:47+00:00"
         },
         {
             "name": "archtechx/enums",
@@ -4337,16 +4337,16 @@
         },
         {
             "name": "laravel-lang/lang",
-            "version": "15.9.3",
+            "version": "15.9.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Laravel-Lang/lang.git",
-                "reference": "48f7e2401929b15f0beff9a78e168e9596beea0b"
+                "reference": "112273e3d30ab52cbb8420418f923b3e3c998c93"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Laravel-Lang/lang/zipball/48f7e2401929b15f0beff9a78e168e9596beea0b",
-                "reference": "48f7e2401929b15f0beff9a78e168e9596beea0b",
+                "url": "https://api.github.com/repos/Laravel-Lang/lang/zipball/112273e3d30ab52cbb8420418f923b3e3c998c93",
+                "reference": "112273e3d30ab52cbb8420418f923b3e3c998c93",
                 "shasum": ""
             },
             "require": {
@@ -4396,7 +4396,7 @@
                 "issues": "https://github.com/Laravel-Lang/lang/issues",
                 "source": "https://github.com/Laravel-Lang/lang"
             },
-            "time": "2024-11-04T11:47:57+00:00"
+            "time": "2024-11-16T23:04:53+00:00"
         },
         {
             "name": "laravel-lang/locale-list",
@@ -5060,16 +5060,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v11.31.0",
+            "version": "v11.32.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "365090ed2c68244e3141cdb5e247cdf3dfba2c40"
+                "reference": "bc2aad63f83ee5089be7b21cf29d645ccf31e927"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/365090ed2c68244e3141cdb5e247cdf3dfba2c40",
-                "reference": "365090ed2c68244e3141cdb5e247cdf3dfba2c40",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/bc2aad63f83ee5089be7b21cf29d645ccf31e927",
+                "reference": "bc2aad63f83ee5089be7b21cf29d645ccf31e927",
                 "shasum": ""
             },
             "require": {
@@ -5265,7 +5265,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2024-11-12T15:36:15+00:00"
+            "time": "2024-11-15T17:04:33+00:00"
         },
         {
             "name": "laravel/jetstream",
@@ -12017,40 +12017,40 @@
         },
         {
             "name": "larastan/larastan",
-            "version": "v2.9.11",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/larastan/larastan.git",
-                "reference": "54eccd35d1732b9ee4392c25aec606a6a9c521e7"
+                "reference": "88f46e3f2cd9d2a14dba13ef293b822a75832e62"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/larastan/larastan/zipball/54eccd35d1732b9ee4392c25aec606a6a9c521e7",
-                "reference": "54eccd35d1732b9ee4392c25aec606a6a9c521e7",
+                "url": "https://api.github.com/repos/larastan/larastan/zipball/88f46e3f2cd9d2a14dba13ef293b822a75832e62",
+                "reference": "88f46e3f2cd9d2a14dba13ef293b822a75832e62",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "illuminate/console": "^9.52.16 || ^10.28.0 || ^11.16",
-                "illuminate/container": "^9.52.16 || ^10.28.0 || ^11.16",
-                "illuminate/contracts": "^9.52.16 || ^10.28.0 || ^11.16",
-                "illuminate/database": "^9.52.16 || ^10.28.0 || ^11.16",
-                "illuminate/http": "^9.52.16 || ^10.28.0 || ^11.16",
-                "illuminate/pipeline": "^9.52.16 || ^10.28.0 || ^11.16",
-                "illuminate/support": "^9.52.16 || ^10.28.0 || ^11.16",
-                "php": "^8.0.2",
+                "illuminate/console": "^11.15.0",
+                "illuminate/container": "^11.15.0",
+                "illuminate/contracts": "^11.15.0",
+                "illuminate/database": "^11.15.0",
+                "illuminate/http": "^11.15.0",
+                "illuminate/pipeline": "^11.15.0",
+                "illuminate/support": "^11.15.0",
+                "php": "^8.2",
                 "phpmyadmin/sql-parser": "^5.9.0",
-                "phpstan/phpstan": "^1.12.5"
+                "phpstan/phpstan": "^2.0.0"
             },
             "require-dev": {
                 "doctrine/coding-standard": "^12.0",
-                "laravel/framework": "^9.52.16 || ^10.28.0 || ^11.16",
-                "mockery/mockery": "^1.5.1",
-                "nikic/php-parser": "^4.19.1",
-                "orchestra/canvas": "^7.11.1 || ^8.11.0 || ^9.0.2",
-                "orchestra/testbench-core": "^7.33.0 || ^8.13.0 || ^9.0.9",
-                "phpstan/phpstan-deprecation-rules": "^1.2",
-                "phpunit/phpunit": "^9.6.13 || ^10.5.16"
+                "laravel/framework": "^11.15.0",
+                "mockery/mockery": "^1.6",
+                "nikic/php-parser": "^5.3",
+                "orchestra/canvas": "^v9.1.3",
+                "orchestra/testbench-core": "^9.5.2",
+                "phpstan/phpstan-deprecation-rules": "^2.0.0",
+                "phpunit/phpunit": "^10.5.16"
             },
             "suggest": {
                 "orchestra/testbench": "Using Larastan for analysing a package needs Testbench"
@@ -12098,27 +12098,15 @@
             ],
             "support": {
                 "issues": "https://github.com/larastan/larastan/issues",
-                "source": "https://github.com/larastan/larastan/tree/v2.9.11"
+                "source": "https://github.com/larastan/larastan/tree/v3.0.0"
             },
             "funding": [
                 {
-                    "url": "https://www.paypal.com/paypalme/enunomaduro",
-                    "type": "custom"
-                },
-                {
                     "url": "https://github.com/canvural",
                     "type": "github"
-                },
-                {
-                    "url": "https://github.com/nunomaduro",
-                    "type": "github"
-                },
-                {
-                    "url": "https://www.patreon.com/nunomaduro",
-                    "type": "patreon"
                 }
             ],
-            "time": "2024-11-11T23:11:00+00:00"
+            "time": "2024-11-15T09:38:34+00:00"
         },
         {
             "name": "laravel/pail",
@@ -12842,20 +12830,20 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.12.10",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "fc463b5d0fe906dcf19689be692c65c50406a071"
+                "reference": "6c98c7600fc717b2c78c11ef60040d5b1e359c82"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/fc463b5d0fe906dcf19689be692c65c50406a071",
-                "reference": "fc463b5d0fe906dcf19689be692c65c50406a071",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/6c98c7600fc717b2c78c11ef60040d5b1e359c82",
+                "reference": "6c98c7600fc717b2c78c11ef60040d5b1e359c82",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2|^8.0"
+                "php": "^7.4|^8.0"
             },
             "conflict": {
                 "phpstan/phpstan-shim": "*"
@@ -12896,7 +12884,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-11-11T15:37:09+00:00"
+            "time": "2024-11-17T14:17:00+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",

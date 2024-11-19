@@ -89,9 +89,11 @@ class TwoFactorChallengeController
 
     private function verifyAndReplaceValidRecoveryCode(User $user, string $recoveryCode): bool
     {
-        /** @var string | null */
-        $code = collect($user->recoveryCodes())->first(function ($code) use ($recoveryCode) {
-            return hash_equals($code, $recoveryCode) ? $code : null;
+        /** @var string[] */
+        $recoveryCodes = $user->recoveryCodes();
+        /** @var ?string */
+        $code = collect($recoveryCodes)->first(function ($code) use ($recoveryCode) {
+            return hash_equals($code, $recoveryCode);
         });
 
         if ($code === null) {
