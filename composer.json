@@ -19,6 +19,7 @@
         "laravel/sanctum": "^4.0.3",
         "laravel/tinker": "^2.10",
         "livewire/livewire": "^3.5.12",
+        "shuvroroy/filament-spatie-laravel-backup": "^2.2",
         "spatie/laravel-data": "^4.11.1"
     },
     "require-dev": {
