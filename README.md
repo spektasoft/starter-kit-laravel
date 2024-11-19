@@ -14,6 +14,16 @@ ULIDs are used as the default ID type.
 
 1. Download this repository and extract it anywhere in your local environment.
 
+1. Install dependencies:
+
+    ```
+    composer install
+    ```
+
+    ```
+    npm i
+    ```
+
 1. Create the `.env` file:
 
     ```
@@ -47,6 +57,16 @@ ULIDs are used as the default ID type.
     ```
 
 To develop a universal app, follow the additional instructions below:
+
+1. Make sure that your devices are connected to the same network.
+
+1. Get your `IP Address`:
+
+    On Windows:
+
+    ```
+    ipconfig /all
+    ```
 
 1. In your `.env` file, use URL with `IP Address` instead of `localhost`. Replace `IP Address` with your own:
 
