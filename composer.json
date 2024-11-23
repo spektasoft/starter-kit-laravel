@@ -18,8 +18,10 @@
         "laravel/jetstream": "^5.3.3",
         "laravel/sanctum": "^4.0.4",
         "laravel/tinker": "^2.10",
+        "lasserafn/php-initial-avatar-generator": "^4.4",
         "livewire/livewire": "^3.5.12",
         "shuvroroy/filament-spatie-laravel-backup": "^2.2.3",
+        "spatie/color": "^1.6",
         "spatie/laravel-data": "^4.11.1"
     },
     "require-dev": {
