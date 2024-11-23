@@ -38,6 +38,12 @@ ULIDs are used as the default ID type.
     # Example: admin@example.com,su@example.com
     ```
 
+1. Assign a backup email address to send backup result notifications:
+
+    ```
+    BACKUP_MAIL_TO_ADDRESS={EMAIL_ADDRESS}
+    ```
+
 1. Generate the `APP_KEY`:
 
     ```
