@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Laravel\Fortify\Fortify;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\Features;
@@ -130,6 +131,15 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
             return null;
         }
 
+        $sessionKey = 'avatar-'.$this->id;
+
+        if (Session::has($sessionKey)) {
+            /** @var string */
+            $encodedImage = Session::get($sessionKey);
+
+            return $encodedImage;
+        }
+
         $avatar = new InitialAvatar;
         /** @var string */
         $foregroundColor = config('avatar.colors.foreground', '#ffffff');
@@ -150,7 +160,11 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
             ->size(64)
             ->generate();
 
-        return $image->encode('data-url')->encoded;
+        $encodedImage = $image->encode('data-url')->encoded;
+
+        Session::put($sessionKey, $encodedImage);
+
+        return $encodedImage;
     }
 
     public function isSuperUser(): bool

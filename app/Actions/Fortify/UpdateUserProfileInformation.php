@@ -3,6 +3,7 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
@@ -28,6 +29,11 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             /** @var \Illuminate\Http\UploadedFile */
             $photo = $input['photo'];
             $user->updateProfilePhoto($photo);
+        }
+
+        $sessionKey = 'avatar-'.$user->id;
+        if (Session::has($sessionKey)) {
+            Session::remove($sessionKey);
         }
 
         if (Jetstream::managesProfilePhotos()) {
