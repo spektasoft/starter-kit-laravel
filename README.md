@@ -38,6 +38,12 @@ ULIDs are used as the default ID type.
     # Example: admin@example.com,su@example.com
     ```
 
+1. Assign a backup email address to send backup result notifications:
+
+    ```
+    BACKUP_MAIL_TO_ADDRESS={EMAIL_ADDRESS}
+    ```
+
 1. Generate the `APP_KEY`:
 
     ```
@@ -95,6 +101,10 @@ To develop a universal app, follow the additional instructions below:
     ```
     composer run dev:host
     ```
+
+## Upstream
+
+Apply any changes available from the Laravel [11.x branch](https://github.com/laravel/laravel/compare/8b67958f49054f3e6c9b61d2e0b0a1e5323f30f4...11.x).
 
 ## License
 
