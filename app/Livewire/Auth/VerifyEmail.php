@@ -38,8 +38,7 @@ class VerifyEmail extends Component implements HasForms
                                 ->url(route('profile.show')) : null,
                         ]))->alignEnd(),
                     ]),
-            ])
-            ->statePath('data');
+            ]);
     }
 
     public function mount(): void
