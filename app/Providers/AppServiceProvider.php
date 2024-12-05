@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Contracts\Jwt;
-use App\Models\Permission;
 use App\Services\AhcJwtService;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
@@ -31,8 +30,5 @@ class AppServiceProvider extends ServiceProvider
             'primary' => Color::Indigo,
             'secondary' => Color::Emerald,
         ]);
-
-        Permission::firstOrCreate(['name' => 'download-backup']);
-        Permission::firstOrCreate(['name' => 'delete-backup']);
     }
 }

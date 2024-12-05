@@ -8,4 +8,12 @@ use Spatie\Permission\Models\Permission as SpatiePermission;
 class Permission extends SpatiePermission
 {
     use HasUlids;
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::firstOrCreate(['name' => 'download-backup']);
+        static::firstOrCreate(['name' => 'delete-backup']);
+    }
 }
