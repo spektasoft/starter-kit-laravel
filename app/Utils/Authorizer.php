@@ -3,6 +3,8 @@
 namespace App\Utils;
 
 use App\Models\User;
+use Auth;
+use Gate;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\Contracts\HasAbilities;
@@ -30,6 +32,27 @@ class Authorizer
                 throw new AuthorizationException;
             }
         }
+    }
+
+    public static function check(string $action, Model|string $model): bool
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return false;
+        }
+
+        /** @var object|string|null */
+        $policy = Gate::getPolicyFor($model);
+
+        if (
+            ($policy === null) ||
+            (! method_exists($policy, $action))
+        ) {
+            return false;
+        }
+
+        return Gate::forUser($user)->check($action, $model);
     }
 
     public static function getUser(): User
