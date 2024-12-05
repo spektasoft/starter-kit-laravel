@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Concerns\SuperUserAuthorizable;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
@@ -36,6 +37,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     use HasRoles;
     use HasUlids;
     use Notifiable;
+    use SuperUserAuthorizable;
     use TwoFactorAuthenticatable;
 
     /**
@@ -88,21 +90,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    /**
-     * Determine if the entity has the given abilities.
-     *
-     * @param  array<string>|string  $abilities
-     * @param  array|mixed  $arguments
-     */
-    public function can($abilities, $arguments = []): bool
-    {
-        if ($this->isSuperUser()) {
-            return true;
-        }
-
-        return parent::can($abilities, $arguments);
     }
 
     /**
