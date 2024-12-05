@@ -26,7 +26,7 @@ class UserController extends Controller
     public function index()
     {
         Authorizer::authorizeToken('read');
-        Authorizer::authorize('view_any_user', User::class);
+        Authorizer::authorize('viewAny', User::class);
 
         /** @var string */
         $tableSortColumn = request()->input('tableSortColumn') ?? 'id';
@@ -47,7 +47,7 @@ class UserController extends Controller
     public function show(User $user): UserData
     {
         Authorizer::authorizeToken('read');
-        Authorizer::authorize('view_user', $user);
+        Authorizer::authorize('view', $user);
 
         return UserData::from($user);
     }
@@ -55,7 +55,7 @@ class UserController extends Controller
     public function store(Request $request): JsonResponse
     {
         Authorizer::authorizeToken('create');
-        Authorizer::authorize('create_user', User::class);
+        Authorizer::authorize('create', User::class);
 
         $request = $this->normalizeRequest($request);
 
@@ -85,7 +85,7 @@ class UserController extends Controller
     public function update(User $user, Request $request): JsonResponse
     {
         Authorizer::authorizeToken('update');
-        Authorizer::authorize('update_user', $user);
+        Authorizer::authorize('update', $user);
 
         $input = $request->all();
 
@@ -128,7 +128,7 @@ class UserController extends Controller
     public function destroy(User $user): JsonResponse
     {
         Authorizer::authorizeToken('delete');
-        Authorizer::authorize('delete_user', $user);
+        Authorizer::authorize('delete', $user);
 
         $user->delete();
 

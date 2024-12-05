@@ -11,11 +11,23 @@ use Laravel\Sanctum\Contracts\HasAbilities;
 
 class Authorizer
 {
-    public static function authorize(string $permission, Model|string $model): void
+    public static function authorize(string $action, Model|string $model): void
     {
         $user = static::getUser();
 
-        if ($user->cannot($permission, $model)) {
+        /** @var object|string|null */
+        $policy = Gate::getPolicyFor($model);
+
+        if (
+            ($policy === null) ||
+            (! method_exists($policy, $action))
+        ) {
+            throw new AuthorizationException;
+        }
+
+        $isAllowed = Gate::forUser($user)->check($action, $model);
+
+        if ($isAllowed) {
             throw new AuthorizationException;
         }
     }
