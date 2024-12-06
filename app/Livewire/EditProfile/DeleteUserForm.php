@@ -53,8 +53,7 @@ class DeleteUserForm extends Component implements HasForms
                             }),
                     ])
                     ->aside(),
-            ])
-            ->statePath('data');
+            ]);
     }
 
     /**

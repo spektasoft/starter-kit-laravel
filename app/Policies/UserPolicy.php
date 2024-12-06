@@ -46,6 +46,10 @@ class UserPolicy
      */
     public function delete(User $user, User $otherUser): bool
     {
+        if ($otherUser->isReferenced()) {
+            return false;
+        }
+
         return $user->can('delete_user');
     }
 
@@ -62,6 +66,10 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $otherUser): bool
     {
+        if ($otherUser->isReferenced()) {
+            return false;
+        }
+
         return $user->can('force_delete_user');
     }
 

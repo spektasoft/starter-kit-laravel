@@ -3,19 +3,29 @@
 namespace App\Utils;
 
 use App\Models\User;
+use Auth;
+use Gate;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\Contracts\HasAbilities;
 
 class Authorizer
 {
-    public static function authorize(string $permission, Model|string $model): void
+    public static function authorize(string $action, Model|string $model): void
     {
         $user = static::getUser();
 
-        if ($user->cannot($permission, $model)) {
+        /** @var object|string|null */
+        $policy = Gate::getPolicyFor($model);
+
+        if (
+            ($policy === null) ||
+            (! method_exists($policy, $action))
+        ) {
             throw new AuthorizationException;
         }
+
+        Gate::forUser($user)->authorize($action, $model);
     }
 
     public static function authorizeToken(string $tokenPermission): void
@@ -30,6 +40,27 @@ class Authorizer
                 throw new AuthorizationException;
             }
         }
+    }
+
+    public static function check(string $action, Model|string $model): bool
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return false;
+        }
+
+        /** @var object|string|null */
+        $policy = Gate::getPolicyFor($model);
+
+        if (
+            ($policy === null) ||
+            (! method_exists($policy, $action))
+        ) {
+            return false;
+        }
+
+        return Gate::forUser($user)->check($action, $model);
     }
 
     public static function getUser(): User

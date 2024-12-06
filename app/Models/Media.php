@@ -26,13 +26,22 @@ class Media extends CuratorMedia
         return $this->belongsTo(User::class);
     }
 
+    public function isReferenced(): bool
+    {
+        if ($this->usersWithThisAsProfilePhoto()->count() > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Get all of the Users for the Media
      *
      * @return HasMany<User, $this>
      */
-    public function users(): HasMany
+    public function usersWithThisAsProfilePhoto(): HasMany
     {
-        return $this->hasMany(User::class, 'photo_profile_media_id');
+        return $this->hasMany(User::class, 'profile_photo_media_id');
     }
 }

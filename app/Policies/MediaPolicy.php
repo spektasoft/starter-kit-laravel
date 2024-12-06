@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Media;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class MediaPolicy
@@ -15,7 +15,7 @@ class MediaPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_media');
+        return true;
     }
 
     /**
@@ -23,6 +23,10 @@ class MediaPolicy
      */
     public function view(User $user, Media $media): bool
     {
+        if ($user->id === $media->creator?->id) {
+            return true;
+        }
+
         return $user->can('view_media');
     }
 
@@ -31,7 +35,7 @@ class MediaPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_media');
+        return true;
     }
 
     /**
@@ -39,6 +43,10 @@ class MediaPolicy
      */
     public function update(User $user, Media $media): bool
     {
+        if ($user->id === $media->creator?->id) {
+            return true;
+        }
+
         return $user->can('update_media');
     }
 
@@ -47,6 +55,13 @@ class MediaPolicy
      */
     public function delete(User $user, Media $media): bool
     {
+        if ($media->isReferenced()) {
+            return false;
+        }
+        if ($user->id === $media->creator?->id) {
+            return true;
+        }
+
         return $user->can('delete_media');
     }
 
@@ -55,7 +70,7 @@ class MediaPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_media');
+        return true;
     }
 
     /**
@@ -63,6 +78,13 @@ class MediaPolicy
      */
     public function forceDelete(User $user, Media $media): bool
     {
+        if ($media->isReferenced()) {
+            return false;
+        }
+        if ($user->id === $media->creator?->id) {
+            return true;
+        }
+
         return $user->can('force_delete_media');
     }
 
@@ -71,7 +93,7 @@ class MediaPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_media');
+        return true;
     }
 
     /**
@@ -79,6 +101,10 @@ class MediaPolicy
      */
     public function restore(User $user, Media $media): bool
     {
+        if ($user->id === $media->creator?->id) {
+            return true;
+        }
+
         return $user->can('restore_media');
     }
 
@@ -87,7 +113,7 @@ class MediaPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_media');
+        return true;
     }
 
     /**
@@ -95,6 +121,10 @@ class MediaPolicy
      */
     public function replicate(User $user, Media $media): bool
     {
+        if ($user->id === $media->creator?->id) {
+            return true;
+        }
+
         return $user->can('replicate_media');
     }
 
@@ -103,6 +133,6 @@ class MediaPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_media');
+        return true;
     }
 }

@@ -15,8 +15,7 @@ return new class extends Migration
             $table->foreignUlid('profile_photo_media_id')
                 ->nullable()
                 ->after('id')
-                ->constrained(app(config('curator.model'))->getTable())
-                ->nullOnDelete();
+                ->constrained(app(config('curator.model'))->getTable());
         });
     }
 

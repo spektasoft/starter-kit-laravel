@@ -56,8 +56,7 @@ class LogoutOtherBrowserSessionsForm extends Component implements HasForms
                             }),
                     ])
                     ->aside(),
-            ])
-            ->statePath('data');
+            ]);
     }
 
     /**
