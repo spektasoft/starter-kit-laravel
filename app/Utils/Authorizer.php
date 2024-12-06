@@ -25,11 +25,7 @@ class Authorizer
             throw new AuthorizationException;
         }
 
-        $isAllowed = Gate::forUser($user)->check($action, $model);
-
-        if ($isAllowed) {
-            throw new AuthorizationException;
-        }
+        Gate::forUser($user)->authorize($action, $model);
     }
 
     public static function authorizeToken(string $tokenPermission): void
