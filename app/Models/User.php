@@ -158,6 +158,15 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         return $encodedImage;
     }
 
+    public function isReferenced(): bool
+    {
+        if ($this->media()->count() > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function isSuperUser(): bool
     {
         /** @var string[] */
