@@ -6,6 +6,7 @@ use App\Data\UserData;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Utils\Authorizer;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -141,26 +142,28 @@ class UserController extends Controller
     public function can(Request $request): JsonResponse
     {
         $request->validate([
-            'permission' => 'required',
+            'action' => 'required',
             'resource' => 'required',
             'id' => 'nullable',
         ]);
 
         /** @var string */
-        $permission = $request->input('permission');
+        $action = $request->input('action');
         /** @var string */
         $resource = $request->input('resource');
         /** @var string|null */
         $id = $request->input('id');
 
+        /** @var Model|string */
         $model = $this->guessModelFromResource($resource);
         if ($id) {
+            /** @var Model */
             $model = $model::find($id);
         }
 
-        if (User::auth()?->cannot($permission, $model)) {
+        if (! Authorizer::check($action, $model)) {
             return response()->json(
-                ['message' => 'Permission denies!'],
+                ['message' => 'Permission denied!'],
                 JsonResponse::HTTP_FORBIDDEN
             );
         }
