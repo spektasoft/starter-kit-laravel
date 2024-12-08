@@ -6,6 +6,7 @@ use App\Data\UserData;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Utils\Authorizer;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -141,26 +142,28 @@ class UserController extends Controller
     public function can(Request $request): JsonResponse
     {
         $request->validate([
-            'permission' => 'required',
+            'action' => 'required',
             'resource' => 'required',
             'id' => 'nullable',
         ]);
 
         /** @var string */
-        $permission = $request->input('permission');
+        $action = $request->input('action');
         /** @var string */
         $resource = $request->input('resource');
         /** @var string|null */
         $id = $request->input('id');
 
+        /** @var Model|string */
         $model = $this->guessModelFromResource($resource);
         if ($id) {
+            /** @var Model */
             $model = $model::find($id);
         }
 
-        if (User::auth()?->cannot($permission, $model)) {
+        if (! Authorizer::check($action, $model)) {
             return response()->json(
-                ['message' => 'Permission denies!'],
+                ['message' => 'Permission denied!'],
                 JsonResponse::HTTP_FORBIDDEN
             );
         }
@@ -176,11 +179,14 @@ class UserController extends Controller
      */
     private function guessModelFromResource(string $resource)
     {
-        if (substr($resource, -1) === 's') {
-            $resource = substr($resource, 0, -1);
+        $namespace = 'App\\Models\\';
+        $modelName = $namespace.ucfirst($resource);
+
+        if (class_exists($modelName)) {
+            return $modelName;
         }
 
-        $modelName = 'App\\Models\\'.ucfirst($resource);
+        $modelName = $namespace.ucfirst(str($resource)->singular());
 
         if (class_exists($modelName)) {
             return $modelName;
