@@ -179,11 +179,14 @@ class UserController extends Controller
      */
     private function guessModelFromResource(string $resource)
     {
-        if (substr($resource, -1) === 's') {
-            $resource = substr($resource, 0, -1);
+        $namespace = 'App\\Models\\';
+        $modelName = $namespace.ucfirst($resource);
+
+        if (class_exists($modelName)) {
+            return $modelName;
         }
 
-        $modelName = 'App\\Models\\'.ucfirst($resource);
+        $modelName = $namespace.ucfirst(str($resource)->singular());
 
         if (class_exists($modelName)) {
             return $modelName;
