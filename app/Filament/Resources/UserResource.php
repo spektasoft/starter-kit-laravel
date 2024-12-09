@@ -4,6 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
+use Awcodes\Curator\Components\Forms\CuratorPicker;
+use Awcodes\Curator\Components\Tables\CuratorColumn;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -17,6 +19,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
+use Laravel\Jetstream\Jetstream;
 
 class UserResource extends Resource
 {
@@ -31,7 +34,14 @@ class UserResource extends Resource
                 Forms\Components\Grid::make([
                     'sm' => 1,
                     'md' => 2,
-                ])->schema([
+                ])->schema(array_filter([
+                    Jetstream::managesProfilePhotos() ?
+                    CuratorPicker::make('profile_photo_media_id')
+                        ->relationship('profilePhotoMedia', 'name')
+                        ->label(__('Photo'))
+                        ->buttonLabel(__('Select A New Photo'))
+                        ->extraAttributes(['class' => 'sm:w-fit'])
+                        ->columnSpanFull() : null,
                     Forms\Components\TextInput::make('name')
                         ->label(__('Name'))
                         ->required(),
@@ -55,14 +65,19 @@ class UserResource extends Resource
                     Forms\Components\DateTimePicker::make('email_verified_at')
                         ->label(__('user.resource.email_verified_at'))
                         ->native(false),
-                ]),
+                ])),
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
+            ->columns(array_filter([
+                Jetstream::managesProfilePhotos() ?
+                CuratorColumn::make('profile_photo_media_id')
+                    ->label(__('Photo'))
+                    ->circular()
+                    ->size(32) : null,
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Name'))
                     ->searchable(),
@@ -99,7 +114,7 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->label(__('user.resource.email_verified_at'))
                     ->dateTime(),
-            ])
+            ]))
             ->filters([
                 //
             ])
