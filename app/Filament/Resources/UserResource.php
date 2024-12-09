@@ -4,16 +4,14 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
@@ -30,29 +28,32 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                Grid::make([
+                Forms\Components\Grid::make([
                     'sm' => 1,
                     'md' => 2,
                 ])->schema([
-                    TextInput::make('name')
+                    Forms\Components\TextInput::make('name')
                         ->label(__('Name'))
                         ->required(),
-                    TextInput::make('email')
+                    Forms\Components\TextInput::make('email')
                         ->label(__('Email'))
                         ->required(),
-                    TextInput::make('password')
+                    Forms\Components\TextInput::make('password')
                         ->label(__('Password'))
                         ->password()
                         ->revealable()
                         ->dehydrateStateUsing(fn (string $state): string => Hash::make($state))
                         ->dehydrated(fn (?string $state): bool => filled($state))
                         ->required(fn (string $operation): bool => $operation === 'create'),
-                    Select::make('roles')
+                    Forms\Components\Select::make('roles')
                         ->label(__('Role'))
                         ->relationship('roles', 'name')
                         ->multiple()
                         ->preload()
                         ->searchable(),
+                    Forms\Components\DateTimePicker::make('email_verified_at')
+                        ->label(__('user.resource.email_verified_at'))
+                        ->native(false),
                 ]),
             ]);
     }
@@ -61,13 +62,13 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')
+                Tables\Columns\TextColumn::make('name')
                     ->label(__('Name'))
                     ->searchable(),
-                TextColumn::make('email')
+                Tables\Columns\TextColumn::make('email')
                     ->label(__('Email'))
                     ->searchable(),
-                TextColumn::make('roles')
+                Tables\Columns\TextColumn::make('roles')
                     ->label(__('Role'))
                     ->getStateUsing(function (User $record): string {
                         $roles = collect([]);
@@ -94,6 +95,9 @@ class UserResource extends Resource
                     ->badge()
                     ->separator(',')
                     ->default(''),
+                Tables\Columns\TextColumn::make('email_verified_at')
+                    ->label(__('user.resource.email_verified_at'))
+                    ->dateTime(),
             ])
             ->filters([
                 //
