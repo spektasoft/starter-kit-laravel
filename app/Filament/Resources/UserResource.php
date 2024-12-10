@@ -69,6 +69,16 @@ class UserResource extends Resource
             ]);
     }
 
+    public static function getModelLabel(): string
+    {
+        return trans_choice('user.resource.model_label', 1);
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return trans_choice('user.resource.model_label', 2);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
