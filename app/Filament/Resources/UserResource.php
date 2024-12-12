@@ -4,21 +4,22 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
+use Awcodes\Curator\Components\Forms\CuratorPicker;
+use Awcodes\Curator\Components\Tables\CuratorColumn;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
+use Laravel\Jetstream\Jetstream;
 
 class UserResource extends Resource
 {
@@ -30,44 +31,70 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                Grid::make([
+                Forms\Components\Grid::make([
                     'sm' => 1,
                     'md' => 2,
-                ])->schema([
-                    TextInput::make('name')
+                ])->schema(array_filter([
+                    Jetstream::managesProfilePhotos() ?
+                    CuratorPicker::make('profile_photo_media_id')
+                        ->relationship('profilePhotoMedia', 'name')
+                        ->label(__('Photo'))
+                        ->buttonLabel(__('Select A New Photo'))
+                        ->extraAttributes(['class' => 'sm:w-fit'])
+                        ->columnSpanFull() : null,
+                    Forms\Components\TextInput::make('name')
                         ->label(__('Name'))
                         ->required(),
-                    TextInput::make('email')
+                    Forms\Components\TextInput::make('email')
                         ->label(__('Email'))
-                        ->required(),
-                    TextInput::make('password')
+                        ->required()
+                        ->unique(ignoreRecord: true),
+                    Forms\Components\TextInput::make('password')
                         ->label(__('Password'))
                         ->password()
                         ->revealable()
                         ->dehydrateStateUsing(fn (string $state): string => Hash::make($state))
                         ->dehydrated(fn (?string $state): bool => filled($state))
                         ->required(fn (string $operation): bool => $operation === 'create'),
-                    Select::make('roles')
+                    Forms\Components\Select::make('roles')
                         ->label(__('Role'))
                         ->relationship('roles', 'name')
                         ->multiple()
                         ->preload()
                         ->searchable(),
-                ]),
+                    Forms\Components\DateTimePicker::make('email_verified_at')
+                        ->label(__('user.resource.email_verified_at'))
+                        ->native(false),
+                ])),
             ]);
+    }
+
+    public static function getModelLabel(): string
+    {
+        return trans_choice('user.resource.model_label', 1);
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return trans_choice('user.resource.model_label', 2);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
-                TextColumn::make('name')
+            ->columns(array_filter([
+                Jetstream::managesProfilePhotos() ?
+                CuratorColumn::make('profile_photo_media_id')
+                    ->label(__('Photo'))
+                    ->circular()
+                    ->size(32) : null,
+                Tables\Columns\TextColumn::make('name')
                     ->label(__('Name'))
                     ->searchable(),
-                TextColumn::make('email')
+                Tables\Columns\TextColumn::make('email')
                     ->label(__('Email'))
                     ->searchable(),
-                TextColumn::make('roles')
+                Tables\Columns\TextColumn::make('roles')
                     ->label(__('Role'))
                     ->getStateUsing(function (User $record): string {
                         $roles = collect([]);
@@ -94,7 +121,10 @@ class UserResource extends Resource
                     ->badge()
                     ->separator(',')
                     ->default(''),
-            ])
+                Tables\Columns\TextColumn::make('email_verified_at')
+                    ->label(__('user.resource.email_verified_at'))
+                    ->dateTime(),
+            ]))
             ->filters([
                 //
             ])
