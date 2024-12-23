@@ -11,7 +11,6 @@ return new class extends Migration
         Schema::create(app(config('curator.model'))->getTable(), function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->foreignUlid('creator_id')
-                ->nullable()
                 ->constrained('users');
             $table->string('disk')->default('public');
             $table->string('directory')->default('media');
