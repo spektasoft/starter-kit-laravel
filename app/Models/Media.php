@@ -6,6 +6,7 @@ use App\Observers\MediaObserver;
 use Awcodes\Curator\Models\Media as CuratorMedia;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -16,6 +17,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[ObservedBy([MediaObserver::class])]
 class Media extends CuratorMedia
 {
+    /** @use HasFactory<\Database\Factories\MediaFactory> */
+    use HasFactory;
+
     use HasUlids;
 
     /**
