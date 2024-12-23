@@ -12,22 +12,22 @@
         "adhocore/jwt": "^1.1.2",
         "awcodes/filament-curator": "^3.6.14",
         "bezhansalleh/filament-shield": "^3.3.4",
-        "filament/filament": "^3.2.128",
+        "filament/filament": "^3.2.131",
         "laravel-lang/common": "^6.4",
-        "laravel/framework": "^11.34.2",
-        "laravel/jetstream": "^5.3.3",
-        "laravel/sanctum": "^4.0.5",
+        "laravel/framework": "^11.36.1",
+        "laravel/jetstream": "^5.3.4",
+        "laravel/sanctum": "^4.0.7",
         "laravel/tinker": "^2.10",
         "lasserafn/php-initial-avatar-generator": "^4.4",
         "livewire/livewire": "^3.5.12",
         "shuvroroy/filament-spatie-laravel-backup": "^2.2.3",
-        "spatie/color": "^1.6.1",
+        "spatie/color": "^1.6.2",
         "spatie/laravel-data": "^4.11.1",
         "spatie/laravel-google-fonts": "^1.4.1"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.14.9",
-        "barryvdh/laravel-ide-helper": "^3.2.2",
+        "barryvdh/laravel-ide-helper": "^3.3.0",
         "fakerphp/faker": "^1.24.1",
         "larastan/larastan": "^3.0.2",
         "laravel/pail": "^1.2.1",
@@ -35,7 +35,7 @@
         "laravel/sail": "^1.39.1",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "^8.5",
-        "phpunit/phpunit": "^11.5.0"
+        "phpunit/phpunit": "^11.5.2"
     },
     "autoload": {
         "psr-4": {
