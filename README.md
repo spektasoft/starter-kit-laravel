@@ -56,6 +56,12 @@ ULIDs are used as the default ID type.
     php artisan storage:link
     ```
 
+1. Run the migration:
+
+    ```
+    php artisan migrate
+    ```
+
 1. Run the app:
 
     ```
@@ -74,7 +80,7 @@ To develop a universal app, follow the additional instructions below:
     ipconfig /all
     ```
 
-1. In your `.env` file, use URL with `IP Address` instead of `localhost`. Replace `IP Address` with your own:
+1. In your `.env` file, use the URL with `IP Address` instead of `localhost`. Replace `IP Address` with your own:
 
     ```
     APP_URL={SERVER_IP_ADRESS_URL}
@@ -104,7 +110,7 @@ To develop a universal app, follow the additional instructions below:
 
 ## Upstream
 
-Apply any changes available from the Laravel [11.x branch](https://github.com/laravel/laravel/compare/0993d09dc8206d0933628074036427344be16fc5...11.x).
+Apply any changes available from the Laravel [11.x branch](https://github.com/laravel/laravel/compare/657070ea8a95ec269d0ed4c801cead04976a871a...11.x).
 
 ## License
 

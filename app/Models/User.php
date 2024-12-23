@@ -161,7 +161,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
 
     public function isReferenced(): bool
     {
-        if ($this->media()->count() > 0) {
+        if ($this->media()->exists()) {
             return true;
         }
 

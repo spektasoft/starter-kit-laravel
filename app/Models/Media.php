@@ -28,7 +28,7 @@ class Media extends CuratorMedia
 
     public function isReferenced(): bool
     {
-        if ($this->usersWithThisAsProfilePhoto()->count() > 0) {
+        if ($this->usersWithThisAsProfilePhoto()->exists()) {
             return true;
         }
 
