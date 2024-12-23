@@ -19,6 +19,14 @@ class MediaPolicy
     }
 
     /**
+     * Determine whether the user can view all models.
+     */
+    public function viewAll(User $user): bool
+    {
+        return $user->can('view_all_media');
+    }
+
+    /**
      * Determine whether the user can view the model.
      */
     public function view(User $user, Media $media): bool
@@ -70,7 +78,7 @@ class MediaPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return true;
+        return $user->can('delete_any_media');
     }
 
     /**
@@ -93,7 +101,7 @@ class MediaPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return true;
+        return $user->can('force_delete_any_media');
     }
 
     /**
@@ -113,7 +121,7 @@ class MediaPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return true;
+        return $user->can('restore_any_media');
     }
 
     /**

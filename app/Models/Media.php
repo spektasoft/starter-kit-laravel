@@ -3,11 +3,15 @@
 namespace App\Models;
 
 use App\Observers\MediaObserver;
+use App\Utils\Authorizer;
 use Awcodes\Curator\Models\Media as CuratorMedia;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 /**
  * @property string $disk
@@ -16,7 +20,30 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[ObservedBy([MediaObserver::class])]
 class Media extends CuratorMedia
 {
+    /** @use HasFactory<\Database\Factories\MediaFactory> */
+    use HasFactory;
+
     use HasUlids;
+
+    protected static function booted()
+    {
+        static::addGlobalScope('curator-panel', function (Builder $builder) {
+            if (Authorizer::check('viewAll', Media::class)) {
+                return;
+            }
+
+            /** @var Builder<Media> */
+            $builder = $builder;
+            /** @var Collection<string, mixed> */
+            $traces = collect(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10));
+            /** @var Collection<int, string> */
+            $files = $traces->pluck('file');
+
+            if ($files->contains(fn ($item) => strpos($item, 'CuratorPanel') !== false)) {
+                $builder->whereCreatorId(User::auth()?->id);
+            }
+        });
+    }
 
     /**
      * @return BelongsTo<User, $this>

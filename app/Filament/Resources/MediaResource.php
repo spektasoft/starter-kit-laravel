@@ -4,15 +4,54 @@ namespace App\Filament\Resources;
 
 use App\Models\Media;
 use App\Models\User;
-use App\Utils\Authorizer;
 use Awcodes\Curator\Resources\MediaResource as CuratorMediaResource;
 use Awcodes\Curator\Resources\MediaResource\ListMedia;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class MediaResource extends CuratorMediaResource
+class MediaResource extends CuratorMediaResource implements HasShieldPermissions
 {
+    public static function canViewAll(): bool
+    {
+        return static::can('viewAll');
+    }
+
+    /**
+     * @return Builder<Media>
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        /** @var Builder<Media> */
+        $query = parent::getEloquentQuery();
+
+        if (! static::canViewAll()) {
+            $query->whereCreatorId(User::auth()?->id);
+        }
+
+        return $query;
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view_all',
+            'view',
+            'update',
+            'delete',
+            'delete_any',
+            'restore',
+            'restore_any',
+            'force_delete',
+            'force_delete_any',
+            'replicate',
+        ];
+    }
+
     public static function table(Table $table): Table
     {
         /** @var ListMedia */
@@ -25,7 +64,7 @@ class MediaResource extends CuratorMediaResource
                     ->extraAttributes(['class' => $livewire->layoutView === 'grid' ? 'hidden' : ''])
                     ->searchable()
                     ->sortable(),
-                Authorizer::check('viewAny', User::class) ? TextColumn::make('creator.name')
+                static::canViewAll() ? TextColumn::make('creator.name')
                     ->label(__('attributes.created_by'))
                     ->extraAttributes(['class' => 'my-2'])
                     ->icon($livewire->layoutView === 'grid' ? 'heroicon-o-user' : null)
@@ -35,19 +74,5 @@ class MediaResource extends CuratorMediaResource
             ]));
 
         return $table;
-    }
-
-    /**
-     * @return Builder<Media>
-     */
-    public static function getEloquentQuery(): Builder
-    {
-        $query = parent::getEloquentQuery();
-
-        if (! Authorizer::check('viewAny', User::class)) {
-            $query->where('creator_id', '=', User::auth()?->id);
-        }
-
-        return $query;
     }
 }
