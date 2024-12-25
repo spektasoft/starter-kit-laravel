@@ -50,6 +50,9 @@ class PermissionPolicy
         if ($permission->isReferenced()) {
             return false;
         }
+        if (collect(Permission::$customPermissions)->contains($permission->name)) {
+            return false;
+        }
 
         return $user->can('delete_permission');
     }
@@ -76,6 +79,9 @@ class PermissionPolicy
     public function forceDelete(User $user, Permission $permission): bool
     {
         if ($permission->isReferenced()) {
+            return false;
+        }
+        if (collect(Permission::$customPermissions)->contains($permission->name)) {
             return false;
         }
 
