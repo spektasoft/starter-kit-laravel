@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\User;
+use Illuminate\Contracts\Support\Htmlable;
 use ShuvroRoy\FilamentSpatieLaravelBackup\Pages\Backups as BaseBackups;
 
 class Backups extends BaseBackups
@@ -15,5 +16,10 @@ class Backups extends BaseBackups
         }
 
         return $user->can('page_Backups');
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+        return __('filament-spatie-backup::backup.pages.backups.navigation.label');
     }
 }

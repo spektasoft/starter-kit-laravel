@@ -31,6 +31,11 @@ class PermissionResource extends Resource implements HasShieldPermissions
             ]);
     }
 
+    public static function getModelLabel(): string
+    {
+        return trans_choice('permission.resource.model_label', 1);
+    }
+
     public static function getNavigationGroup(): ?string
     {
         return __('filament-shield::filament-shield.nav.group');
@@ -38,7 +43,7 @@ class PermissionResource extends Resource implements HasShieldPermissions
 
     public static function getPluralModelLabel(): string
     {
-        return __('filament-shield::filament-shield.column.permissions');
+        return trans_choice('permission.resource.model_label', 2);
     }
 
     /**
