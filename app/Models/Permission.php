@@ -16,4 +16,13 @@ class Permission extends SpatiePermission
         static::firstOrCreate(['name' => 'download-backup']);
         static::firstOrCreate(['name' => 'delete-backup']);
     }
+
+    public function isReferenced(): bool
+    {
+        if ($this->roles()->exists()) {
+            return true;
+        }
+
+        return false;
+    }
 }
