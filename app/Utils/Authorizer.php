@@ -3,10 +3,10 @@
 namespace App\Utils;
 
 use App\Models\User;
-use Auth;
-use Gate;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Laravel\Sanctum\Contracts\HasAbilities;
 
 class Authorizer
