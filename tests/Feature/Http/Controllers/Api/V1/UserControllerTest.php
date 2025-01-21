@@ -315,10 +315,10 @@ class UserControllerTest extends TestCase
     {
         /** @var User */
         $user = User::factory()->create();
-        $user->givePermissionTo('view_all_user');
+        $user->givePermissionTo('view_any_user');
         $this->actingAs($user);
         $response = $this->postJson(route('api.v1.user.can'), [
-            'permission' => 'view_all_user',
+            'action' => 'viewAny',
             'resource' => 'users',
         ]);
         $response->assertSuccessful();
@@ -331,7 +331,7 @@ class UserControllerTest extends TestCase
         $user->givePermissionTo('view_any_user');
         $this->actingAs($user);
         $response = $this->postJson(route('api.v1.user.can'), [
-            'permission' => 'view_all_user',
+            'action' => 'deleteAny',
             'resource' => 'users',
         ]);
         $response->assertForbidden();
