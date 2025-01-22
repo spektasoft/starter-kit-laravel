@@ -14,8 +14,26 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
 /**
+ * @property string $id
  * @property string $disk
  * @property string $path
+ * @property string|null $creator_id
+ * @property string $directory
+ * @property string $visibility
+ * @property string $name
+ * @property int|null $width
+ * @property int|null $height
+ * @property int|null $size
+ * @property string $type
+ * @property string $ext
+ * @property string|null $alt
+ * @property string|null $title
+ * @property string|null $description
+ * @property string|null $caption
+ * @property array<string, string>|null $exif
+ * @property array<string, mixed>|null $curations
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  */
 #[ObservedBy([MediaObserver::class])]
 class Media extends CuratorMedia
