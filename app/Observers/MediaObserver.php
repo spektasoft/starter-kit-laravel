@@ -11,6 +11,13 @@ use Intervention\Image\Facades\Image;
 
 class MediaObserver extends CuratorMediaObserver
 {
+    /** @var string[] */
+    private $supportedImageToConvertTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+    ];
+
     /**
      * Handle the Media "creating" event.
      */
@@ -31,8 +38,17 @@ class MediaObserver extends CuratorMediaObserver
     public function created(Media $media): void
     {
         $this->removeExif($media);
+        $this->convertToWebP($media);
+    }
 
-        if (strpos($media->type, 'image') !== 0 || $media->ext === 'webp') {
+    private function convertToWebP(Media $media): void
+    {
+        if (strpos($media->type, 'image') !== 0) {
+            return;
+        }
+
+        $type = strtolower($media->type);
+        if (collect($this->supportedImageToConvertTypes)->doesntContain($type)) {
             return;
         }
 
