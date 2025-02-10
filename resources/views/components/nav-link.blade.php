@@ -1,12 +1,25 @@
-@props(['active'])
+@props(['active', 'icon'])
 
 @php
-    $classes =
+    $wrapperClass =
         $active ?? false
-            ? 'inline-flex items-center px-1 pt-1 border-b-2 border-primary-400 dark:border-primary-600 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-primary-700 transition duration-150 ease-in-out'
-            : 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-700 focus:outline-none focus:text-gray-700 dark:focus:text-gray-300 focus:border-gray-300 dark:focus:border-gray-700 transition duration-150 ease-in-out';
+            ? 'relative flex items-center gap-x-3 rounded-lg px-2 py-2 outline-none transition duration-75 hover:bg-gray-100 focus-visible:bg-gray-100 dark:hover:bg-white/5 dark:focus-visible:bg-white/5 bg-gray-100 dark:bg-white/5'
+            : 'relative flex items-center gap-x-3 rounded-lg px-2 py-2 outline-none transition duration-75 hover:bg-gray-100 focus-visible:bg-gray-100 dark:hover:bg-white/5 dark:focus-visible:bg-white/5';
+
+    $iconClass =
+        $active ?? false
+            ? 'h-6 w-6 text-primary-600 dark:text-primary-400'
+            : 'h-6 w-6 text-gray-400 dark:text-gray-500';
+
+    $textClass =
+        $active ?? false
+            ? 'flex-1 truncate text-sm font-medium text-primary-600 dark:text-primary-400'
+            : 'flex-1 truncate text-sm font-medium text-gray-700 dark:text-gray-200';
 @endphp
 
-<a {{ $attributes->merge(['class' => $classes]) }}>
-    {{ $slot }}
+<a {{ $attributes->merge(['class' => $wrapperClass]) }}>
+    <span class="{{ $iconClass }}">
+        @svg($icon)
+    </span>
+    <span class="{{ $textClass }}">{{ $slot }}</span>
 </a>
