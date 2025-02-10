@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
 
 <head>
     <meta charset="utf-8">
@@ -7,20 +7,6 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
-
-    <!-- Scripts -->
-    <script>
-        const theme = localStorage.getItem('theme')
-
-        if (
-            theme === 'dark' ||
-            (theme === 'system' &&
-                window.matchMedia('(prefers-color-scheme: dark)')
-                .matches)
-        ) {
-            document.documentElement.classList.add('dark')
-        }
-    </script>
 
     <!-- Fonts -->
     @googlefonts('sans')
@@ -58,6 +44,22 @@
     @filamentScripts(withCore: true)
     @vite(['resources/ts/app.ts'])
     @livewireScripts
+
+    <!-- Scripts -->
+    <script>
+        var theme = localStorage.getItem('theme')
+
+        if (
+            theme === 'dark' ||
+            (theme === 'system' &&
+                window.matchMedia('(prefers-color-scheme: dark)')
+                .matches)
+        ) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
 </body>
 
 </html>
