@@ -6,6 +6,7 @@ use App\Contracts\Jwt;
 use App\Services\AhcJwtService;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
+use Filament\Support\Facades\FilamentView;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
@@ -30,5 +31,6 @@ class AppServiceProvider extends ServiceProvider
             'primary' => Color::Indigo,
             'secondary' => Color::Emerald,
         ]);
+        FilamentView::spa();
     }
 }

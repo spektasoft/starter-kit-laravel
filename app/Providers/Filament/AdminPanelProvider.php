@@ -93,12 +93,6 @@ class AdminPanelProvider extends PanelProvider
             BLADE))
             ->renderHook(PanelsRenderHook::USER_MENU_BEFORE, fn () => Blade::render('<x-navigation-menu.language-switcher />'))
             ->spa()
-            ->spaUrlExceptions(fn () => [
-                route('home'),
-                route('profile.show'),
-                route('api-tokens.index'),
-                url('*?lang=*'),
-            ])
             ->unsavedChangesAlerts()
             ->viteTheme('resources/css/app.css');
     }
