@@ -6,15 +6,15 @@
             <div class="flex">
                 <!-- Hamburger -->
                 <div class="flex items-center">
-                    <button title="Menu" x-on:click="toggle()" x-on:click.outside="open = false"
-                        class="mr-2 p-2.5 text-gray-500 rounded-lg dark:text-gray-400">
+                    <div title="Menu" x-on:click="toggle()" x-on:click.outside="open = false"
+                        class="mr-2 p-2.5 hover:bg-gray-500/10 rounded-2xl hover:dark:bg-gray-400/10">
                         <template x-if="!open">
-                            @svg('heroicon-o-bars-3', 'w-5 h-5')
+                            <x-filament::icon-button icon="heroicon-m-bars-3" color="gray" size="xl" />
                         </template>
                         <template x-if="open">
-                            @svg('heroicon-o-x-mark', 'w-5 h-5')
+                            <x-filament::icon-button icon="heroicon-m-x-mark" color="gray" size="xl" />
                         </template>
-                    </button>
+                    </div>
                 </div>
 
                 <!-- Logo -->
@@ -25,14 +25,14 @@
                 </div>
             </div>
 
-            <div class="flex flex-row items-center space-x-4">
+            <div class="flex flex-row items-center gap-4">
                 <!-- Language Switcher -->
                 <div class="relative">
                     <x-navigation-menu.language-switcher />
                 </div>
 
                 <!-- Menu -->
-                <div class="flex items-center gap-4">
+                <div>
                     @guest
                         <x-navigation-menu.guest-menu />
                     @endguest

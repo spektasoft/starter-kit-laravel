@@ -1,8 +1,7 @@
 <x-filament::dropdown placement="bottom-end" teleport>
     <x-slot name="trigger">
-        <button aria-label="{{ __('navigation-menu.menu.open_menu') }}" type="button" class="shrink-0">
-            <x-filament::icon icon="heroicon-o-ellipsis-vertical" class="w-6 h-6 text-gray-500 dark:text-gray-400" />
-        </button>
+        <x-filament::icon-button color="gray" class="p-2.5 hover:bg-gray-500/10 rounded-2xl hover:dark:bg-gray-400/10"
+            icon="heroicon-m-ellipsis-vertical" :label="__('navigation-menu.menu.open_menu')" size="xl" />
     </x-slot>
 
     <x-filament::dropdown.header :icon="'heroicon-o-user-circle'">
