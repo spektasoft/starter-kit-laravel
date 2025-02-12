@@ -63,11 +63,18 @@
     </div>
 
     <!-- Drawer Overlay -->
-    <div :class="{ '': open, 'hidden': !open }"
-        class="fixed bottom-0 left-0 right-0 transition duration-500 top-16 bg-gray-950/50 dark:bg-gray-950/75"></div>
+    <div :class="{
+        '-translate-x-0': open,
+        '-translate-x-full': !open
+    }"
+        class="fixed left-0 z-30 w-full h-screen p-4 overflow-y-auto -translate-x-full bg-gray-950/50 dark:bg-gray-950/75 top-16">
+    </div>
 
     <!-- Drawer -->
-    <div :class="{ '-translate-x-0': open, '-translate-x-full': !open }"
+    <div :class="{
+        '-translate-x-0': open,
+        '-translate-x-full': !open
+    }"
         class="fixed left-0 z-40 w-64 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white top-16 dark:bg-gray-900"
         tabindex="-1" aria-labelledby="drawer-navigation-label">
         <div class="overflow-y-auto">
