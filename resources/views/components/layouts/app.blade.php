@@ -19,22 +19,11 @@
 
 <body class="font-sans antialiased text-black bg-white dark:text-white dark:bg-gray-900">
     @livewire('navigation-menu')
-    <div>
-        <!-- Page Heading -->
-        @if (isset($header))
-            <header class="shadow">
-                <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {{ $header }}
-                </div>
-            </header>
-        @endif
 
-        <!-- Page Content -->
-        <main class="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
-            <x-banner />
-            <div class="flex-grow">{{ $slot }}</div>
-        </main>
-    </div>
+    <main class="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
+        <x-banner />
+        <div class="flex-grow">{{ $slot }}</div>
+    </main>
 
     <x-curator::modals.modal />
 
