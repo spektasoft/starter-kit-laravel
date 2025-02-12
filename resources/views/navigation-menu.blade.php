@@ -18,14 +18,14 @@
         '-translate-y-full': !show
     }"
     class="sticky top-0 left-0 z-10 w-full duration-500 bg-white transition-top dark:bg-gray-900 dark:border-gray-950/5">
-    <!-- Primary Navigation Menu -->
+
     <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
-            <div class="flex">
+            <div class="flex flex-row gap-2">
                 <!-- Hamburger -->
                 <div class="flex items-center">
                     <div title="Menu" x-on:click="toggle()" x-on:click.outside="open = false"
-                        class="mr-2 p-2.5 hover:bg-gray-500/10 rounded-2xl hover:dark:bg-gray-400/10">
+                        class="p-2.5 hover:bg-gray-500/10 rounded-2xl hover:dark:bg-gray-400/10">
                         <template x-if="!open">
                             <x-filament::icon-button icon="heroicon-m-bars-3" color="gray" size="xl" />
                         </template>
