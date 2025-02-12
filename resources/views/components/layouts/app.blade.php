@@ -19,7 +19,7 @@
 
 <body class="font-sans antialiased text-black bg-white dark:text-white dark:bg-gray-900">
     @livewire('navigation-menu')
-    <div class="pt-16">
+    <div>
         <!-- Page Heading -->
         @if (isset($header))
             <header class="shadow">
