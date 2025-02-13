@@ -9,7 +9,7 @@
         '-translate-y-full top-0': !show
     }"
     class="sticky z-10 duration-500 bg-white transition-top dark:bg-gray-900">
-    <section {{ $attributes->merge(['class' => 'flex flex-col']) }}>
+    <section {{ $attributes->merge(['class' => 'mx-auto max-w-7xl']) }}>
         <header class="flex flex-col px-4 pb-4 sm:px-6 lg:px-8 fi-header sm:flex-row sm:items-center sm:justify-between">
             <div>
                 @if ($breadcrumbs)
