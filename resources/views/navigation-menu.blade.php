@@ -1,18 +1,4 @@
-<nav x-data="{
-    open: false,
-    lastScrollY: 0,
-    show: true,
-    toggle() { this.open = !this.open; },
-    scroll() {
-        const currentScrollY = window.scrollY;
-        if (currentScrollY > this.lastScrollY && !this.open) {
-            this.show = false;
-        } else {
-            this.show = true;
-        }
-        this.lastScrollY = currentScrollY;
-    },
-}" x-on:scroll.window.throttle.100ms="scroll"
+<nav x-data="navigationMenu" x-on:scroll.window.throttle.100ms="scroll"
     :class="{
         '-translate-y-0': show,
         '-translate-y-full': !show
