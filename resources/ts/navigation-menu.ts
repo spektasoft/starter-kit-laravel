@@ -2,7 +2,7 @@ import { AlpineComponent } from "alpinejs";
 
 const Alpine = window.Alpine;
 
-export type NavigationMenu = {
+type NavigationMenu = {
     open: boolean;
     lastScrollY: number;
     show: boolean;
