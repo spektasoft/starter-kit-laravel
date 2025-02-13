@@ -3,19 +3,7 @@
     'breadcrumbs' => [],
 ])
 
-<div x-data="{
-    lastScrollY: 0,
-    show: true,
-    scroll() {
-        const currentScrollY = window.scrollY;
-        if (currentScrollY > this.lastScrollY) {
-            this.show = false;
-        } else {
-            this.show = true;
-        }
-        this.lastScrollY = currentScrollY;
-    }
-}" x-on:scroll.window.throttle.100ms="scroll"
+<div x-data="header" x-on:scroll.window.throttle.100ms="scroll"
     :class="{
         '-translate-y-0 top-16': show,
         '-translate-y-full top-0': !show
