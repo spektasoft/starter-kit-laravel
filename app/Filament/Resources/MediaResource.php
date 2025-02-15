@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Models\Media;
 use App\Models\User;
 use Awcodes\Curator\Resources\MediaResource as CuratorMediaResource;
@@ -44,10 +45,6 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
             'update',
             'delete',
             'delete_any',
-            'restore',
-            'restore_any',
-            'force_delete',
-            'force_delete_any',
             'replicate',
         ];
     }
@@ -58,6 +55,9 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
         $livewire = $table->getLivewire();
 
         $table = parent::table($table)
+            ->bulkActions([
+                ReferenceAwareDeleteBulkAction::make(),
+            ])
             ->pushColumns(array_filter([
                 TextColumn::make('title')
                     ->label(__('attributes.title'))

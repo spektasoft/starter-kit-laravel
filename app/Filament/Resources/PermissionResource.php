@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\PermissionResource\Pages;
 use App\Models\Permission;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
@@ -54,6 +55,7 @@ class PermissionResource extends Resource implements HasShieldPermissions
         return [
             'view_any',
             'delete',
+            'delete_any',
             'restore',
             'force_delete',
         ];
@@ -81,6 +83,9 @@ class PermissionResource extends Resource implements HasShieldPermissions
             ])
             ->actions([
                 Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                ReferenceAwareDeleteBulkAction::make(),
             ]);
     }
 

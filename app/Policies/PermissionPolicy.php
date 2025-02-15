@@ -62,7 +62,7 @@ class PermissionPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return false;
+        return $user->can('delete_any_permission');
     }
 
     /**
