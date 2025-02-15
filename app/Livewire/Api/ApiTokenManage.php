@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Api;
 
+use App\Concerns\CanUpdatePaginators;
 use App\Concerns\HasUser;
 use App\Models\PersonalAccessToken;
 use App\Models\User;
@@ -30,6 +31,7 @@ use Livewire\Component;
  */
 class ApiTokenManage extends Component implements HasForms, HasTable
 {
+    use CanUpdatePaginators;
     use HasUser;
     use InteractsWithForms;
     use InteractsWithTable;
@@ -54,6 +56,11 @@ class ApiTokenManage extends Component implements HasForms, HasTable
      * @var string[]
      */
     public $permissions = [];
+
+    public function __construct()
+    {
+        $this->scrollToElement = '#api-token-manage-table';
+    }
 
     /**
      * Mount the component.

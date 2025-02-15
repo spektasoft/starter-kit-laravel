@@ -17,7 +17,7 @@
     @livewireStyles
 
     <!-- Scripts -->
-    @vite(['resources/ts/app.ts'])
+    @vite(['resources/ts/app.ts', 'resources/ts/events.ts'])
 </head>
 
 <body class="font-sans antialiased text-black bg-white dark:text-white dark:bg-gray-900">
