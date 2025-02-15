@@ -96,6 +96,8 @@ class AdminPanelProvider extends PanelProvider
             BLADE))
             ->renderHook(PanelsRenderHook::USER_MENU_BEFORE, fn () => Blade::render('<x-navigation-menu.language-switcher />'))
             ->spa()
+            ->sidebarFullyCollapsibleOnDesktop()
+            ->sidebarWidth('14rem')
             ->unsavedChangesAlerts()
             ->viteTheme('resources/css/app.css');
     }

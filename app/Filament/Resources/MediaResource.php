@@ -71,7 +71,8 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
                     ->badge($livewire->layoutView === 'grid')
                     ->searchable()
                     ->sortable() : null,
-            ]));
+            ]))
+            ->paginationPageOptions([12, 24]);
 
         return $table;
     }

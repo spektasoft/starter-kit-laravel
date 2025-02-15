@@ -136,8 +136,7 @@ class UserResource extends Resource
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ])
-            ->extremePaginationLinks();
+            ]);
     }
 
     public static function getRelations(): array
