@@ -45,7 +45,6 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
             'update',
             'delete',
             'delete_any',
-            'replicate',
         ];
     }
 

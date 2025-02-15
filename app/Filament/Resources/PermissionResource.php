@@ -56,8 +56,6 @@ class PermissionResource extends Resource implements HasShieldPermissions
             'view_any',
             'delete',
             'delete_any',
-            'restore',
-            'force_delete',
         ];
     }
 
