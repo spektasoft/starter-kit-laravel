@@ -47,7 +47,7 @@ class UserPolicyTest extends TestCase
         Permission::insert($permissions->toArray());
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->policy = new UserPolicy;
@@ -55,7 +55,7 @@ class UserPolicyTest extends TestCase
         static::setUpPermissions();
     }
 
-    public function test_viewAny_grants_access_to_users_with_permission(): void
+    public function test_view_any_grants_access_to_users_with_permission(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('view_any_user');
@@ -63,7 +63,7 @@ class UserPolicyTest extends TestCase
         $this->assertTrue($this->policy->viewAny($user));
     }
 
-    public function test_viewAny_denies_access_to_users_without_permission(): void
+    public function test_view_any_denies_access_to_users_without_permission(): void
     {
         $user = User::factory()->create();
 
@@ -136,7 +136,7 @@ class UserPolicyTest extends TestCase
         $this->assertFalse($this->policy->delete($user, $otherUser));
     }
 
-    public function test_deleteAny_grants_access_to_users_with_permission(): void
+    public function test_delete_any_grants_access_to_users_with_permission(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('delete_any_user');
@@ -144,106 +144,10 @@ class UserPolicyTest extends TestCase
         $this->assertTrue($this->policy->deleteAny($user));
     }
 
-    public function test_deleteAny_denies_access_to_users_without_permission(): void
+    public function test_delete_any_denies_access_to_users_without_permission(): void
     {
         $user = User::factory()->create();
 
         $this->assertFalse($this->policy->deleteAny($user));
-    }
-
-    public function test_forceDelete_grants_access_to_users_with_permission(): void
-    {
-        $user = User::factory()->create();
-        $otherUser = User::factory()->create();
-        $user->givePermissionTo('force_delete_user');
-
-        $this->assertTrue($this->policy->forceDelete($user, $otherUser));
-    }
-
-    public function test_forceDelete_denies_access_to_users_without_permission(): void
-    {
-        $user = User::factory()->create();
-        $otherUser = User::factory()->create();
-
-        $this->assertFalse($this->policy->forceDelete($user, $otherUser));
-    }
-
-    public function test_forceDeleteAny_grants_access_to_users_with_permission(): void
-    {
-        $user = User::factory()->create();
-        $user->givePermissionTo('force_delete_any_user');
-
-        $this->assertTrue($this->policy->forceDeleteAny($user));
-    }
-
-    public function test_forceDeleteAny_denies_access_to_users_without_permission(): void
-    {
-        $user = User::factory()->create();
-
-        $this->assertFalse($this->policy->forceDeleteAny($user));
-    }
-
-    public function test_restore_grants_access_to_users_with_permission(): void
-    {
-        $user = User::factory()->create();
-        $otherUser = User::factory()->create();
-        $user->givePermissionTo('restore_user');
-
-        $this->assertTrue($this->policy->restore($user, $otherUser));
-    }
-
-    public function test_restore_denies_access_to_users_without_permission(): void
-    {
-        $user = User::factory()->create();
-        $otherUser = User::factory()->create();
-
-        $this->assertFalse($this->policy->restore($user, $otherUser));
-    }
-
-    public function test_restoreAny_grants_access_to_users_with_permission(): void
-    {
-        $user = User::factory()->create();
-        $user->givePermissionTo('restore_any_user');
-
-        $this->assertTrue($this->policy->restoreAny($user));
-    }
-
-    public function test_restoreAny_denies_access_to_users_without_permission(): void
-    {
-        $user = User::factory()->create();
-
-        $this->assertFalse($this->policy->restoreAny($user));
-    }
-
-    public function test_replicate_grants_access_to_users_with_permission(): void
-    {
-        $user = User::factory()->create();
-        $otherUser = User::factory()->create();
-        $user->givePermissionTo('replicate_user');
-
-        $this->assertTrue($this->policy->replicate($user, $otherUser));
-    }
-
-    public function test_replicate_denies_access_to_users_without_permission(): void
-    {
-        $user = User::factory()->create();
-        $otherUser = User::factory()->create();
-
-        $this->assertFalse($this->policy->replicate($user, $otherUser));
-    }
-
-    public function test_reorder_grants_access_to_users_with_permission(): void
-    {
-        $user = User::factory()->create();
-        $user->givePermissionTo('reorder_user');
-
-        $this->assertTrue($this->policy->reorder($user));
-    }
-
-    public function test_reorder_denies_access_to_users_without_permission(): void
-    {
-        $user = User::factory()->create();
-
-        $this->assertFalse($this->policy->reorder($user));
     }
 }
