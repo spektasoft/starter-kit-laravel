@@ -3,6 +3,10 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Backups;
+use App\Filament\Resources\MediaResource;
+use App\Filament\Resources\PermissionResource;
+use App\Filament\Resources\RoleResource;
+use App\Filament\Resources\UserResource;
 use App\Http\Middleware\SetLocaleFromQueryAndSession;
 use Blade;
 use Filament\Http\Middleware\Authenticate;
@@ -70,6 +74,18 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 \Awcodes\Curator\CuratorPlugin::make(),
+                \Awcodes\Overlook\OverlookPlugin::make()
+                    ->columns([
+                        'default' => 2,
+                        'sm' => 3,
+                        'md' => 4,
+                    ])
+                    ->includes([
+                        MediaResource::class,
+                        UserResource::class,
+                        PermissionResource::class,
+                        RoleResource::class,
+                    ]),
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
                 \ShuvroRoy\FilamentSpatieLaravelBackup\FilamentSpatieLaravelBackupPlugin::make()
                     ->usingPage(Backups::class),
@@ -99,6 +115,9 @@ class AdminPanelProvider extends PanelProvider
             ->sidebarFullyCollapsibleOnDesktop()
             ->sidebarWidth('14rem')
             ->unsavedChangesAlerts()
-            ->viteTheme('resources/css/app.css');
+            ->viteTheme('resources/css/app.css')
+            ->widgets([
+                \Awcodes\Overlook\Widgets\OverlookWidget::class,
+            ]);
     }
 }
