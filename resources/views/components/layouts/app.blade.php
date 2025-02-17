@@ -29,6 +29,7 @@
     </main>
 
     <x-curator::modals.modal />
+    <x-loading />
 
     @stack('modals')
     @livewire('notifications')

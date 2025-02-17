@@ -104,6 +104,9 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-key')
                     ->url(fn () => route('api-tokens.index')),
             ])
+            ->renderHook(PanelsRenderHook::BODY_END, fn () => Blade::render(<<<'BLADE'
+            <x-loading />
+            BLADE))
             ->renderHook(PanelsRenderHook::SCRIPTS_AFTER, fn () => Blade::render(<<<'BLADE'
             @vite(['resources/ts/events.ts'])
             BLADE))
