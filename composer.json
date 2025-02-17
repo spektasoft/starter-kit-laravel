@@ -11,6 +11,7 @@
         "php": "^8.2",
         "adhocore/jwt": "^1.1.2",
         "awcodes/filament-curator": "^3.6.15",
+        "awcodes/overlook": "^2.2",
         "bezhansalleh/filament-shield": "^3.3.4",
         "filament/filament": "^3.2.139",
         "intervention/image": "^2.7.2",
