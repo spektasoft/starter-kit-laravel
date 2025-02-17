@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\PermissionResource\Pages;
 use App\Models\Permission;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -20,15 +20,7 @@ class PermissionResource extends Resource implements HasShieldPermissions
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('guard_name')
-                    ->required()
-                    ->maxLength(255),
-            ]);
+        return $form;
     }
 
     public static function getModelLabel(): string
@@ -54,8 +46,7 @@ class PermissionResource extends Resource implements HasShieldPermissions
         return [
             'view_any',
             'delete',
-            'restore',
-            'force_delete',
+            'delete_any',
         ];
     }
 
@@ -81,6 +72,9 @@ class PermissionResource extends Resource implements HasShieldPermissions
             ])
             ->actions([
                 Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                ReferenceAwareDeleteBulkAction::make(),
             ]);
     }
 
@@ -95,8 +89,6 @@ class PermissionResource extends Resource implements HasShieldPermissions
     {
         return [
             'index' => Pages\ListPermissions::route('/'),
-            'create' => Pages\CreatePermission::route('/create'),
-            'edit' => Pages\EditPermission::route('/{record}/edit'),
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
@@ -10,9 +11,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,40 +31,51 @@ class UserResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Grid::make([
-                    'sm' => 1,
-                    'md' => 2,
-                ])->schema(array_filter([
-                    Jetstream::managesProfilePhotos() ?
-                    CuratorPicker::make('profile_photo_media_id')
-                        ->relationship('profilePhotoMedia', 'name')
-                        ->label(__('Photo'))
-                        ->buttonLabel(__('Select A New Photo'))
-                        ->extraAttributes(['class' => 'sm:w-fit'])
-                        ->columnSpanFull() : null,
-                    Forms\Components\TextInput::make('name')
-                        ->label(__('Name'))
-                        ->required(),
-                    Forms\Components\TextInput::make('email')
-                        ->label(__('Email'))
-                        ->required()
-                        ->unique(ignoreRecord: true),
-                    Forms\Components\TextInput::make('password')
-                        ->label(__('Password'))
-                        ->password()
-                        ->revealable()
-                        ->dehydrateStateUsing(fn (string $state): string => Hash::make($state))
-                        ->dehydrated(fn (?string $state): bool => filled($state))
-                        ->required(fn (string $operation): bool => $operation === 'create'),
-                    Forms\Components\Select::make('roles')
-                        ->label(__('Role'))
-                        ->relationship('roles', 'name')
-                        ->multiple()
-                        ->preload()
-                        ->searchable(),
-                    Forms\Components\DateTimePicker::make('email_verified_at')
-                        ->label(__('user.resource.email_verified_at'))
-                        ->native(false),
-                ])),
+                    'default' => 1,
+                    'sm' => 3,
+                ])->schema([
+                    Forms\Components\Section::make([
+                        Forms\Components\TextInput::make('name')
+                            ->label(__('Name'))
+                            ->required(),
+                        Forms\Components\TextInput::make('email')
+                            ->label(__('Email'))
+                            ->required()
+                            ->unique(ignoreRecord: true),
+                        Forms\Components\TextInput::make('password')
+                            ->label(__('Password'))
+                            ->password()
+                            ->revealable()
+                            ->dehydrateStateUsing(fn (string $state): string => Hash::make($state))
+                            ->dehydrated(fn (?string $state): bool => filled($state))
+                            ->required(fn (string $operation): bool => $operation === 'create'),
+                        Forms\Components\Select::make('roles')
+                            ->label(__('Role'))
+                            ->relationship('roles', 'name')
+                            ->multiple()
+                            ->preload()
+                            ->searchable(),
+                    ])->columnSpan([
+                        'default' => 1,
+                        'sm' => 2,
+                    ]),
+                    Forms\Components\Group::make(array_filter([
+                        Jetstream::managesProfilePhotos() ?
+                        Forms\Components\Section::make([
+                            CuratorPicker::make('profile_photo_media_id')
+                                ->relationship('profilePhotoMedia', 'name')
+                                ->label(__('Photo'))
+                                ->buttonLabel(__('Select A New Photo'))
+                                ->extraAttributes(['class' => 'sm:w-fit'])
+                                ->columnSpanFull(),
+                        ]) : null,
+                        Forms\Components\Section::make([
+                            Forms\Components\DateTimePicker::make('email_verified_at')
+                                ->label(__('user.resource.email_verified_at'))
+                                ->native(false),
+                        ]),
+                    ])),
+                ]),
             ]);
     }
 
@@ -133,11 +143,8 @@ class UserResource extends Resource
                 DeleteAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ])
-            ->extremePaginationLinks();
+                ReferenceAwareDeleteBulkAction::make(),
+            ]);
     }
 
     public static function getRelations(): array

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark" dir="{{ __('layout.direction') ?? 'ltr' }}">
 
 <head>
     <meta charset="utf-8">
@@ -8,9 +8,38 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
+    <!-- Fonts -->
+    @googlefonts('sans')
+
+    <!-- Styles -->
+    @filamentStyles
+    @vite(['resources/css/app.css'])
+    @livewireStyles
+
+    <!-- Scripts -->
+    @vite(['resources/ts/app.ts', 'resources/ts/events.ts'])
+</head>
+
+<body class="font-sans antialiased text-black bg-white dark:text-white dark:bg-gray-900">
+    @livewire('navigation-menu')
+
+    <main class="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
+        <x-banner />
+        <div class="flex-grow">{{ $slot }}</div>
+    </main>
+
+    <x-curator::modals.modal />
+    <x-loading />
+
+    @stack('modals')
+    @livewire('notifications')
+
+    @filamentScripts(withCore: true)
+    @livewireScripts
+
     <!-- Scripts -->
     <script>
-        const theme = localStorage.getItem('theme')
+        var theme = localStorage.getItem('theme')
 
         if (
             theme === 'dark' ||
@@ -19,45 +48,10 @@
                 .matches)
         ) {
             document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
         }
     </script>
-
-    <!-- Fonts -->
-    @googlefonts('sans')
-
-    <!-- Styles -->
-    @filamentStyles
-    @vite(['resources/css/app.css'])
-    @livewireStyles
-</head>
-
-<body class="font-sans antialiased text-black bg-white dark:text-white dark:bg-gray-900">
-    @livewire('navigation-menu')
-    <div class="pt-16">
-        <!-- Page Heading -->
-        @if (isset($header))
-            <header class="shadow">
-                <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {{ $header }}
-                </div>
-            </header>
-        @endif
-
-        <!-- Page Content -->
-        <main class="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
-            <x-banner />
-            <div class="flex-grow">{{ $slot }}</div>
-        </main>
-    </div>
-
-    <x-curator::modals.modal />
-
-    @stack('modals')
-    @livewire('notifications')
-
-    @filamentScripts(withCore: true)
-    @vite(['resources/ts/app.ts'])
-    @livewireScripts
 </body>
 
 </html>

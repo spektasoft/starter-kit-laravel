@@ -3,7 +3,7 @@
         {{ $this->form }}
     </x-form>
 
-    <div class="mx-4 mt-4 sm:mx-0">
+    <div id="api-token-manage-table" class="mx-4 mt-4 sm:mx-0">
         {{ $this->table }}
     </div>
 

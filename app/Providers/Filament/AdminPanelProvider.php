@@ -3,6 +3,10 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Backups;
+use App\Filament\Resources\MediaResource;
+use App\Filament\Resources\PermissionResource;
+use App\Filament\Resources\RoleResource;
+use App\Filament\Resources\UserResource;
 use App\Http\Middleware\SetLocaleFromQueryAndSession;
 use Blade;
 use Filament\Http\Middleware\Authenticate;
@@ -70,6 +74,18 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 \Awcodes\Curator\CuratorPlugin::make(),
+                \Awcodes\Overlook\OverlookPlugin::make()
+                    ->columns([
+                        'default' => 2,
+                        'sm' => 3,
+                        'md' => 4,
+                    ])
+                    ->includes([
+                        MediaResource::class,
+                        UserResource::class,
+                        PermissionResource::class,
+                        RoleResource::class,
+                    ]),
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
                 \ShuvroRoy\FilamentSpatieLaravelBackup\FilamentSpatieLaravelBackupPlugin::make()
                     ->usingPage(Backups::class),
@@ -88,18 +104,23 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-key')
                     ->url(fn () => route('api-tokens.index')),
             ])
+            ->renderHook(PanelsRenderHook::BODY_END, fn () => Blade::render(<<<'BLADE'
+            <x-loading />
+            BLADE))
+            ->renderHook(PanelsRenderHook::SCRIPTS_AFTER, fn () => Blade::render(<<<'BLADE'
+            @vite(['resources/ts/events.ts'])
+            BLADE))
             ->renderHook(PanelsRenderHook::STYLES_AFTER, fn () => Blade::render(<<<'BLADE'
             @googlefonts('sans')
             BLADE))
             ->renderHook(PanelsRenderHook::USER_MENU_BEFORE, fn () => Blade::render('<x-navigation-menu.language-switcher />'))
             ->spa()
-            ->spaUrlExceptions(fn () => [
-                route('home'),
-                route('profile.show'),
-                route('api-tokens.index'),
-                url('*?lang=*'),
-            ])
+            ->sidebarFullyCollapsibleOnDesktop()
+            ->sidebarWidth('14rem')
             ->unsavedChangesAlerts()
-            ->viteTheme('resources/css/app.css');
+            ->viteTheme('resources/css/app.css')
+            ->widgets([
+                \Awcodes\Overlook\Widgets\OverlookWidget::class,
+            ]);
     }
 }
