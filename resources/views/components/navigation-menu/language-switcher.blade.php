@@ -9,7 +9,7 @@
             <x-filament::icon icon="heroicon-m-chevron-down" color="gray" class="size-3" />
         </button>
     </x-slot>
-    <x-filament::dropdown.list x-data="languageSwitcher">
+    <x-filament::dropdown.list x-data="languageSwitcher" x-init="switchLanguage('{{ app()->getLocale() }}')">
         <x-filament::dropdown.list.item x-on:click="switchLanguage('id')"
             href="{{ request()->fullUrlWithQuery(['lang' => 'id']) }}" tag="a">
             Bahasa Indonesia
