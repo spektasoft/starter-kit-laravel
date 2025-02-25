@@ -50,8 +50,6 @@ class Media extends CuratorMedia
                 return;
             }
 
-            /** @var Builder<Media> */
-            $builder = $builder;
             /** @var Collection<string, mixed> */
             $traces = collect(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10));
             /** @var Collection<int, string> */
