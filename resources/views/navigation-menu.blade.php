@@ -24,7 +24,7 @@
                 <!-- Logo -->
                 <div class="flex items-center shrink-0">
                     <a wire:navigate href="{{ route('home') }}">
-                        <x-application-mark class="block w-auto h-9" />
+                        <x-app-logo-icon class="text-black fill-current size-9 dark:text-white" />
                     </a>
                 </div>
             </div>

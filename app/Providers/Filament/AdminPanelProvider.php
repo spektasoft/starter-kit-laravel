@@ -37,9 +37,9 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandLogo(fn () => view('components.application-mark', [
+            ->brandLogo(fn () => view('components.app-logo-icon', [
                 'attributes' => new ComponentAttributeBag([
-                    'class' => 'block w-auto h-9',
+                    'class' => 'size-9 fill-current text-black dark:text-white',
                 ]),
             ]))
             ->colors([
