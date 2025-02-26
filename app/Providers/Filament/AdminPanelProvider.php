@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Colors\Color;
 use App\Filament\Pages\Backups;
 use App\Filament\Resources\MediaResource;
 use App\Filament\Resources\PermissionResource;
@@ -16,7 +17,6 @@ use Filament\Navigation\MenuItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
@@ -37,14 +37,14 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandLogo(fn () => view('components.application-mark', [
+            ->brandLogo(fn () => view('components.app-logo-icon', [
                 'attributes' => new ComponentAttributeBag([
-                    'class' => 'block w-auto h-9',
+                    'class' => 'size-9 fill-current text-black dark:text-white',
                 ]),
             ]))
             ->colors([
-                'primary' => Color::Indigo,
-                'secondary' => Color::Emerald,
+                'primary' => Color::Vermilion,
+                'secondary' => Color::WebOrange,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

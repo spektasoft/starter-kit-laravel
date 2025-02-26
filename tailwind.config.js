@@ -1,5 +1,5 @@
-import colors from "tailwindcss/colors";
 import defaultTheme from "tailwindcss/defaultTheme";
+import { colors } from "./colors";
 import preset from "./vendor/filament/support/tailwind.config.preset";
 
 /** @type {import('tailwindcss').Config} */
@@ -22,8 +22,8 @@ export default {
     theme: {
         extend: {
             colors: {
-                primary: colors["indigo"],
-                secondary: colors["emerald"],
+                primary: colors.vermilion,
+                secondary: colors["web-orange"],
             },
             fontFamily: {
                 sans: ["Figtree", ...defaultTheme.fontFamily.sans],

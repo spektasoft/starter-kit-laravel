@@ -110,7 +110,7 @@ To develop a universal app, follow the additional instructions below:
 
 ## Upstream
 
-Apply any changes available from the Laravel [11.x branch](https://github.com/laravel/laravel/compare/657070ea8a95ec269d0ed4c801cead04976a871a...11.x).
+Apply any changes available from the Laravel [12.x branch](https://github.com/laravel/laravel/compare/bd44e4a0ce6e767a10c9b55a61feaaa255f1c75b...12.x).
 
 ## License
 
