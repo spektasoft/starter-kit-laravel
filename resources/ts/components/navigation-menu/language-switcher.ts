@@ -10,7 +10,7 @@ type LanguageSwitcher = {
 const languageSwitcherComponentFactory: () => AlpineComponent<LanguageSwitcher> =
     () => ({
         switchLanguage(lang: string) {
-            Android?.switchLanguage(lang === "id" ? "in" : lang);
+            Android?.switchLanguage?.(lang === "id" ? "in" : lang);
         },
     });
 

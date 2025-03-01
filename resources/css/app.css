@@ -14,8 +14,3 @@
 dl.grid.md\:grid-cols-3.gap-6 {
     @apply overflow-auto md:overflow-hidden;
 }
-
-/* Loading component */
-.nprogress-busy #loading {
-    @apply -translate-x-0;
-}

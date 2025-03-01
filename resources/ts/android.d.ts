@@ -1,3 +1,5 @@
 export interface Android {
-    switchLanguage(lang: string): void;
+    navigate?: () => void;
+    navigated?: () => void;
+    switchLanguage?: (lang: string) => void;
 }
