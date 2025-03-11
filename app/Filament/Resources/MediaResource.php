@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
+use App\Filament\Resources\MediaResource\Pages;
 use App\Models\Media;
 use App\Models\User;
 use Awcodes\Curator\Resources\MediaResource as CuratorMediaResource;
@@ -32,6 +33,14 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
         }
 
         return $query;
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            ...parent::getPages(),
+            'index' => Pages\ListMedia::route('/'),
+        ];
     }
 
     /**
