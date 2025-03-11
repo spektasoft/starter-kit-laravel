@@ -11,11 +11,15 @@ class MediaPolicy
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can view any models.
+     * Determine whether the user can view the model.
      */
-    public function viewAny(User $user): bool
+    public function view(User $user, Media $media): bool
     {
-        return true;
+        if ($media->creator->is($user)) {
+            return true;
+        }
+
+        return $user->can('view_media');
     }
 
     /**
@@ -27,15 +31,11 @@ class MediaPolicy
     }
 
     /**
-     * Determine whether the user can view the model.
+     * Determine whether the user can view any models.
      */
-    public function view(User $user, Media $media): bool
+    public function viewAny(User $user): bool
     {
-        if ($user->id === $media->creator?->id) {
-            return true;
-        }
-
-        return $user->can('view_media');
+        return true;
     }
 
     /**
@@ -51,7 +51,7 @@ class MediaPolicy
      */
     public function update(User $user, Media $media): bool
     {
-        if ($user->id === $media->creator?->id) {
+        if ($media->creator->is($user)) {
             return true;
         }
 
@@ -66,7 +66,7 @@ class MediaPolicy
         if ($media->isReferenced()) {
             return false;
         }
-        if ($user->id === $media->creator?->id) {
+        if ($media->creator->is($user)) {
             return true;
         }
 

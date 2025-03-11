@@ -18,6 +18,7 @@ use Illuminate\Support\Collection;
  * @property string $disk
  * @property string $path
  * @property string|null $creator_id
+ * @property User $creator
  * @property string $directory
  * @property string $visibility
  * @property string $name
@@ -66,7 +67,19 @@ class Media extends CuratorMedia
      */
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'creator_id');
+    }
+
+    public function getCreatorAttribute(): User
+    {
+        if (! $this->relationLoaded('creator')) {
+            $this->load('creator');
+        }
+
+        /** @var User */
+        $creator = $this->getRelation('creator');
+
+        return $creator;
     }
 
     public function isReferenced(): bool
@@ -79,8 +92,6 @@ class Media extends CuratorMedia
     }
 
     /**
-     * Get all of the Users for the Media
-     *
      * @return HasMany<User, $this>
      */
     public function usersWithThisAsProfilePhoto(): HasMany
