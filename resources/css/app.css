@@ -14,3 +14,9 @@
 dl.grid.md\:grid-cols-3.gap-6 {
     @apply overflow-auto md:overflow-hidden;
 }
+
+.fi-ta-record:has(.curator-grid-column-square) {
+    label {
+        @apply aspect-square !important;
+    }
+}

@@ -57,6 +57,19 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
             ->bulkActions([
                 ReferenceAwareDeleteBulkAction::make(),
             ])
+            ->contentGrid(function () use ($livewire) {
+                if ($livewire->layoutView === 'grid') {
+                    return [
+                        'default' => 2,
+                        'sm' => 3,
+                        'md' => 3,
+                        'lg' => 4,
+                        'xl' => 6,
+                    ];
+                }
+
+                return null;
+            })
             ->pushColumns(array_filter([
                 TextColumn::make('title')
                     ->label(__('attributes.title'))
@@ -64,10 +77,9 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
                     ->searchable()
                     ->sortable(),
                 static::canViewAll() ? TextColumn::make('creator.name')
-                    ->label(__('attributes.created_by'))
-                    ->extraAttributes(['class' => 'my-2'])
+                    ->hidden(fn () => $livewire->layoutView === 'grid')
                     ->icon($livewire->layoutView === 'grid' ? 'heroicon-o-user' : null)
-                    ->badge($livewire->layoutView === 'grid')
+                    ->label(__('attributes.created_by'))
                     ->searchable()
                     ->sortable() : null,
             ]))
