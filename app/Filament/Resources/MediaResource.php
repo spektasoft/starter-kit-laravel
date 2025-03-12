@@ -50,11 +50,10 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
     public static function getPermissionPrefixes(): array
     {
         return [
-            'view_all',
             'view',
+            'view_all',
             'update',
             'delete',
-            'delete_any',
         ];
     }
 
