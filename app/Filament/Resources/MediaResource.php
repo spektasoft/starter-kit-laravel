@@ -9,6 +9,7 @@ use App\Models\User;
 use Awcodes\Curator\Resources\MediaResource as CuratorMediaResource;
 use Awcodes\Curator\Resources\MediaResource\ListMedia;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Filament\Forms;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -54,6 +55,24 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
             'update',
             'delete',
             'delete_any',
+        ];
+    }
+
+    /**
+     * @return array<Forms\Components\Component>
+     */
+    public static function getAdditionalInformationFormSchema(): array
+    {
+        // @phpstan-ignore-next-line
+        return [
+            ...parent::getAdditionalInformationFormSchema(),
+            static::canViewAll() ? Forms\Components\Select::make('creator_id')
+                ->label(__('attributes.created_by'))
+                ->relationship('creator', titleAttribute: 'name')
+                ->default(User::auth()?->id)
+                ->native(false)
+                ->searchable() : Forms\Components\Hidden::make('creator_id')
+                ->dehydrateStateUsing(fn () => User::auth()?->id),
         ];
     }
 
