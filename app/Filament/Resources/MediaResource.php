@@ -3,11 +3,13 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
+use App\Filament\Resources\MediaResource\Pages;
 use App\Models\Media;
 use App\Models\User;
 use Awcodes\Curator\Resources\MediaResource as CuratorMediaResource;
 use Awcodes\Curator\Resources\MediaResource\ListMedia;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Filament\Forms;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -34,17 +36,42 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
         return $query;
     }
 
+    public static function getPages(): array
+    {
+        return [
+            ...parent::getPages(),
+            'index' => Pages\ListMedia::route('/'),
+        ];
+    }
+
     /**
      * @return string[]
      */
     public static function getPermissionPrefixes(): array
     {
         return [
-            'view_all',
             'view',
+            'view_all',
             'update',
             'delete',
-            'delete_any',
+        ];
+    }
+
+    /**
+     * @return array<Forms\Components\Component>
+     */
+    public static function getAdditionalInformationFormSchema(): array
+    {
+        // @phpstan-ignore-next-line
+        return [
+            ...parent::getAdditionalInformationFormSchema(),
+            static::canViewAll() ? Forms\Components\Select::make('creator_id')
+                ->label(__('attributes.created_by'))
+                ->relationship('creator', titleAttribute: 'name')
+                ->default(User::auth()?->id)
+                ->native(false)
+                ->searchable() : Forms\Components\Hidden::make('creator_id')
+                ->dehydrateStateUsing(fn () => User::auth()?->id),
         ];
     }
 
@@ -57,6 +84,19 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
             ->bulkActions([
                 ReferenceAwareDeleteBulkAction::make(),
             ])
+            ->contentGrid(function () use ($livewire) {
+                if ($livewire->layoutView === 'grid') {
+                    return [
+                        'default' => 2,
+                        'sm' => 3,
+                        'md' => 3,
+                        'lg' => 4,
+                        'xl' => 6,
+                    ];
+                }
+
+                return null;
+            })
             ->pushColumns(array_filter([
                 TextColumn::make('title')
                     ->label(__('attributes.title'))
@@ -64,10 +104,9 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
                     ->searchable()
                     ->sortable(),
                 static::canViewAll() ? TextColumn::make('creator.name')
-                    ->label(__('attributes.created_by'))
-                    ->extraAttributes(['class' => 'my-2'])
+                    ->hidden(fn () => $livewire->layoutView === 'grid')
                     ->icon($livewire->layoutView === 'grid' ? 'heroicon-o-user' : null)
-                    ->badge($livewire->layoutView === 'grid')
+                    ->label(__('attributes.created_by'))
                     ->searchable()
                     ->sortable() : null,
             ]))
