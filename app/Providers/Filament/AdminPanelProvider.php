@@ -105,7 +105,7 @@ class AdminPanelProvider extends PanelProvider
                     ->url(fn () => route('api-tokens.index')),
             ])
             ->renderHook(PanelsRenderHook::SCRIPTS_AFTER, fn () => Blade::render(<<<'BLADE'
-            @vite(['resources/ts/events.ts'])
+            @vite(['resources/ts/app.ts', 'resources/ts/events.ts'])
             BLADE))
             ->renderHook(PanelsRenderHook::STYLES_AFTER, fn () => Blade::render(<<<'BLADE'
             @googlefonts('sans')
