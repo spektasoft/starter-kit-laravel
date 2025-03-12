@@ -19,4 +19,8 @@ dl.grid.md\:grid-cols-3.gap-6 {
     label {
         @apply aspect-square !important;
     }
+
+    .fi-ta-actions {
+        @apply xl:flex-wrap;
+    }
 }
