@@ -4,7 +4,7 @@
 
 ## Universal Starter Kit
 
-This starter kit is meant to be used with [Starter Kit Expo](https://github.com/spektasoft/starter-kit-expo).
+This starter kit is meant to be used with [Starter Kit WebView Android](https://github.com/spektasoft/starter-kit-webview-android).
 
 ## Important Notice
 
