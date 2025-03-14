@@ -11,5 +11,7 @@ document.addEventListener("livewire:navigate", () => {
 });
 
 document.addEventListener("livewire:navigated", () => {
-    Android?.navigated?.();
+    setTimeout(() => {
+        Android?.navigated?.();
+    }, 100);
 });
