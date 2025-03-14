@@ -1,4 +1,3 @@
-import "./bootstrap";
-
 import "./components";
+import "./events";
 import "./navigation-menu";
