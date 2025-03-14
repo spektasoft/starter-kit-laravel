@@ -15,7 +15,7 @@ class MediaPolicy
      */
     public function view(User $user, Media $media): bool
     {
-        if ($media->creator->is($user)) {
+        if ($user->is($media->creator)) {
             return true;
         }
 
@@ -51,7 +51,7 @@ class MediaPolicy
      */
     public function update(User $user, Media $media): bool
     {
-        if ($media->creator->is($user)) {
+        if ($user->is($media->creator)) {
             return true;
         }
 
@@ -66,7 +66,7 @@ class MediaPolicy
         if ($media->isReferenced()) {
             return false;
         }
-        if ($media->creator->is($user)) {
+        if ($user->is($media->creator)) {
             return true;
         }
 

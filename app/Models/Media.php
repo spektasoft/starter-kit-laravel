@@ -70,7 +70,10 @@ class Media extends CuratorMedia
         return $this->belongsTo(User::class, 'creator_id');
     }
 
-    public function getCreatorAttribute(): User
+    /**
+     * @return User
+     */
+    public function getCreatorAttribute()
     {
         if (! $this->relationLoaded('creator')) {
             $this->load('creator');
