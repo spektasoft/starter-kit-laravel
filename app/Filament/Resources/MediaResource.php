@@ -10,6 +10,7 @@ use Awcodes\Curator\Resources\MediaResource as CuratorMediaResource;
 use Awcodes\Curator\Resources\MediaResource\ListMedia;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms;
+use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -79,7 +80,9 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
 
         $table = parent::table($table)
             ->bulkActions([
-                ReferenceAwareDeleteBulkAction::make(),
+                Tables\Actions\BulkActionGroup::make([
+                    ReferenceAwareDeleteBulkAction::make(),
+                ]),
             ])
             ->contentGrid(function () use ($livewire) {
                 if ($livewire->layoutView === 'grid') {
