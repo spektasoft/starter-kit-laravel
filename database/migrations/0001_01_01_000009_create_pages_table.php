@@ -15,7 +15,7 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->foreignUlid('creator_id')->constrained('users');
             $table->json('title');
-            $table->json('content')->nullable();
+            $table->json('content');
             $table->timestamps();
         });
     }
