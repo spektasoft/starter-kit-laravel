@@ -24,6 +24,7 @@
         "lasserafn/php-initial-avatar-generator": "^4.4",
         "livewire/livewire": "^3.6.2",
         "shuvroroy/filament-spatie-laravel-backup": "^2.2.4",
+        "solution-forest/filament-translate-field": "^1.4",
         "spatie/color": "^1.8.0",
         "spatie/laravel-data": "^4.14.1",
         "spatie/laravel-google-fonts": "^1.4.3",
