@@ -7,6 +7,7 @@ use App\Filament\Resources\UserResource\Utils\Creator;
 use App\Models\Page;
 use App\Models\User;
 use App\Utils\Locale;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -16,7 +17,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use SolutionForest\FilamentTranslateField\Forms\Component\Translate;
 
-class PageResource extends Resource
+class PageResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Page::class;
 
@@ -85,6 +86,21 @@ class PageResource extends Resource
             'index' => Pages\ListPages::route('/'),
             'create' => Pages\CreatePage::route('/create'),
             'edit' => Pages\EditPage::route('/{record}/edit'),
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_all',
+            'view_any',
+            'create',
+            'update',
+            'delete',
         ];
     }
 

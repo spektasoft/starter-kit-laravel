@@ -36,4 +36,9 @@ class Page extends Model
      * @var string[]
      */
     protected $guarded = [];
+
+    public function isReferenced(): bool
+    {
+        return false;
+    }
 }
