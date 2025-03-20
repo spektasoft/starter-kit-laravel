@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Concerns\HasCreatorAttribute;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
@@ -22,7 +23,9 @@ class Page extends Model
 
     /** @use HasFactory<\Database\Factories\PageFactory> */
     use HasFactory;
+
     use HasTranslations;
+    use HasUlids;
 
     /**
      * @var string[]
