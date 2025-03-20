@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use SolutionForest\FilamentTranslateField\Facades\FilamentTranslateField;
+use Spatie\Translatable\Facades\Translatable;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -38,6 +39,8 @@ class AppServiceProvider extends ServiceProvider
         Table::configureUsing(function (Table $table): void {
             $table->paginationPageOptions([12, 24]);
         });
+
+        Translatable::fallback(fallbackAny: true);
 
         /** @var string[]|null */
         $locales = config('app.supported_locales', null);
