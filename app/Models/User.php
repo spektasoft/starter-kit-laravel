@@ -164,6 +164,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         if ($this->media()->exists()) {
             return true;
         }
+        if ($this->pages()->exists()) {
+            return true;
+        }
 
         return false;
     }
@@ -188,6 +191,14 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     public function media(): HasMany
     {
         return $this->hasMany(Media::class, 'creator_id');
+    }
+
+    /**
+     * @return HasMany<Page, $this>
+     */
+    public function pages(): HasMany
+    {
+        return $this->hasMany(Page::class, 'creator_id');
     }
 
     /**
