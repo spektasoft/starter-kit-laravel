@@ -12,11 +12,7 @@ export default defineConfig(({ mode }) => {
         },
         plugins: [
             laravel({
-                input: [
-                    "resources/css/app.css",
-                    "resources/ts/app.ts",
-                    "resources/ts/events.ts",
-                ],
+                input: ["resources/css/app.css", "resources/ts/app.ts"],
                 refresh: true,
             }),
         ],
