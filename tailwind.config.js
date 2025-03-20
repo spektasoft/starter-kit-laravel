@@ -13,6 +13,7 @@ export default {
         "./resources/ts/**/*.ts",
         "./storage/framework/views/*.php",
         "./vendor/awcodes/filament-curator/resources/**/*.blade.php",
+        "./vendor/awcodes/filament-tiptap-editor/resources/**/*.blade.php",
         "./vendor/awcodes/overlook/resources/**/*.blade.php",
         "./vendor/filament/**/*.blade.php",
         "./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php",
