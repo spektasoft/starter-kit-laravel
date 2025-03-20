@@ -71,10 +71,14 @@ class PermissionResource extends Resource implements HasShieldPermissions
                     ),
             ])
             ->actions([
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
-                ReferenceAwareDeleteBulkAction::make(),
+                Tables\Actions\BulkActionGroup::make([
+                    ReferenceAwareDeleteBulkAction::make(),
+                ]),
             ]);
     }
 

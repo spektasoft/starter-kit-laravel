@@ -15,11 +15,11 @@ class MediaPolicy
      */
     public function view(User $user, Media $media): bool
     {
-        if ($user->is($media->creator)) {
-            return true;
+        if ($user->isNot($media->creator) && ! $this->viewAll($user)) {
+            return false;
         }
 
-        return $user->can('view_media');
+        return true;
     }
 
     /**
@@ -31,31 +31,15 @@ class MediaPolicy
     }
 
     /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
-    {
-        return true;
-    }
-
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
-    {
-        return true;
-    }
-
-    /**
      * Determine whether the user can update the model.
      */
     public function update(User $user, Media $media): bool
     {
-        if ($user->is($media->creator)) {
-            return true;
+        if ($user->isNot($media->creator) && ! $this->viewAll($user)) {
+            return false;
         }
 
-        return $user->can('update_media');
+        return true;
     }
 
     /**
@@ -66,18 +50,10 @@ class MediaPolicy
         if ($media->isReferenced()) {
             return false;
         }
-        if ($user->is($media->creator)) {
-            return true;
+        if ($user->isNot($media->creator) && ! $this->viewAll($user)) {
+            return false;
         }
 
-        return $user->can('delete_media');
-    }
-
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
-    {
         return true;
     }
 }

@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\RoleResource\Pages;
 use BezhanSalleh\FilamentShield\Resources\RoleResource as ShieldRoleResource;
+use Filament\Tables;
 use Filament\Tables\Table;
 
 class RoleResource extends ShieldRoleResource
@@ -36,7 +37,9 @@ class RoleResource extends ShieldRoleResource
     {
         return parent::table($table)
             ->bulkActions([
-                ReferenceAwareDeleteBulkAction::make(),
+                Tables\Actions\BulkActionGroup::make([
+                    ReferenceAwareDeleteBulkAction::make(),
+                ]),
             ]);
     }
 }

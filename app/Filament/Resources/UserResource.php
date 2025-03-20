@@ -139,11 +139,15 @@ class UserResource extends Resource
                 //
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
-                ReferenceAwareDeleteBulkAction::make(),
+                Tables\Actions\BulkActionGroup::make([
+                    ReferenceAwareDeleteBulkAction::make(),
+                ]),
             ]);
     }
 
