@@ -14,6 +14,7 @@ use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use FilamentTiptapEditor\TiptapEditor;
 use Illuminate\Database\Eloquent\Builder;
 use SolutionForest\FilamentTranslateField\Forms\Component\Translate;
 
@@ -50,7 +51,7 @@ class PageResource extends Resource implements HasShieldPermissions
                     ->suffixLocaleLabel(),
                 Translate::make()
                     ->schema([
-                        Forms\Components\Textarea::make('content')
+                        TiptapEditor::make('content')
                             ->label(__('page.resource.content')),
                     ])
                     ->columnSpanFull()
