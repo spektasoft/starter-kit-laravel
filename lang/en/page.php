@@ -6,6 +6,10 @@ return [
     'resource' => [
         'content' => 'Content',
         'model_label' => 'Page|Pages',
+        'status' => [
+            'draft' => 'Draft',
+            'publish' => 'Publish',
+        ],
         'title' => 'Title',
     ],
 ];
