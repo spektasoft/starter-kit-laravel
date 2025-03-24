@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignUlid('creator_id')->constrained('users');
             $table->json('title');
             $table->json('content');
+            $table->string('status');
             $table->timestamps();
         });
     }
