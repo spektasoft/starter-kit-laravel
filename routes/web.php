@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Page\Status;
 use App\Models\Page;
 use Illuminate\Support\Facades\Route;
 use Laravel\Jetstream\Jetstream;
@@ -16,12 +17,14 @@ Route::group(['middleware' => ['auth:sanctum', 'json']], function () {
 
 if (Jetstream::hasTermsAndPrivacyPolicyFeature()) {
     Route::get('/terms-of-service', function () {
-        $record = Page::find(config('page.terms'));
+        $record = Page::whereStatus(Status::Publish)
+            ->find(config('page.terms'));
 
         return view('terms-of-service', ['record' => $record]);
     })->name('terms.show');
     Route::get('/privacy-policy', function () {
-        $record = Page::find(config('page.privacy'));
+        $record = Page::whereStatus(Status::Publish)
+            ->find(config('page.privacy'));
 
         return view('privacy-policy', ['record' => $record]);
     })->name('policy.show');

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\Page\Status;
 use App\Filament\Resources\PageResource\Pages;
 use App\Filament\Resources\UserResource\Utils\Creator;
 use App\Models\Page;
@@ -33,31 +34,52 @@ class PageResource extends Resource implements HasShieldPermissions
     {
         return $form
             ->schema([
-                Translate::make()
-                    ->schema(function (Get $get) {
-                        /** @var array<?string> */
-                        $titles = $get('title');
-                        $required = collect($titles)->every(fn ($item) => $item === null || trim($item) === '');
+                Forms\Components\Grid::make([
+                    'default' => 1,
+                    'sm' => 6,
+                ])->schema([
+                    Forms\Components\Group::make([
+                        Translate::make()
+                            ->schema(function (Get $get) {
+                                /** @var array<?string> */
+                                $titles = $get('title');
+                                $required = collect($titles)->every(fn ($item) => $item === null || trim($item) === '');
 
-                        return [
-                            Forms\Components\Textarea::make('title')
-                                ->label(__('page.resource.title'))
-                                ->lazy()
-                                ->required($required),
-                        ];
-                    })
-                    ->columnSpanFull()
-                    ->locales(Locale::getSortedLocales())
-                    ->suffixLocaleLabel(),
-                Translate::make()
-                    ->schema([
-                        TiptapEditor::make('content')
-                            ->label(__('page.resource.content')),
-                    ])
-                    ->columnSpanFull()
-                    ->locales(Locale::getSortedLocales())
-                    ->suffixLocaleLabel(),
-                Creator::getComponent(static::canViewAll()),
+                                return [
+                                    Forms\Components\Textarea::make('title')
+                                        ->label(__('page.resource.title'))
+                                        ->lazy()
+                                        ->required($required),
+                                ];
+                            })
+                            ->columnSpanFull()
+                            ->locales(Locale::getSortedLocales())
+                            ->suffixLocaleLabel(),
+                        Translate::make()
+                            ->schema([
+                                TiptapEditor::make('content')
+                                    ->label(__('page.resource.content')),
+                            ])
+                            ->columnSpanFull()
+                            ->locales(Locale::getSortedLocales())
+                            ->suffixLocaleLabel(),
+                    ])->columnSpan([
+                        'default' => 1,
+                        'sm' => 4,
+                    ]),
+                    Forms\Components\Group::make([
+                        Forms\Components\Section::make([
+                            Forms\Components\Radio::make('status')
+                                ->default(Status::Draft)
+                                ->options(Status::class)
+                                ->required(),
+                        ]),
+                        Creator::getComponent(static::canViewAll()),
+                    ])->columnSpan([
+                        'default' => 1,
+                        'sm' => 2,
+                    ]),
+                ]),
             ]);
     }
 
@@ -116,6 +138,8 @@ class PageResource extends Resource implements HasShieldPermissions
             ->columns(array_filter([
                 Tables\Columns\TextColumn::make('title')
                     ->label(__('page.resource.title')),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge(),
                 static::canViewAll() ? Tables\Columns\TextColumn::make('creator.name')
                     ->label(ucfirst(__('validation.attributes.creator')))
                     ->searchable() : null,
