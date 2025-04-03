@@ -7,4 +7,5 @@ return [
     App\Providers\JetstreamServiceProvider::class,
     App\Providers\SanctumServiceProvider::class,
     App\Queue\QueueServiceProvider::class,
+    Artesaos\SEOTools\Providers\SEOToolsServiceProvider::class,
 ];
