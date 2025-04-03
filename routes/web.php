@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Page\Status;
+use App\Http\Controllers\SitemapController;
 use App\Models\Page;
 use Illuminate\Support\Facades\Route;
 use Laravel\Jetstream\Jetstream;
@@ -29,3 +30,5 @@ if (Jetstream::hasTermsAndPrivacyPolicyFeature()) {
         return view('privacy-policy', ['record' => $record]);
     })->name('policy.show');
 }
+
+Route::get('/sitemap.xml', [SitemapController::class, 'index']);
