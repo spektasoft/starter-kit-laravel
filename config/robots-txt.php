@@ -1,18 +1,27 @@
 <?php
+
 return [
     'environments' => [
         'production' => [
             'paths' => [
                 '*' => [
                     'disallow' => [
-                        ''
+                        '/admin',
                     ],
-                    'allow' => []
                 ],
             ],
             'sitemaps' => [
-                'sitemap.xml'
-            ]
-        ]
-    ]
+                'sitemap.xml',
+            ],
+        ],
+        'staging' => [
+            'paths' => [
+                '*' => [
+                    'disallow' => [
+                        '/',
+                    ],
+                ],
+            ],
+        ],
+    ],
 ];
