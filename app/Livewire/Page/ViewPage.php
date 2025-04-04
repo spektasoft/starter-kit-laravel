@@ -3,7 +3,9 @@
 namespace App\Livewire\Page;
 
 use App\Models\Page;
+use Artesaos\SEOTools\Facades\SEOTools;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Str;
 use Livewire\Component;
 
 class ViewPage extends Component
@@ -12,6 +14,18 @@ class ViewPage extends Component
 
     public function mount(Page $record): void
     {
+        $description = Str::limit(strip_tags($record->content), 160, '...');
+
+        SEOTools::setTitle($record->title);
+        SEOTools::setDescription($description);
+        SEOTools::opengraph()->setTitle($record->title);
+        SEOTools::opengraph()->setDescription($description);
+        SEOTools::twitter()->setTitle($record->title);
+        SEOTools::twitter()->setDescription($description);
+        SEOTools::jsonLd()->setTitle($record->title);
+        SEOTools::jsonLd()->setDescription($description);
+        SEOTools::jsonLd()->setType('WebPage');
+
         $this->page = $record;
     }
 
