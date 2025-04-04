@@ -22,7 +22,7 @@ use Laravel\Fortify\Fortify;
 class UserController extends Controller
 {
     /**
-     * @return AbstractPaginator<UserData>|Enumerable<string|int, UserData>
+     * @return AbstractPaginator<int, UserData>|Enumerable<int, UserData>
      */
     public function index()
     {
