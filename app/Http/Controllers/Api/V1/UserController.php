@@ -88,6 +88,8 @@ class UserController extends Controller
         Authorizer::authorizeToken('update');
         Authorizer::authorize('update', $user);
 
+        $request = $this->normalizeRequest($request);
+
         $input = $request->all();
 
         Validator::make($input, [
@@ -96,34 +98,28 @@ class UserController extends Controller
             'password' => ['nullable', 'string', Password::default()],
         ])->validate();
 
-        $request = $this->normalizeRequest($request);
-
         $dataToUpdate = [];
 
-        if (isset($input['name'])) {
+        if (array_key_exists('name', $input)) {
             $dataToUpdate['name'] = $input['name'];
         }
 
-        if (isset($input['email'])) {
+        if (array_key_exists('email', $input)) {
             $dataToUpdate['email'] = $input['email'];
         }
 
-        if (isset($input['password'])) {
+        if (array_key_exists('password', $input) && ! is_null($input['password'])) {
             /** @var string */
             $password = $input['password'];
             $dataToUpdate['password'] = Hash::make($password);
         }
-
         try {
             $user->update($dataToUpdate);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to update user.'], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return response()->json(
-            ['message' => 'User updated successfully!'],
-            JsonResponse::HTTP_ACCEPTED
-        );
+        return response()->json(['message' => 'User updated successfully!'], JsonResponse::HTTP_ACCEPTED);
     }
 
     public function destroy(User $user): JsonResponse
@@ -154,11 +150,17 @@ class UserController extends Controller
         /** @var string|null */
         $id = $request->input('id');
 
-        /** @var Model|string */
-        $model = $this->guessModelFromResource($resource);
+        /** @var class-string<Model> */
+        $modelClass = $this->guessModelFromResource($resource);
+        /** @var Model|class-string<Model> */
+        $model = $modelClass;
         if ($id) {
-            /** @var Model */
-            $model = $model::find($id);
+            /** @var ?Model */
+            $modelInstance = $modelClass::find($id);
+            if (! $modelInstance) {
+                throw (new ModelNotFoundException)->setModel($modelClass, $id);
+            }
+            $model = $modelInstance;
         }
 
         if (! Authorizer::check($action, $model)) {
@@ -175,17 +177,19 @@ class UserController extends Controller
     }
 
     /**
-     * @return class-string
+     * @return class-string<Model>
      */
     private function guessModelFromResource(string $resource)
     {
         $namespace = 'App\\Models\\';
+        /** @var class-string<Model> */
         $modelName = $namespace.ucfirst($resource);
 
         if (class_exists($modelName)) {
             return $modelName;
         }
 
+        /** @var class-string<Model> */
         $modelName = $namespace.ucfirst(str($resource)->singular());
 
         if (class_exists($modelName)) {
@@ -198,11 +202,14 @@ class UserController extends Controller
     private function normalizeRequest(Request $request): Request
     {
         if (config('fortify.lowercase_usernames')) {
-            /** @var string */
-            $username = $request->{Fortify::username()};
-            $request->merge([
-                Fortify::username() => Str::lower($username),
-            ]);
+            $usernameKey = Fortify::username();
+            if ($request->has($usernameKey)) {
+                /** @var string|null */
+                $username = $request->input($usernameKey);
+                $request->merge([
+                    $usernameKey => filled($username) ? Str::lower($username) : $username,
+                ]);
+            }
         }
 
         return $request;
