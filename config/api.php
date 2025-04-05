@@ -26,4 +26,17 @@ return [
     */
 
     'key' => env('API_KEY', null),
+
+    /*
+    |--------------------------------------------------------------------------
+    | API Limit Per Minute
+    |--------------------------------------------------------------------------
+    |
+    | The number of API requests allowed per minute. This value is used for
+    | rate limiting to prevent abuse and ensure the API remains available
+    | for all users.
+    |
+    */
+
+    'limit_per_minute' => env('API_LIMIT_PER_MINUTE', 5),
 ];

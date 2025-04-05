@@ -29,6 +29,7 @@ class LoginController
             $password = $request->password;
             /** @var string */
             $device_name = $request->device_name;
+            $device_name = strip_tags($device_name);
 
             if (config('fortify.lowercase_usernames')) {
                 $username = Str::lower($username);
@@ -42,19 +43,21 @@ class LoginController
                 ]);
             }
 
-            if (Fortify::confirmsTwoFactorAuthentication()) {
-                if ($user->two_factor_secret &&
-                ! is_null($user->two_factor_confirmed_at) &&
-                in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user))) {
-                    return $this->twoFactorChallengeResponse($user, $jwt);
-                }
-            }
+            // Check if a two-factor challenge is required
+            $usesTwoFactorAuthenticatable = in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user));
+            $hasTwoFactorSecret = ! is_null($user->two_factor_secret);
+            $isTwoFactorConfirmed = ! is_null($user->two_factor_confirmed_at);
+            $requiresConfirmation = Fortify::confirmsTwoFactorAuthentication();
 
-            if ($user->two_factor_secret &&
-            in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user))) {
+            if ($usesTwoFactorAuthenticatable && $hasTwoFactorSecret && (! $requiresConfirmation || $isTwoFactorConfirmed)) {
+                // Trigger challenge if:
+                // - User uses the 2FA trait
+                // - User has enabled 2FA (secret exists)
+                // - AND (Fortify doesn't require confirmation OR the user has confirmed)
                 return $this->twoFactorChallengeResponse($user, $jwt);
             }
 
+            // If no 2FA challenge is required, create and return the token
             $token = $user->createToken($device_name, ['*'])->plainTextToken;
 
             return response()->json([

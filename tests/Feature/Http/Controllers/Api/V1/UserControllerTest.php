@@ -14,7 +14,7 @@ class UserControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         UserPolicyTest::setUpPermissions();
@@ -335,5 +335,27 @@ class UserControllerTest extends TestCase
             'resource' => 'users',
         ]);
         $response->assertForbidden();
+    }
+
+    public function test_user_endpoint_is_throttled(): void
+    {
+        /** @var User */
+        $user = User::factory()->create();
+        $token = $user->createToken('test-token')->plainTextToken;
+
+        /** @var int */
+        $limit = config('api.limit_per_minute', 5);
+
+        foreach (range(0, $limit) as $i) {
+            $response = $this->withHeaders([
+                'Authorization' => 'Bearer '.$token,
+            ])->getJson(route('api.v1.user'));
+
+            if ($i < $limit) {
+                $response->assertSuccessful();
+            } else {
+                $response->assertTooManyRequests();
+            }
+        }
     }
 }

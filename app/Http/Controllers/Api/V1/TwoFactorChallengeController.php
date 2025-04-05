@@ -19,7 +19,10 @@ class TwoFactorChallengeController
     {
         try {
             $request->validate([
-                'login_id' => 'required',
+                'login_id' => 'required|string',
+                'device_name' => 'required|string',
+                'code' => 'nullable|string',
+                'recovery_code' => 'nullable|string',
             ]);
 
             /** @var string */
@@ -30,12 +33,15 @@ class TwoFactorChallengeController
             $recoveryCode = $request->recovery_code ?? '';
             /** @var string */
             $deviceName = $request->device_name;
+            $deviceName = strip_tags($deviceName);
 
+            /** @var string[] */
+            $payload = $jwt->decode($loginId);
             /** @var string|null */
-            $id = $jwt->decode($loginId)['uid'];
-            $user = User::find($id);
+            $id = $payload['uid'] ?? null;
+            $user = $id ? User::find($id) : null;
 
-            if (! $user) {
+            if (! $user || ! $user->two_factor_secret) {
                 throw ValidationException::withMessages([
                     Fortify::username() => ['The provided credentials are incorrect.'],
                 ]);
@@ -79,12 +85,22 @@ class TwoFactorChallengeController
 
     private function hasValidCode(User $user, string $code): bool
     {
-        /** @var string */
-        $twoFactorSecret = $user->two_factor_secret;
-        /** @var string */
-        $secret = decrypt($twoFactorSecret);
+        if (! $user->two_factor_secret) {
+            return false;
+        }
 
-        return app(TwoFactorAuthenticationProvider::class)->verify($secret, $code);
+        try {
+            /** @var string */
+            $twoFactorSecret = $user->two_factor_secret;
+            /** @var string */
+            $secret = decrypt($twoFactorSecret);
+
+            return app(TwoFactorAuthenticationProvider::class)->verify($secret, $code);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            Log::error('Failed to decrypt two_factor_secret for user: '.$user->id, ['exception' => $e]);
+
+            return false;
+        }
     }
 
     private function verifyAndReplaceValidRecoveryCode(User $user, string $recoveryCode): bool

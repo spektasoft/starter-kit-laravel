@@ -7,7 +7,7 @@ use App\Http\Controllers\Api\V1\TwoFactorChallengeController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\EmailVerificationNotificationController;
 
-Route::group(['middleware' => ['json'], 'prefix' => 'v1'], function () {
+Route::group(['middleware' => ['json', 'throttle:api'], 'prefix' => 'v1'], function () {
     Route::post('/login', LoginController::class)
         ->name('api.v1.login');
 

@@ -17,9 +17,11 @@ class LogoutController extends Controller
         try {
             /** @var User */
             $user = Auth::user();
-            /** @var PersonalAccessToken */
+            /** @var PersonalAccessToken|mixed|null */
             $token = $user->currentAccessToken();
-            $token->delete();
+            if ($token && $token instanceof PersonalAccessToken) {
+                $token->delete();
+            }
 
             return response()->json([
                 'message' => 'Logged out successfully.',
