@@ -264,4 +264,29 @@ class LoginControllerTest extends TestCase
         /** @var array<string, array<mixed>> $response */
         $this->assertArrayHasKey('device_name', $response['errors']);
     }
+
+    public function test_login_endpoint_is_throttled(): void
+    {
+        User::factory()->create([
+            'email' => 'test@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
+        /** @var int */
+        $limit = config('api.limit_per_minute', 5);
+
+        foreach (range(0, $limit) as $i) {
+            $response = $this->postJson(route('api.v1.login'), [
+                'email' => 'test@example.com',
+                'password' => 'password',
+                'device_name' => 'Test Device',
+            ]);
+
+            if ($i < $limit) {
+                $response->assertSuccessful();
+            } else {
+                $response->assertTooManyRequests();
+            }
+        }
+    }
 }

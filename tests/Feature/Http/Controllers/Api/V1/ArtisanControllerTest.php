@@ -58,4 +58,24 @@ class ArtisanControllerTest extends TestCase
 
         $response->assertSuccessful();
     }
+
+    public function test_throttle_should_limit_requests(): void
+    {
+        config(['api.artisan' => true]);
+
+        /** @var int */
+        $limit = config('api.limit_per_minute', 5);
+
+        foreach (range(0, $limit) as $i) {
+            $response = $this->postJson(route('api.v1.artisan.key.generate'), [
+                'api_key' => config('api.key'),
+            ]);
+
+            if ($i < $limit) {
+                $response->assertSuccessful();
+            } else {
+                $response->assertTooManyRequests();
+            }
+        }
+    }
 }

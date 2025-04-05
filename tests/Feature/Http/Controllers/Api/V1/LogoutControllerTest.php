@@ -44,4 +44,26 @@ class LogoutControllerTest extends TestCase
 
         $response->assertStatus(401);
     }
+
+    public function test_logout_endpoint_is_throttled(): void
+    {
+        /** @var User */
+        $user = User::factory()->create();
+        $token = $user->createToken('test-token')->plainTextToken;
+
+        /** @var int */
+        $limit = config('api.limit_per_minute', 5);
+
+        foreach (range(0, $limit) as $i) {
+            $response = $this->withHeaders([
+                'Authorization' => 'Bearer '.$token,
+            ])->postJson(route('api.v1.logout'));
+
+            if ($i < $limit) {
+                $response->assertSuccessful();
+            } else {
+                $response->assertTooManyRequests();
+            }
+        }
+    }
 }

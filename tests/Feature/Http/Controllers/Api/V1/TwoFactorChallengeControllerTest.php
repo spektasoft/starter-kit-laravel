@@ -186,4 +186,28 @@ class TwoFactorChallengeControllerTest extends TestCase
 
         return $loginId;
     }
+
+    public function test_two_factor_challenge_endpoint_is_throttled(): void
+    {
+        /** @var int */
+        $limit = config('api.limit_per_minute', 5);
+
+        $loginId = $this->getTwoFactorAuthenticationLoginId();
+        $limit -= 1;
+
+        foreach (range(0, $limit) as $i) {
+            $response = $this->postJson(route('api.v1.two-factor-challenge'), [
+                'login_id' => $loginId,
+                'code' => '123456',
+                'recovery_code' => '',
+                'device_name' => 'device_name',
+            ]);
+
+            if ($i < $limit) {
+                $response->assertStatus(JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+            } else {
+                $response->assertTooManyRequests();
+            }
+        }
+    }
 }
