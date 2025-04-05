@@ -112,18 +112,69 @@ class TwoFactorChallengeControllerTest extends TestCase
         $response->assertExactJsonStructure(['token']);
     }
 
+    public function test_invalid_login_id(): void
+    {
+        $response = $this->postJson(route('api.v1.two-factor-challenge'), [
+            'login_id' => 'invalid_login_id',
+            'code' => '123456',
+            'recovery_code' => '',
+            'device_name' => 'device_name',
+        ]);
+
+        $response->assertStatus(JsonResponse::HTTP_UNAUTHORIZED);
+    }
+
+    public function test_invalid_code_and_recovery_code(): void
+    {
+        $loginId = $this->getTwoFactorAuthenticationLoginId();
+
+        $response = $this->postJson(route('api.v1.two-factor-challenge'), [
+            'login_id' => $loginId,
+            'code' => 'invalid_code',
+            'recovery_code' => 'invalid_recovery_code',
+            'device_name' => 'device_name',
+        ]);
+
+        $response->assertStatus(JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    public function test_missing_code_and_recovery_code(): void
+    {
+        $loginId = $this->getTwoFactorAuthenticationLoginId();
+
+        $response = $this->postJson(route('api.v1.two-factor-challenge'), [
+            'login_id' => $loginId,
+            'code' => '',
+            'recovery_code' => '',
+            'device_name' => 'device_name',
+        ]);
+
+        $response->assertStatus(JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    public function test_device_name_is_required(): void
+    {
+        $loginId = $this->getTwoFactorAuthenticationLoginId();
+
+        $response = $this->postJson(route('api.v1.two-factor-challenge'), [
+            'login_id' => $loginId,
+            'code' => '123456',
+            'recovery_code' => '',
+        ]);
+
+        $response->assertStatus(JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonValidationErrors(['device_name']);
+    }
+
     private function getTwoFactorAuthenticationLoginId(): string
     {
         $provider = app(TwoFactorAuthenticationProvider::class);
-        /** @var int */
-        $secretLength = config('fortify-options.two-factor-authentication.secret-length', 16);
         $user = User::factory()->create([
-            'two_factor_secret' => encrypt($provider->generateSecretKey($secretLength)),
+            'two_factor_secret' => encrypt($provider->generateSecretKey()),
             'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
                 return RecoveryCode::generate();
             }))),
-        ] + (Fortify::confirmsTwoFactorAuthentication() ? ['two_factor_confirmed_at' => now()] : [])
-        );
+        ] + (Fortify::confirmsTwoFactorAuthentication() ? ['two_factor_confirmed_at' => now()] : []));
         $response = $this->postJson(route('api.v1.login'), [
             'email' => $user->email,
             'password' => 'password',
