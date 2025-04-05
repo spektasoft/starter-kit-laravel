@@ -8,6 +8,7 @@ use App\Http\Middleware\VerifyApiKey;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Spatie\Honeypot\ProtectAgainstSpam;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->append(ProtectAgainstSpam::class);
         $middleware->append(SetLocaleFromHeader::class);
         $middleware->web(append: [SetLocaleFromQueryAndSession::class]);
         $middleware->statefulApi();

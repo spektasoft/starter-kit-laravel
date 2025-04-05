@@ -9,7 +9,7 @@
 
     <x-form action="{{ route('register') }}">
         @csrf
-
+        <x-honeypot />
         {{ $this->form }}
     </x-form>
 </x-authentication-card>
