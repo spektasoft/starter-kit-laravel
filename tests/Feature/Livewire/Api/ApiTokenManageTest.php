@@ -63,7 +63,7 @@ class ApiTokenManageTest extends TestCase
             $this->markTestSkipped('API support is not enabled.');
         }
 
-        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+        $this->actingAs($user = User::factory()->create());
 
         $testable = Livewire::test(ApiTokenManage::class);
         $testable->fillForm([
@@ -93,7 +93,7 @@ class ApiTokenManageTest extends TestCase
         }
 
         /** @var User */
-        $user = User::factory()->withPersonalTeam()->create();
+        $user = User::factory()->create();
 
         $this->actingAs($user);
 
@@ -137,7 +137,7 @@ class ApiTokenManageTest extends TestCase
         }
 
         /** @var User */
-        $user = User::factory()->withPersonalTeam()->create();
+        $user = User::factory()->create();
 
         $this->actingAs($user);
 
