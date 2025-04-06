@@ -85,7 +85,7 @@
         ],
         "test": [
             "npm run build",
-            "phpunit"
+            "php artisan test"
         ]
     },
     "extra": {
