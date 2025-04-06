@@ -43,7 +43,6 @@ class ForgotPassword extends Component implements HasForms
                             ->required()
                             ->autocomplete()
                             ->autofocus()
-                            ->default(old('email'))
                             ->extraInputAttributes(['name' => 'email']),
                     ])
                     ->footerActions(array_filter([
