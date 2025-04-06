@@ -3,6 +3,8 @@
 namespace Tests\Feature\Livewire\Auth;
 
 use App\Livewire\Auth\ConfirmPassword;
+use App\Models\User;
+use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -10,7 +12,59 @@ class ConfirmPasswordTest extends TestCase
 {
     public function test_confirm_password_can_be_rendered(): void
     {
-        Livewire::test(ConfirmPassword::class)
-            ->assertStatus(200);
+        $component = Livewire::test(ConfirmPassword::class);
+        $component->assertStatus(200);
+    }
+
+    public function test_confirm_password_form_validation(): void
+    {
+        $testable = Livewire::test(ConfirmPassword::class);
+        /** @var ConfirmPassword */
+        $component = $testable->instance();
+
+        $form = $component->form;
+
+        $form->fill(['password' => '']);
+
+        $this->expectException(ValidationException::class);
+
+        $component->form->getState();
+    }
+
+    public function test_password_is_confirmed_successfully(): void
+    {
+        $testable = Livewire::test(ConfirmPassword::class);
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $testable->set('data.password', 'password');
+
+        /** @var ConfirmPassword */
+        $component = $testable->instance();
+
+        $response = $this->post(route('password.confirm'), $component->form->getState());
+
+        $this->assertTrue(session()->has('auth.password_confirmed_at'));
+
+        /** @var ?string */
+        $redirectUrl = config('fortify.home');
+        $response->assertRedirect($redirectUrl);
+    }
+
+    public function test_password_is_not_confirmed_with_incorrect_password(): void
+    {
+        $testable = Livewire::test(ConfirmPassword::class);
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $testable->set('data.password', 'wrong-password');
+
+        /** @var ConfirmPassword */
+        $component = $testable->instance();
+
+        $response = $this->post(route('password.confirm'), $component->form->getState());
+        $response->assertSessionHasErrors(['password']);
+
+        $this->assertFalse(session()->has('auth.password_confirmed_at'));
     }
 }
