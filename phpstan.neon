@@ -5,7 +5,9 @@ includes:
 parameters:
     paths:
         - app/
+        - database/factories
         - tests/
         - resources/views
+        - routes
     tmpDir: tmp
     level: max
