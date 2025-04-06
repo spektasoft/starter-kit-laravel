@@ -49,7 +49,6 @@ class Register extends Component implements HasForms
                             ->maxLength(255)
                             ->autofocus()
                             ->autocomplete('name')
-                            ->default(old('name'))
                             ->extraInputAttributes(['name' => 'name']),
                         TextInput::make('email')
                             ->label(__('filament-panels::pages/auth/register.form.email.label'))
@@ -58,7 +57,6 @@ class Register extends Component implements HasForms
                             ->maxLength(255)
                             ->unique(User::class)
                             ->autocomplete('username')
-                            ->default(old('email'))
                             ->extraInputAttributes(['name' => 'email']),
                         TextInput::make('password')
                             ->label(__('filament-panels::pages/auth/register.form.password.label'))
