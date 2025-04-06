@@ -14,9 +14,6 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Support\Enums\Alignment;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
@@ -191,61 +188,49 @@ class ApiTokenManage extends Component implements HasForms, HasTable
                     ->sortable(),
             ])
             ->actions([
-                /**
-                 * @source https://github.com/ArtMin96/filament-jet/blob/22c19af19b02a5e694b4edea6c05a424d0a924b3/src/Http/Livewire/ApiTokensTable.php#L80
-                 *
-                 * @license MIT
-                 */
-                Action::make('permissions')
-                    ->icon('heroicon-o-lock-closed')
-                    ->action(function (Model $record, array $data) {
-                        /** @var string[] */
-                        $abilities = $data['abilities'];
-                        $record->forceFill([
-                            'abilities' => Jetstream::validPermissions($abilities),
-                        ])->save();
+                Tables\Actions\ActionGroup::make([
+                    /**
+                     * @source https://github.com/ArtMin96/filament-jet/blob/22c19af19b02a5e694b4edea6c05a424d0a924b3/src/Http/Livewire/ApiTokensTable.php#L80
+                     *
+                     * @license MIT
+                     */
+                    Tables\Actions\Action::make('permissions')
+                        ->icon('heroicon-o-lock-closed')
+                        ->action(function (Model $record, array $data) {
+                            /** @var string[] */
+                            $abilities = $data['abilities'];
+                            $record->forceFill([
+                                'abilities' => Jetstream::validPermissions($abilities),
+                            ])->save();
 
-                        Notification::make()
-                            ->title(__('Done.'))
-                            ->success()
-                            ->send();
-                    })
-                    ->label(__('Permissions'))
-                    ->modalHeading(__('API Token Permissions'))
-                    ->modalWidth('2xl')
-                    ->mountUsing(
-                        function (ComponentContainer $form, Model $record) {
-                            /** @var ?array<string, mixed> */
-                            $data = $record->toArray();
-                            $form->fill($data);
+                            Notification::make()
+                                ->title(__('Done.'))
+                                ->success()
+                                ->send();
                         })
-                    ->form([
-                        Forms\Components\CheckboxList::make('abilities')
-                            ->label(__('Permissions'))
-                            ->options(collect($this->getPermissions())->mapWithKeys(function (string $permission) {
-                                return [$permission => $permission];
-                            }))
-                            ->afterStateHydrated(function (Forms\Components\Component $component, $state) {
-                                /** @var string[] */
-                                $mState = $state;
-                                $permissions = $this->getPermissions();
-
-                                $tokenPermissions = collect($permissions)
-                                    ->filter(function ($permission) use ($mState) {
-                                        return in_array($permission, $mState);
-                                    })
-                                    ->values()
-                                    ->toArray();
-
-                                $component->state($tokenPermissions);
+                        ->label(__('Permissions'))
+                        ->modalHeading(__('API Token Permissions'))
+                        ->modalWidth('2xl')
+                        ->mountUsing(
+                            function (ComponentContainer $form, PersonalAccessToken $record) {
+                                $form->fill(['abilities' => $record->abilities]);
                             })
-                            ->columns(2),
-                    ])
-                    ->modalFooterActionsAlignment(Alignment::End),
-                DeleteAction::make(),
+                        ->form([
+                            Forms\Components\CheckboxList::make('abilities')
+                                ->label(__('Permissions'))
+                                ->options(collect($this->getPermissions())->mapWithKeys(function (string $permission) {
+                                    return [$permission => $permission];
+                                }))
+                                ->columns(2),
+                        ])
+                        ->modalFooterActionsAlignment(Alignment::End),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
-                DeleteBulkAction::make(),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 
