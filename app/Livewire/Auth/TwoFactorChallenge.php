@@ -9,8 +9,12 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Support\Enums\Alignment;
+use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
+/**
+ * @property Form $form
+ */
 class TwoFactorChallenge extends Component implements HasForms
 {
     use InteractsWithForms;
@@ -39,6 +43,7 @@ class TwoFactorChallenge extends Component implements HasForms
         return $form
             ->schema([
                 Section::make('two-factor-authentication')
+                    ->key('two-factor-authentication')
                     ->heading(__('Two Factor Authentication'))
                     ->description($this->showRecovery ? __('Please confirm access to your account by entering one of your emergency recovery codes.') : __('Please confirm access to your account by entering the authentication code provided by your authenticator application.'))
                     ->schema([
@@ -63,5 +68,10 @@ class TwoFactorChallenge extends Component implements HasForms
                     ->footerActionsAlignment(Alignment::End),
             ])
             ->statePath('data');
+    }
+
+    public function render(): View
+    {
+        return view('livewire.auth.two-factor-challenge');
     }
 }
