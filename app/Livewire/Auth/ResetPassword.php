@@ -41,12 +41,14 @@ class ResetPassword extends Component implements HasForms
                 Section::make('request-password')
                     ->heading(__('filament-panels::pages/auth/password-reset/reset-password.heading'))
                     ->schema([
-                        Hidden::make('token'),
+                        Hidden::make('token')
+                            ->extraAttributes(['name' => 'token']),
                         TextInput::make('email')
                             ->label(__('filament-panels::pages/auth/password-reset/reset-password.form.email.label'))
                             ->readOnly()
                             ->autofocus()
-                            ->autocomplete('username'),
+                            ->autocomplete('username')
+                            ->extraInputAttributes(['name' => 'email']),
                         TextInput::make('password')
                             ->label(__('filament-panels::pages/auth/password-reset/reset-password.form.password.label'))
                             ->password()
@@ -54,13 +56,14 @@ class ResetPassword extends Component implements HasForms
                             ->required()
                             ->rule(Password::default())
                             ->same('passwordConfirmation')
-                            ->validationAttribute(__('filament-panels::pages/auth/password-reset/reset-password.form.password.validation_attribute')),
+                            ->validationAttribute(__('filament-panels::pages/auth/password-reset/reset-password.form.password.validation_attribute'))->extraInputAttributes(['name' => 'password']),
                         TextInput::make('passwordConfirmation')
                             ->label(__('filament-panels::pages/auth/password-reset/reset-password.form.password_confirmation.label'))
                             ->password()
                             ->revealable()
                             ->required()
-                            ->dehydrated(false),
+                            ->dehydrated(false)
+                            ->extraInputAttributes(['name' => 'password_confirmation']),
                     ])
                     ->footerActions([
                         Action::make('resetPassword')

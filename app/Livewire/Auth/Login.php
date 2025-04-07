@@ -47,15 +47,18 @@ class Login extends Component implements HasForms
                             ->autofocus()
                             ->autocomplete('email')
                             ->default(old('email'))
-                            ->email(),
+                            ->email()
+                            ->extraInputAttributes(['name' => 'email']),
                         TextInput::make('password')
                             ->label(__('Password'))
                             ->required()
                             ->password()
                             ->revealable()
-                            ->hint(Route::has('password.request') ? new HtmlString(Blade::render('<x-filament::link wire:navigate href="{{ route(\'password.request\') }}" tabindex="3"> {{ __(\'filament-panels::pages/auth/login.actions.request_password_reset.label\') }}</x-filament::link>')) : null),
+                            ->hint(Route::has('password.request') ? new HtmlString(Blade::render('<x-filament::link wire:navigate href="{{ route(\'password.request\') }}" tabindex="3"> {{ __(\'filament-panels::pages/auth/login.actions.request_password_reset.label\') }}</x-filament::link>')) : null)
+                            ->extraInputAttributes(['name' => 'password']),
                         Checkbox::make('remember')
-                            ->label(__('Remember me')),
+                            ->label(__('Remember me'))
+                            ->extraInputAttributes(['name' => 'remember']),
                     ])
                     ->footerActions(array_filter([
                         Action::make('login')
