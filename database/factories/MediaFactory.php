@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,17 +18,17 @@ class MediaFactory extends Factory
     public function definition(): array
     {
         return [
-            'creator_id' => $this->faker->ulid,
-            'disk' => $this->faker->randomElement(['public', 'private']),
+            'creator_id' => User::factory(),
+            'disk' => 'public',
             'directory' => $this->faker->randomElement(['media', 'images', 'videos']),
             'visibility' => $this->faker->randomElement(['public', 'private']),
             'name' => $this->faker->word,
-            'path' => $this->faker->filePath,
+            'path' => $this->faker->word,
             'width' => $this->faker->optional()->numberBetween(100, 1000),
             'height' => $this->faker->optional()->numberBetween(100, 1000),
             'size' => $this->faker->optional()->numberBetween(100, 10000),
             'type' => $this->faker->randomElement(['image', 'video', 'audio']),
-            'ext' => $this->faker->fileExtension,
+            'ext' => $this->faker->fileExtension(),
             'alt' => $this->faker->optional()->sentence,
             'title' => $this->faker->optional()->sentence,
             'description' => $this->faker->optional()->paragraph,

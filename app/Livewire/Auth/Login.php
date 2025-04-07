@@ -10,6 +10,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Support\Enums\Alignment;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\HtmlString;
@@ -46,18 +47,15 @@ class Login extends Component implements HasForms
                             ->autofocus()
                             ->autocomplete('email')
                             ->default(old('email'))
-                            ->email()
-                            ->extraInputAttributes(['name' => 'email']),
+                            ->email(),
                         TextInput::make('password')
                             ->label(__('Password'))
                             ->required()
                             ->password()
                             ->revealable()
-                            ->hint(Route::has('password.request') ? new HtmlString(Blade::render('<x-filament::link wire:navigate href="{{ route(\'password.request\') }}" tabindex="3"> {{ __(\'filament-panels::pages/auth/login.actions.request_password_reset.label\') }}</x-filament::link>')) : null)
-                            ->extraInputAttributes(['name' => 'password']),
+                            ->hint(Route::has('password.request') ? new HtmlString(Blade::render('<x-filament::link wire:navigate href="{{ route(\'password.request\') }}" tabindex="3"> {{ __(\'filament-panels::pages/auth/login.actions.request_password_reset.label\') }}</x-filament::link>')) : null),
                         Checkbox::make('remember')
-                            ->label(__('Remember me'))
-                            ->extraInputAttributes(['name' => 'remember']),
+                            ->label(__('Remember me')),
                     ])
                     ->footerActions(array_filter([
                         Action::make('login')
@@ -73,5 +71,10 @@ class Login extends Component implements HasForms
                     ->footerActionsAlignment(Alignment::End),
             ])
             ->statePath('data');
+    }
+
+    public function render(): View
+    {
+        return view('livewire.auth.login');
     }
 }
