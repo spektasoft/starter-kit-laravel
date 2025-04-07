@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\View\View;
 use Laravel\Jetstream\Features;
 use Livewire\Component;
 
@@ -25,6 +26,11 @@ use Livewire\Component;
 class Register extends Component implements HasForms
 {
     use InteractsWithForms;
+
+    public function mount(): void
+    {
+        $this->form->fill();
+    }
 
     /**
      * @var array<string, mixed> | null
@@ -100,8 +106,8 @@ class Register extends Component implements HasForms
             ->statePath('data');
     }
 
-    public function mount(): void
+    public function render(): View
     {
-        $this->form->fill();
+        return view('livewire.auth.register');
     }
 }

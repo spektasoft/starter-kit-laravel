@@ -9,6 +9,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Support\Enums\Alignment;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Route;
 use Livewire\Component;
 
@@ -58,5 +59,10 @@ class ForgotPassword extends Component implements HasForms
                     ->footerActionsAlignment(Alignment::Right),
             ])
             ->statePath('data');
+    }
+
+    public function render(): View
+    {
+        return view('livewire.auth.forgot-password');
     }
 }
