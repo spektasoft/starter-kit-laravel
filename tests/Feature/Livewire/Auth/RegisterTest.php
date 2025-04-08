@@ -19,6 +19,22 @@ class RegisterTest extends TestCase
             ->assertStatus(200);
     }
 
+    public function test_register_form_has_proper_attributes(): void
+    {
+        $testable = Livewire::test(Register::class);
+        $testable->assertFormExists();
+        $testable->assertFormFieldExists('name');
+        $testable->assertSeeHtml('name="name"');
+        $testable->assertFormFieldExists('email');
+        $testable->assertSeeHtml('name="email"');
+        $testable->assertFormFieldExists('password');
+        $testable->assertSeeHtml('name="password"');
+        $testable->assertFormFieldExists('passwordConfirmation');
+        $testable->assertSeeHtml('name="password_confirmation"');
+        $testable->assertFormFieldExists('terms');
+        $testable->assertSeeHtml('name="terms"');
+    }
+
     public function test_registration_screen_can_be_rendered(): void
     {
         if (! Features::enabled(Features::registration())) {

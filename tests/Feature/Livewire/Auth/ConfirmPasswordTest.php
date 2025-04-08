@@ -15,6 +15,14 @@ class ConfirmPasswordTest extends TestCase
         $component = Livewire::test(ConfirmPassword::class);
         $component->assertStatus(200);
     }
+    
+    public function test_confirm_password_form_has_proper_attributes(): void
+    {
+        $testable = Livewire::test(ConfirmPassword::class);
+        $testable->assertFormExists();
+        $testable->assertFormFieldExists('password');
+        $testable->assertSeeHtml('name="password"');
+    }
 
     public function test_confirm_password_form_validation(): void
     {

@@ -21,6 +21,14 @@ class ForgotPasswordTest extends TestCase
         $testable->assertStatus(200);
     }
 
+    public function test_forgot_password_form_has_proper_attributes(): void
+    {
+        $testable = Livewire::test(ForgotPassword::class);
+        $testable->assertFormExists();
+        $testable->assertFormFieldExists('email');
+        $testable->assertSeeHtml('name="email"');
+    }
+
     public function test_email_is_required(): void
     {
         /** @var Testable */

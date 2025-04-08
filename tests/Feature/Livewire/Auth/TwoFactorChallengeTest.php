@@ -25,6 +25,17 @@ class TwoFactorChallengeTest extends TestCase
             ->assertStatus(200);
     }
 
+    public function test_two_factor_challenge_form_has_proper_attributes(): void
+    {
+        $testable = Livewire::test(TwoFactorChallenge::class);
+        $testable->assertFormExists();
+        $testable->assertFormFieldExists('code');
+        $testable->assertSeeHtml('name="code"');
+
+        $testable->set('showRecovery', true);
+        $testable->assertSeeHtml('name="recovery_code"');
+    }
+
     public function test_component_renders_authentication_code_form_by_default(): void
     {
         /** @var Testable */
