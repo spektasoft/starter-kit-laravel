@@ -26,8 +26,11 @@ class LoginTest extends TestCase
         $testable = Livewire::test(Login::class);
         $testable->assertFormExists();
         $testable->assertFormFieldExists('email');
+        $testable->assertSeeHtml('name="email"');
         $testable->assertFormFieldExists('password');
+        $testable->assertSeeHtml('name="password"');
         $testable->assertFormFieldExists('remember');
+        $testable->assertSeeHtml('name="remember"');
     }
 
     public function test_user_can_login_with_valid_credentials(): void

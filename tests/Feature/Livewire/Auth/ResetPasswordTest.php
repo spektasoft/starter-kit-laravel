@@ -21,6 +21,20 @@ class ResetPasswordTest extends TestCase
             ->assertStatus(200);
     }
 
+    public function test_reset_password_form_has_proper_attributes(): void
+    {
+        $testable = Livewire::test(ResetPassword::class);
+        $testable->assertFormExists();
+        $testable->assertFormFieldExists('token');
+        $testable->assertSeeHtml('name="token"');
+        $testable->assertFormFieldExists('email');
+        $testable->assertSeeHtml('name="email"');
+        $testable->assertFormFieldExists('password');
+        $testable->assertSeeHtml('name="password"');
+        $testable->assertFormFieldExists('passwordConfirmation');
+        $testable->assertSeeHtml('name="password_confirmation"');
+    }
+
     public function test_reset_password_link_screen_can_be_rendered(): void
     {
         if (! Features::enabled(Features::resetPasswords())) {
