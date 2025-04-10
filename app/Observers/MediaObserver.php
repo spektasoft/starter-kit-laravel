@@ -6,6 +6,7 @@ use App\Models\Media;
 use Awcodes\Curator\Models\Media as CuratorMedia;
 use Awcodes\Curator\Observers\MediaObserver as CuratorMediaObserver;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 
@@ -19,14 +20,12 @@ class MediaObserver extends CuratorMediaObserver
     ];
 
     /**
-     * Handle the Media "creating" event.
+     * Handle the Media "creating" event. Must adhere to the parent method's signature (CuratorMedia $media).
      */
     public function creating(CuratorMedia $media): void
     {
-        if ($media instanceof Media) {
-            if ($media->creator === null) {
-                $media->creator()->associate(Auth::user());
-            }
+        if ($media instanceof Media && $media->creator === null) {
+            $media->creator()->associate(Auth::user());
         }
 
         parent::creating($media);
@@ -52,24 +51,27 @@ class MediaObserver extends CuratorMediaObserver
             return;
         }
 
-        $originalPath = Storage::disk($media->disk)->path($media->path);
-        $image = Image::make($originalPath);
-        $webpPath = pathinfo($originalPath, PATHINFO_DIRNAME).'/'.pathinfo($originalPath, PATHINFO_FILENAME).'.webp';
-        $image->encode('webp', 90)->save($webpPath);
-        $oldImagePath = $media->path;
-        $media->update([
-            'path' => str_replace(pathinfo($media->path, PATHINFO_EXTENSION), 'webp', $media->path),
-            'ext' => 'webp',
-            'size' => filesize($webpPath),
-            'type' => 'image/webp',
-        ]);
-        Storage::disk($media->disk)->delete($oldImagePath);
+        try {
+            $originalPath = Storage::disk($media->disk)->path($media->path);
+            $image = Image::make($originalPath);
+            $webpPath = pathinfo($originalPath, PATHINFO_DIRNAME).'/'.pathinfo($originalPath, PATHINFO_FILENAME).'.webp';
+            $image->encode('webp', 90)->save($webpPath);
+            $oldImagePath = $media->path;
+            $media->setAttribute('path', str_replace(pathinfo($media->path, PATHINFO_EXTENSION), 'webp', $media->path));
+            $media->setAttribute('ext', 'webp');
+            $media->setAttribute('size', filesize($webpPath));
+            $media->setAttribute('type', 'image/webp');
+            $updated = $media->save();
+            if ($updated) {
+                Storage::disk($media->disk)->delete($oldImagePath);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error converting image to WebP: '.$e->getMessage(), ['media_id' => $media->id, 'path' => $media->path]);
+        }
     }
 
     private function removeExif(Media $media): void
     {
-        $media->update([
-            'exif' => null,
-        ]);
+        $media->setAttribute('exif', null);
     }
 }
