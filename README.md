@@ -108,6 +108,22 @@ To develop a universal app, follow the additional instructions below:
     composer run dev:host
     ```
 
+## Applying Changes to Another Repository
+
+To apply changes from this repository to another Laravel project:
+
+1.  Generate a diff file:
+
+    ```
+    git diff <COMMIT_HASH_FROM> <COMMIT_HASH_TO> --exclude='*.lock' > diff.patch
+    ```
+
+1.  Apply the diff in the destination repository:
+
+    ```
+    git apply --reject diff.patch
+    ```
+
 ## LLM Commands
 
 This starter kit includes LLM (Language Model) commands to assist with generating commit messages and pull request messages.
@@ -126,7 +142,7 @@ php artisan llm:pr
 
 ## Upstream
 
-Apply any changes available from the Laravel [12.x branch](https://github.com/laravel/laravel/compare/979202df1c2fe3547709a20a59a84bcefaf15f4f...12.x).
+Apply any changes available from the Laravel [12.x branch](https://github.com/laravel/laravel/compare/43ad1946fc85a82ebe1ea124c646e91c38cacc4d...12.x).
 
 ## License
 
