@@ -98,7 +98,7 @@ commit range using Prism';
         $this->newLine();
         $this->info('Proposed pull request:');
         $this->info('------------------------');
-        $this->line($response->text);
+        $this->line(trim($response->text));
         $this->info('------------------------');
         $this->info('Elapsed time: '.round($elapsedTime, 2).' seconds');
         $this->info("Prompt tokens: {$response->usage->promptTokens}");
