@@ -13,18 +13,18 @@
         "@tailwindcss/typography": "^0.5.16",
         "@types/alpinejs": "^3.13.11",
         "@types/node": "^22.14.0",
-        "@typescript-eslint/eslint-plugin": "^8.29.0",
-        "@typescript-eslint/parser": "^8.29.0",
+        "@typescript-eslint/eslint-plugin": "^8.29.1",
+        "@typescript-eslint/parser": "^8.29.1",
         "autoprefixer": "^10.4.21",
         "axios": "^1.8.4",
         "concurrently": "^9.1.2",
         "cropperjs": "^1.6.2",
-        "dotenv": "^16.4.7",
-        "eslint": "^9.23.0",
+        "dotenv": "^16.5.0",
+        "eslint": "^9.24.0",
         "laravel-vite-plugin": "^1.2",
         "postcss": "^8.5.3",
         "tailwindcss": "^3.4.17",
-        "typescript": "^5.8.2",
+        "typescript": "^5.8.3",
         "vite": "^6.2"
     }
 }
