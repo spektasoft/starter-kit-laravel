@@ -27,6 +27,12 @@ class Commit extends Command
      */
     public function handle(): void
     {
+        if (app()->environment('production')) {
+            $this->error('This command can only be run in a development environment.');
+
+            return;
+        }
+
         $process = new Process(['git', 'diff', '--staged']);
         $process->run();
 

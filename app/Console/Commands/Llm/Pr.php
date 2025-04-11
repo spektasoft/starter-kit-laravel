@@ -28,6 +28,12 @@ commit range using Prism';
      */
     public function handle(): void
     {
+        if (app()->environment('production')) {
+            $this->error('This command can only be run in a development environment.');
+
+            return;
+        }
+
         /** @var string */
         $commit_hash_1 = $this->ask('Please enter first commit hash (older)');
         /** @var string */
