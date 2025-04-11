@@ -86,7 +86,8 @@
         ],
         "test": [
             "npm run build",
-            "php artisan test"
+            "@php artisan config:clear --ansi",
+            "@php artisan test"
         ]
     },
     "extra": {
