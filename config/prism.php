@@ -48,4 +48,8 @@ return [
             'url' => env('VOYAGEAI_URL', 'https://api.voyageai.com/v1'),
         ],
     ],
+    'using' => [
+        'provider' => env('PRISM_USING_PROVIDER', 'ollama'),
+        'model' => env('PRISM_USING_MODEL', ''),
+    ],
 ];
