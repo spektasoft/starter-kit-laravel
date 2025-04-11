@@ -108,6 +108,22 @@ To develop a universal app, follow the additional instructions below:
     composer run dev:host
     ```
 
+## LLM Commands
+
+This starter kit includes LLM (Language Model) commands to assist with generating commit messages and pull request messages.
+
+To generate a commit message based on staged changes:
+
+```
+php artisan llm:commit
+```
+
+To generate a pull request message based on a commit range:
+
+```
+php artisan llm:pr
+```
+
 ## Upstream
 
 Apply any changes available from the Laravel [12.x branch](https://github.com/laravel/laravel/compare/979202df1c2fe3547709a20a59a84bcefaf15f4f...12.x).
