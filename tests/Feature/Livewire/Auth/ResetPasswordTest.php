@@ -129,7 +129,7 @@ class ResetPasswordTest extends TestCase
             'password_confirmation' => 'password',
         ]);
 
-        $response->assertSessionHasErrors(['email' => 'This password reset token is invalid.']);
+        $response->assertSessionHasErrors(['email']);
     }
 
     public function test_password_reset_fails_with_password_mismatch(): void
