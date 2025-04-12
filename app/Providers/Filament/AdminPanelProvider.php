@@ -119,6 +119,11 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-key')
                     ->url(fn () => route('api-tokens.index')) : null,
             ]))
+            // Hack to disable x-persist
+            ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_BEFORE, fn () => Blade::render(<<<'BLADE'
+            </div>
+            <div class="flex items-center gap-2 ms-auto">
+            BLADE))
             ->renderHook(PanelsRenderHook::SCRIPTS_AFTER, fn () => Blade::render(<<<'BLADE'
             @vite('resources/ts/app.ts')
             BLADE))
