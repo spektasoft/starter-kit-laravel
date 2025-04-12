@@ -14,6 +14,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Pages\Dashboard;
@@ -74,6 +75,14 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 EnsureEmailIsVerified::class,
                 Authenticate::class,
+            ])
+            ->navigationGroups([
+                NavigationGroup::make()
+                    ->label(fn () => __('Administration')),
+                NavigationGroup::make()
+                    ->label(fn () => __('filament-spatie-backup::backup.pages.backups.navigation.group')),
+                NavigationGroup::make()
+                    ->label(fn () => __('filament-shield::filament-shield.nav.group')),
             ])
             ->navigationItems([
                 NavigationItem::make('home')

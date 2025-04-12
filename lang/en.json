@@ -1,6 +1,7 @@
 {
     "(and :count more error)": "(and :count more error)",
     "(and :count more errors)": "(and :count more error)|(and :count more errors)|(and :count more errors)",
+    "Administration": "Administration",
     "A decryption key is required.": "A decryption key is required.",
     "A new verification link has been sent to the email address you provided in your profile settings.": "A new verification link has been sent to the email address you provided in your profile settings.",
     "A new verification link has been sent to your email address.": "A new verification link has been sent to your email address.",
