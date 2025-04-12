@@ -64,12 +64,21 @@
         class="fixed left-0 z-40 w-64 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white top-16 dark:bg-gray-900"
         tabindex="-1" aria-labelledby="drawer-navigation-label">
         <div class="overflow-y-auto">
-            <div class="space-y-2 font-medium">
+            <div class="space-y-1 font-medium">
                 <x-nav-link wire:navigate href="{{ route('home') }}" :active="request()->routeIs('home')" icon="heroicon-o-home">
                     <span class="flex items-center gap-2">
                         {{ __('navigation-menu.menu.home') }}
                     </span>
                 </x-nav-link>
+                @auth
+                    <x-nav-link wire:navigate href="{{ \Filament\Pages\Dashboard::getUrl() }}" :icon="\Filament\Support\Facades\FilamentIcon::resolve(
+                        'panels::pages.dashboard.navigation-item',
+                    )">
+                        <span class="flex items-center gap-2">
+                            {{ __('filament-panels::pages/dashboard.title') }}
+                        </span>
+                    </x-nav-link>
+                @endauth
                 @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
                     <x-menu-border />
                     <x-nav-link wire:navigate href="{{ route('terms.show') }}" :active="request()->routeIs('terms.show')"

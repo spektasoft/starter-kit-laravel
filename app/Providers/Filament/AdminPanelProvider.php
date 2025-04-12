@@ -14,7 +14,9 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
+use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\View\PanelsRenderHook;
@@ -72,6 +74,13 @@ class AdminPanelProvider extends PanelProvider
                 EnsureEmailIsVerified::class,
                 Authenticate::class,
             ])
+            ->navigationItems([
+                NavigationItem::make('home')
+                    ->label(fn () => __('navigation-menu.menu.home'))
+                    ->icon('heroicon-o-home')
+                    ->url(fn () => route('home'))
+                    ->sort(Dashboard::getNavigationSort() - 1),
+            ])
             ->plugins([
                 \Awcodes\Curator\CuratorPlugin::make(),
                 \Awcodes\Overlook\OverlookPlugin::make()
@@ -91,10 +100,6 @@ class AdminPanelProvider extends PanelProvider
                     ->usingPage(Backups::class),
             ])
             ->userMenuItems([
-                MenuItem::make()
-                    ->label(fn () => __('navigation-menu.menu.home'))
-                    ->icon('heroicon-o-home')
-                    ->url(fn () => route('home')),
                 MenuItem::make()
                     ->label(fn () => __('navigation-menu.menu.profile'))
                     ->icon('heroicon-o-user')
