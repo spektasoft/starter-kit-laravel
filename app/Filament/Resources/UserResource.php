@@ -84,6 +84,11 @@ class UserResource extends Resource
         return trans_choice('user.resource.model_label', 1);
     }
 
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Administration');
+    }
+
     public static function getPluralModelLabel(): string
     {
         return trans_choice('user.resource.model_label', 2);

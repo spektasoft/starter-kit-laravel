@@ -14,7 +14,10 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
+use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\View\PanelsRenderHook;
@@ -28,6 +31,7 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\ComponentAttributeBag;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Laravel\Jetstream\Features;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -72,6 +76,21 @@ class AdminPanelProvider extends PanelProvider
                 EnsureEmailIsVerified::class,
                 Authenticate::class,
             ])
+            ->navigationGroups([
+                NavigationGroup::make()
+                    ->label(fn () => __('Administration')),
+                NavigationGroup::make()
+                    ->label(fn () => __('filament-spatie-backup::backup.pages.backups.navigation.group')),
+                NavigationGroup::make()
+                    ->label(fn () => __('filament-shield::filament-shield.nav.group')),
+            ])
+            ->navigationItems([
+                NavigationItem::make('home')
+                    ->label(fn () => __('navigation-menu.menu.home'))
+                    ->icon('heroicon-o-home')
+                    ->url(fn () => route('home'))
+                    ->sort(Dashboard::getNavigationSort() - 1),
+            ])
             ->plugins([
                 \Awcodes\Curator\CuratorPlugin::make(),
                 \Awcodes\Overlook\OverlookPlugin::make()
@@ -90,20 +109,21 @@ class AdminPanelProvider extends PanelProvider
                 \ShuvroRoy\FilamentSpatieLaravelBackup\FilamentSpatieLaravelBackupPlugin::make()
                     ->usingPage(Backups::class),
             ])
-            ->userMenuItems([
-                MenuItem::make()
-                    ->label(fn () => __('navigation-menu.menu.home'))
-                    ->icon('heroicon-o-home')
-                    ->url(fn () => route('home')),
+            ->userMenuItems(array_filter([
                 MenuItem::make()
                     ->label(fn () => __('navigation-menu.menu.profile'))
                     ->icon('heroicon-o-user')
                     ->url(fn () => route('profile.show')),
-                MenuItem::make()
+                Features::hasApiFeatures() ? MenuItem::make()
                     ->label(fn () => __('navigation-menu.menu.api_tokens'))
                     ->icon('heroicon-o-key')
-                    ->url(fn () => route('api-tokens.index')),
-            ])
+                    ->url(fn () => route('api-tokens.index')) : null,
+            ]))
+            // Hack to disable x-persist
+            ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_BEFORE, fn () => Blade::render(<<<'BLADE'
+            </div>
+            <div class="flex items-center gap-2 ms-auto">
+            BLADE))
             ->renderHook(PanelsRenderHook::SCRIPTS_AFTER, fn () => Blade::render(<<<'BLADE'
             @vite('resources/ts/app.ts')
             BLADE))

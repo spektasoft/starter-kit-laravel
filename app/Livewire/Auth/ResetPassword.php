@@ -56,7 +56,8 @@ class ResetPassword extends Component implements HasForms
                             ->required()
                             ->rule(Password::default())
                             ->same('passwordConfirmation')
-                            ->validationAttribute(__('filament-panels::pages/auth/password-reset/reset-password.form.password.validation_attribute'))->extraInputAttributes(['name' => 'password']),
+                            ->validationAttribute(__('filament-panels::pages/auth/password-reset/reset-password.form.password.validation_attribute'))
+                            ->extraInputAttributes(['name' => 'password']),
                         TextInput::make('passwordConfirmation')
                             ->label(__('filament-panels::pages/auth/password-reset/reset-password.form.password_confirmation.label'))
                             ->password()

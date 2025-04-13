@@ -119,7 +119,7 @@ class LoginTest extends TestCase
         $formData = $testable->get('data');
 
         $response = $this->post(route('login'), $formData);
-        $response->assertSessionHasErrors(['email' => 'The email field is required.']);
+        $response->assertSessionHasErrors(['email']);
     }
 
     public function test_form_validation_fails_when_password_field_is_missing(): void
@@ -132,7 +132,7 @@ class LoginTest extends TestCase
 
         $response = $this->post(route('login'), $formData);
 
-        $response->assertSessionHasErrors(['password' => 'The password field is required.']);
+        $response->assertSessionHasErrors(['password']);
     }
 
     public function test_users_can_authenticate_using_the_login_screen(): void

@@ -115,7 +115,7 @@ To apply changes from this repository to another Laravel project:
 1.  Generate a diff file:
 
     ```
-    git diff <COMMIT_HASH_FROM> <COMMIT_HASH_TO> --exclude='*.lock' > diff.patch
+    git diff <COMMIT_HASH_FROM> <COMMIT_HASH_TO> > diff.patch
     ```
 
 1.  Apply the diff in the destination repository:

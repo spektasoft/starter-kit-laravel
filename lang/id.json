@@ -1,6 +1,7 @@
 {
     "(and :count more error)": "(dan :count kesalahan lainnya)",
     "(and :count more errors)": "(dan :count kesalahan lainnya)|(dan :count kesalahan lainnya)|(dan :count kesalahan lainnya)",
+    "Administration": "Administrasi",
     "A decryption key is required.": "A decryption key is required.",
     "A new verification link has been sent to the email address you provided in your profile settings.": "Tautan verifikasi baru telah dikirim ke alamat email yang Anda berikan di pengaturan profil Anda.",
     "A new verification link has been sent to your email address.": "Tautan verifikasi baru telah dikirim ke alamat email Anda.",

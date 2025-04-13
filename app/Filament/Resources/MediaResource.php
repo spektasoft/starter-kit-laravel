@@ -37,6 +37,11 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
         return $query;
     }
 
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Administration');
+    }
+
     public static function getPages(): array
     {
         return [
