@@ -1,3 +1,7 @@
+@php
+    $currentLocale = app()->getLocale();
+@endphp
+
 <x-filament::dropdown placement="bottom-end" teleport>
     <x-slot name="trigger">
         <button aria-label="{{ __('navigation-menu.language_switcher.open_language_switcher') }}" type="button"
@@ -10,7 +14,7 @@
         </button>
     </x-slot>
     <x-filament::dropdown.list class="space-y-1">
-        <x-navigation-menu.language-switcher-item locale="id" languageName="Bahasa Indonesia" />
-        <x-navigation-menu.language-switcher-item locale="en" languageName="English" />
+        <x-navigation-menu.language-switcher-item locale="id" languageName="Bahasa Indonesia" :currentLocale="$currentLocale" />
+        <x-navigation-menu.language-switcher-item locale="en" languageName="English" :currentLocale="$currentLocale" />
     </x-filament::dropdown.list>
 </x-filament::dropdown>
