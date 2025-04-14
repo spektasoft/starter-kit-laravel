@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureJsonRequest;
+use App\Http\Middleware\SetDeviceFromHeader;
 use App\Http\Middleware\SetLocaleFromHeader;
 use App\Http\Middleware\SetLocaleFromQueryAndSession;
 use App\Http\Middleware\VerifyApiArtisan;
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(ProtectAgainstSpam::class);
+        $middleware->append(SetDeviceFromHeader::class);
         $middleware->append(SetLocaleFromHeader::class);
         $middleware->web(append: [SetLocaleFromQueryAndSession::class]);
         $middleware->statefulApi();
