@@ -2,13 +2,20 @@
 
 namespace App\Http\Middleware;
 
-use App\Utils\Device;
+use App\Services\DeviceService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class SetDeviceFromHeader
 {
+    protected DeviceService $deviceService;
+
+    public function __construct(DeviceService $deviceService)
+    {
+        $this->deviceService = $deviceService;
+    }
+
     /**
      * Handle an incoming request.
      *
@@ -18,12 +25,12 @@ class SetDeviceFromHeader
     {
         $userAgent = $request->header('User-Agent');
         if ($userAgent && str_contains($userAgent, 'wv')) {
-            Device::setIsAndroid(true);
+            $this->deviceService->setIsAndroid(true);
         }
 
         $requestedWithHeader = $request->header('x-requested-with');
         if ($requestedWithHeader) {
-            Device::setRequestedWith($requestedWithHeader);
+            $this->deviceService->setRequestedWith($requestedWithHeader);
         }
 
         return $next($request);
