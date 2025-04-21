@@ -2,11 +2,11 @@
 
 namespace App\Livewire\EditProfile;
 
+use App\Concerns\CanRestoreSession;
 use App\Concerns\HasUser;
 use App\Data\SessionData;
 use App\Filament\Actions\PasswordConfirmationAction;
 use App\Models\Session;
-use App\Utils\RestoreSession;
 use Carbon\Carbon;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\View as ComponentsView;
@@ -27,6 +27,7 @@ use Livewire\Component;
  */
 class LogoutOtherBrowserSessionsForm extends Component implements HasForms
 {
+    use CanRestoreSession;
     use HasUser;
     use InteractsWithForms;
 
@@ -113,7 +114,7 @@ class LogoutOtherBrowserSessionsForm extends Component implements HasForms
 
         $this->deleteOtherSessionRecords();
 
-        RestoreSession::invoke();
+        $this->restoreSession();
 
         Notification::make()
             ->title(__('Done.'))

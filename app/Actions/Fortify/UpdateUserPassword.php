@@ -2,14 +2,15 @@
 
 namespace App\Actions\Fortify;
 
+use App\Concerns\CanRestoreSession;
 use App\Models\User;
-use App\Utils\RestoreSession;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\UpdatesUserPasswords;
 
 class UpdateUserPassword implements UpdatesUserPasswords
 {
+    use CanRestoreSession;
     use PasswordValidationRules;
 
     /**
@@ -31,7 +32,7 @@ class UpdateUserPassword implements UpdatesUserPasswords
         ])->save();
 
         if (request()->hasSession()) {
-            RestoreSession::invoke();
+            $this->restoreSession();
         }
     }
 }
