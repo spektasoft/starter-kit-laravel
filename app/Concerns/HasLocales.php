@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Utils;
+namespace App\Concerns;
 
 use Illuminate\Support\Collection;
 
-class Locale
+trait HasLocales
 {
     /**
      * @return Collection<int, string>
      */
-    public static function getSortedLocales()
+    protected static function getSortedLocales()
     {
         $currentLocale = app()->getLocale();
         /** @var string[] */

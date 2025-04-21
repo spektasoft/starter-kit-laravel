@@ -2,12 +2,12 @@
 
 namespace App\Filament\Resources;
 
+use App\Concerns\HasLocales;
 use App\Enums\Page\Status;
 use App\Filament\Resources\PageResource\Pages;
 use App\Filament\Resources\UserResource\Utils\Creator;
 use App\Models\Page;
 use App\Models\User;
-use App\Utils\Locale;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -21,6 +21,8 @@ use SolutionForest\FilamentTranslateField\Forms\Component\Translate;
 
 class PageResource extends Resource implements HasShieldPermissions
 {
+    use HasLocales;
+
     protected static ?string $model = Page::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document';
@@ -53,7 +55,7 @@ class PageResource extends Resource implements HasShieldPermissions
                                 ];
                             })
                             ->columnSpanFull()
-                            ->locales(Locale::getSortedLocales())
+                            ->locales(static::getSortedLocales())
                             ->suffixLocaleLabel(),
                         Translate::make()
                             ->schema([
@@ -61,7 +63,7 @@ class PageResource extends Resource implements HasShieldPermissions
                                     ->label(__('page.resource.content')),
                             ])
                             ->columnSpanFull()
-                            ->locales(Locale::getSortedLocales())
+                            ->locales(static::getSortedLocales())
                             ->suffixLocaleLabel(),
                     ])->columnSpan([
                         'default' => 1,
