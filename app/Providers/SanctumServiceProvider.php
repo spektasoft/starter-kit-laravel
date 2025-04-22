@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Models\PersonalAccessToken;
-use App\Utils\ThrottleKey;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -28,7 +27,10 @@ class SanctumServiceProvider extends ServiceProvider
         Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
 
         RateLimiter::for('api', function (Request $request) {
-            $throttleKey = ThrottleKey::generate($request);
+            // Generate a throttle key based on authenticated user ID or IP
+            $throttleKey = $request->user()
+                ? $request->user()->id.'|'.$request->ip() // Authenticated user + IP
+                : $request->ip(); // Guest user (only IP)
 
             return Limit::perMinute(5)->by($throttleKey);
         });

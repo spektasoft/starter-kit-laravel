@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Concerns\AuthorizesRequestsWithTokens;
 use App\Data\UserData;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Utils\Authorizer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -21,13 +21,14 @@ use Laravel\Fortify\Fortify;
 
 class UserController extends Controller
 {
+    use AuthorizesRequestsWithTokens;
+
     /**
      * @return AbstractPaginator<int, UserData>|Enumerable<int, UserData>
      */
     public function index()
     {
-        Authorizer::authorizeToken('read');
-        Authorizer::authorize('viewAny', User::class);
+        $this->authorizeTokenOrPolicy('read', 'viewAny', User::class);
 
         /** @var string */
         $tableSortColumn = request()->input('tableSortColumn') ?? 'id';
@@ -47,16 +48,14 @@ class UserController extends Controller
 
     public function show(User $user): UserData
     {
-        Authorizer::authorizeToken('read');
-        Authorizer::authorize('view', $user);
+        $this->authorizeTokenOrPolicy('read', 'view', $user);
 
         return UserData::from($user);
     }
 
     public function store(Request $request): JsonResponse
     {
-        Authorizer::authorizeToken('create');
-        Authorizer::authorize('create', User::class);
+        $this->authorizeTokenOrPolicy('create', 'create', User::class);
 
         $request = $this->normalizeRequest($request);
 
@@ -85,8 +84,7 @@ class UserController extends Controller
 
     public function update(User $user, Request $request): JsonResponse
     {
-        Authorizer::authorizeToken('update');
-        Authorizer::authorize('update', $user);
+        $this->authorizeTokenOrPolicy('update', 'update', $user);
 
         $request = $this->normalizeRequest($request);
 
@@ -124,8 +122,7 @@ class UserController extends Controller
 
     public function destroy(User $user): JsonResponse
     {
-        Authorizer::authorizeToken('delete');
-        Authorizer::authorize('delete', $user);
+        $this->authorizeTokenOrPolicy('delete', 'delete', $user);
 
         $user->delete();
 
@@ -163,7 +160,7 @@ class UserController extends Controller
             $model = $modelInstance;
         }
 
-        if (! Authorizer::check($action, $model)) {
+        if (! request()->user()?->can($action, $model)) {
             return response()->json(
                 ['message' => 'Permission denied!'],
                 JsonResponse::HTTP_FORBIDDEN

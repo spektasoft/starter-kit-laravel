@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Observers\MediaObserver;
-use App\Utils\Authorizer;
 use Awcodes\Curator\Models\Media as CuratorMedia;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * @property string $id
@@ -47,7 +47,7 @@ class Media extends CuratorMedia
     protected static function booted()
     {
         static::addGlobalScope('curator-panel', function (Builder $builder) {
-            if (Authorizer::check('viewAll', Media::class)) {
+            if (Gate::check('viewAll', Media::class)) {
                 return;
             }
 

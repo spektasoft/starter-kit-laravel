@@ -2,10 +2,10 @@
 
 namespace App\Filament\Actions\Tables;
 
-use App\Utils\Authorizer;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 
 class ReferenceAwareDeleteBulkAction extends DeleteBulkAction
 {
@@ -15,7 +15,7 @@ class ReferenceAwareDeleteBulkAction extends DeleteBulkAction
 
         $this->action(function (): void {
             $this->process(static fn (Collection $records) => $records->each(function (Model $record) {
-                if (Authorizer::check('delete', $record)) {
+                if (Gate::check('delete', $record)) {
                     $record->delete();
                 }
             }));
