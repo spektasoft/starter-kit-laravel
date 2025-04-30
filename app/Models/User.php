@@ -6,7 +6,6 @@ use App\Concerns\SuperUserAuthorizable;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
-use Filament\Support\Facades\FilamentColor;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,15 +14,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Laravel\Fortify\Fortify;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\Features;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\Jetstream;
 use Laravel\Sanctum\HasApiTokens;
-use LasseRafn\InitialAvatarGenerator\InitialAvatar;
-use Spatie\Color\Rgb;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerifyEmail
@@ -123,40 +119,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
             return null;
         }
 
-        $sessionKey = 'avatar-'.$this->id;
-
-        if (Session::has($sessionKey)) {
-            /** @var string */
-            $encodedImage = Session::get($sessionKey);
-
-            return $encodedImage;
-        }
-
-        $avatar = new InitialAvatar;
-        /** @var string */
-        $foregroundColor = config('avatar.colors.foreground', '#ffffff');
-        /** @var string */
-        $backgroundColor = config('avatar.colors.background', '#000000');
-
-        if ($backgroundColor === 'primary') {
-            /** @var Rgb */
-            $backgroundColorRgb = Rgb::fromString('rgb('.FilamentColor::getColors()['primary'][500].')');
-            $backgroundColorHex = $backgroundColorRgb->toHex();
-            $backgroundColor = $backgroundColorHex->__toString();
-        }
-
-        $image = $avatar
-            ->background($backgroundColor)
-            ->color($foregroundColor)
-            ->name($this->name)
-            ->size(64)
-            ->generate();
-
-        $encodedImage = $image->encode('data-url')->encoded;
-
-        Session::put($sessionKey, $encodedImage);
-
-        return $encodedImage;
+        return null;
     }
 
     public function isReferenced(): bool

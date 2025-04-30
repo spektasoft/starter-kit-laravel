@@ -22,7 +22,6 @@
         "laravel/jetstream": "^5.3.6",
         "laravel/sanctum": "^4.0.8",
         "laravel/tinker": "^2.10.1",
-        "lasserafn/php-initial-avatar-generator": "^4.4",
         "livewire/livewire": "^3.6.3",
         "shuvroroy/filament-spatie-laravel-backup": "^2.2.4",
         "solution-forest/filament-translate-field": "^1.4",
