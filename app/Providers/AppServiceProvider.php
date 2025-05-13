@@ -55,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
         if (! $locales) {
             throw new Exception('Supported locales are null.');
         }
-        // @phpstan-ignore-next-line
+
         FilamentTranslateField::defaultLocales($locales);
     }
 }

@@ -193,6 +193,7 @@ class TwoFactorChallengeControllerTest extends TestCase
         $limit = config('api.limit_per_minute', 5);
 
         $loginId = $this->getTwoFactorAuthenticationLoginId();
+        $limit--;
 
         foreach (range(0, $limit) as $i) {
             $response = $this->postJson(route('api.v1.two-factor-challenge'), [
