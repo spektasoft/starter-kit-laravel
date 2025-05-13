@@ -142,7 +142,7 @@ php artisan llm:pr
 
 ## Upstream
 
-Apply any changes available from the Laravel [12.x branch](https://github.com/laravel/laravel/compare/f6e4638ee6ca1cd40aa7c56311d89ea3d91a24f8...12.x).
+Apply any changes available from the Laravel [12.x branch](https://github.com/laravel/laravel/compare/2d8f562092a376cf80d07e3e4583bb8463bb51bf...12.x).
 
 ## License
 
