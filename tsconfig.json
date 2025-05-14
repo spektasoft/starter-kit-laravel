@@ -12,7 +12,11 @@
         "sourceMap": true,
         "types": [
             "vite/client"
-        ]
+        ],
+        "allowJs": true,
+        "outDir": "./public/build/assets",
+        "declaration": true,
+        "emitDeclarationOnly": false
     },
     "include": [
         "resources/ts/**/*"
