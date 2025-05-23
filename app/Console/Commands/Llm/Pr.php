@@ -3,6 +3,8 @@
 namespace App\Console\Commands\Llm;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Prism\Prism\Prism;
 use Symfony\Component\Process\Process;
 
@@ -13,7 +15,7 @@ class Pr extends Command
      *
      * @var string
      */
-    protected $signature = 'llm:pr';
+    protected $signature = 'llm:pr {--editor= : Specify the editor to use (e.g., nano, vim, code --wait)}';
 
     /**
      * The console command description.
@@ -95,13 +97,60 @@ commit range using Prism';
         $endTime = microtime(true);
         $elapsedTime = $endTime - $startTime;
 
+        $proposedMessage = trim($response->text);
+
         $this->newLine();
         $this->info('Proposed pull request:');
         $this->info('------------------------');
-        $this->line(trim($response->text));
+        $this->line($proposedMessage);
         $this->info('------------------------');
         $this->info('Elapsed time: '.round($elapsedTime, 2).' seconds');
         $this->info("Prompt tokens: {$response->usage->promptTokens}");
         $this->info("Completion tokens: {$response->usage->completionTokens}");
+
+        /** @var ?string */
+        $editor = $this->option('editor');
+
+        if (! $editor) {
+            $editInEditor = $this->confirm('Do you want to open this message in an editor to make changes?');
+        } else {
+            $editInEditor = true;
+        }
+
+        if ($editInEditor) {
+            if (! $editor) {
+                // If no editor is found, ask the user
+                /** @var ?string */
+                $editor = $this->ask('Please enter the command for your preferred editor (e.g., nano, vim, code --wait):');
+            }
+
+            if ($editor) {
+                // Create a unique temporary file path for the PR message
+                $tempFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'llm_pr_'.Str::uuid()->toString().'.md';
+
+                // Write the proposed message to the temporary file
+                File::put($tempFilePath, $proposedMessage);
+
+                $this->info("Opening pull request message in editor: '{$editor} {$tempFilePath}'");
+
+                // Construct the process command string, escaping the file path
+                $command = "{$editor} ".escapeshellarg($tempFilePath);
+
+                $process = Process::fromShellCommandline($command);
+                $process->setTimeout(null); // Allow indefinite editing time
+                $process->setTty(Process::isTtySupported()); // Enable TTY for interactive editors
+
+                try {
+                    $process->run(); // Execute the editor process
+                } catch (\Exception $e) {
+                    $this->error('Error during editor execution: '.$e->getMessage());
+                } finally {
+                    // Clean up the temporary file
+                    File::delete($tempFilePath);
+                }
+            } else {
+                $this->warn('No editor command provided. Skipping editor step.');
+            }
+        }
     }
 }
