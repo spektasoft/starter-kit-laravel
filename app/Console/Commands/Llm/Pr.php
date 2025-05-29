@@ -67,15 +67,15 @@ commit range using Prism';
 
         The `pull request message` should be strictly in this format:
 
-        ```
+        <format>
         branch name
 
         type: brief description
 
         body of the pull request message
-        ```
+        </format>
 
-        The `branch name` must be in kebab-case derived from `brief description`. The `type` should be one of fix, feat, docs, style, refactor, perf, test, build, ci, chore, or revert. Please identify the `type` from the commit messages, create the `brief description`, and include a `body of the pull request message` that describes the changes, reasoning, or any other relevant information. The `brief description` must start the sentence with a lowercase letter. The `body of the pull request message` should be wrapped in paragraphs using Markdown format. Do not add explanations, only the `pull request message`.
+        The `branch name` must be in kebab-case derived from `brief description`. The `type` should be one of fix, feat, docs, style, refactor, perf, test, build, ci, chore, or revert. Please identify the `type` from the commit messages, create the `brief description`, and include a `body of the pull request message` that describes the changes, reasoning, or any other relevant information. The `brief description` must start the sentence with a lowercase letter. Do not add explanations, only the `pull request message`.
         MARKDOWN;
 
         $prompt = strtr($template, [
