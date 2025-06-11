@@ -138,6 +138,7 @@ class AdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/app.css')
             ->widgets([
                 \Awcodes\Overlook\Widgets\OverlookWidget::class,
-            ]);
+            ])
+            ->databaseNotifications();
     }
 }
