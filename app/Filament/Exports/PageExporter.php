@@ -17,7 +17,7 @@ class PageExporter extends Exporter
         return [
             ExportColumn::make('id')
                 ->label('ID'),
-            ExportColumn::make('creator.name'),
+            ExportColumn::make('creator_id'),
             ExportColumn::make('title'),
             ExportColumn::make('content'),
             ExportColumn::make('status')
