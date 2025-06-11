@@ -7,6 +7,7 @@ use App\Contracts\Jwt;
 use App\Services\AhcJwtService;
 use App\Services\DeviceService;
 use Exception;
+use Filament\Notifications\Livewire\DatabaseNotifications;
 use Filament\Support\Facades\FilamentColor;
 use Filament\Support\Facades\FilamentIcon;
 use Filament\Support\Facades\FilamentView;
@@ -36,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        DatabaseNotifications::trigger('filament.notifications.database-notifications-trigger');
         FilamentColor::register([
             'primary' => Color::Vermilion,
             'secondary' => Color::WebOrange,
