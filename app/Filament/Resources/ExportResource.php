@@ -40,7 +40,7 @@ class ExportResource extends Resource implements HasShieldPermissions
 
     public static function getNavigationGroup(): ?string
     {
-        return __('export.navigation_group');
+        return __('Data Management');
     }
 
     public static function getPages(): array

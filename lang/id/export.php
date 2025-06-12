@@ -1,7 +1,6 @@
 <?php
 
 return [
-    'navigation_group' => 'Manajemen Data',
     'exporter' => 'Eksportir',
     'file_name' => 'Nama File',
     'file_disk' => 'Disk File',
