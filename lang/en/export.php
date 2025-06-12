@@ -9,4 +9,5 @@ return [
     'successful_rows' => 'Successful Rows',
     'initiated_by' => 'Initiated By',
     'completed_at' => 'Completed At',
+    'download_name' => 'Download :name',
 ];

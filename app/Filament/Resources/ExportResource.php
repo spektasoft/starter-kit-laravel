@@ -110,6 +110,20 @@ class ExportResource extends Resource implements HasShieldPermissions
             ])
             ->actions([
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('download_csv')
+                        ->label(__('export.download_name', ['name' => 'CSV']))
+                        ->icon('heroicon-o-document-arrow-down')
+                        ->url(fn (Export $record): string => route('filament.exports.download', ['export' => $record->id, 'format' => 'csv']))
+                        ->openUrlInNewTab()
+                        ->visible(fn (Export $record) => filled($record->file_name) && filled($record->file_disk)),
+                    Tables\Actions\Action::make('download_xlsx')
+                        ->label(__('export.download_name', ['name' => 'XLSX']))
+                        ->icon('heroicon-o-document-arrow-down')
+                        ->url(fn (Export $record): string => route('filament.exports.download', ['export' => $record->id, 'format' => 'xlsx']))
+                        ->openUrlInNewTab()
+                        ->visible(fn (Export $record) => filled($record->file_name) && filled($record->file_disk)),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
