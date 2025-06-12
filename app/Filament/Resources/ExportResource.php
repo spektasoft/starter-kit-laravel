@@ -32,7 +32,7 @@ class ExportResource extends Resource implements HasShieldPermissions
         $query = parent::getEloquentQuery();
 
         if (! static::canViewAll()) {
-            $query->where('creator_id', Auth::id());
+            $query->where('user_id', Auth::id());
         }
 
         return $query;
@@ -91,7 +91,8 @@ class ExportResource extends Resource implements HasShieldPermissions
                 Tables\Columns\TextColumn::make('user.name')
                     ->label(__('export.initiated_by'))
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->visible(static::canViewAll()),
                 Tables\Columns\TextColumn::make('completed_at')
                     ->label(__('export.completed_at'))
                     ->dateTime()
@@ -106,9 +107,6 @@ class ExportResource extends Resource implements HasShieldPermissions
                     ->label(ucfirst(__('validation.attributes.updated_at')))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('creator.name')
-                    ->label(ucfirst(__('validation.attributes.creator')))
-                    ->searchable(),
             ])
             ->actions([
                 Tables\Actions\DeleteAction::make(),
