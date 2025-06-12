@@ -65,7 +65,14 @@ class ExportResource extends Resource implements HasShieldPermissions
                 Tables\Columns\TextColumn::make('exporter')
                     ->label(__('export.exporter'))
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->formatStateUsing(function (string $state): string {
+                        $exporterName = class_basename($state); // e.g., PageExporter
+                        $modelName = str_replace('Exporter', '', $exporterName); // e.g., Page
+                        $lowercasedModelName = strtolower($modelName); // e.g., page
+
+                        return trans_choice("{$lowercasedModelName}.resource.model_label", 1);
+                    }),
                 Tables\Columns\TextColumn::make('file_name')
                     ->label(__('export.file_name'))
                     ->searchable()

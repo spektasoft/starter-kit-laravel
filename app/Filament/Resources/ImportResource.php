@@ -62,6 +62,17 @@ class ImportResource extends Resource implements HasShieldPermissions
     {
         return $table
             ->columns([
+                TextColumn::make('importer')
+                    ->label(__('import.importer'))
+                    ->searchable()
+                    ->sortable()
+                    ->formatStateUsing(function (string $state): string {
+                        $importerName = class_basename($state); // e.g., PageImporter
+                        $modelName = str_replace('Importer', '', $importerName); // e.g., Page
+                        $lowercasedModelName = strtolower($modelName); // e.g., page
+
+                        return trans_choice("{$lowercasedModelName}.resource.model_label", 1);
+                    }),
                 TextColumn::make('file_name')
                     ->label(__('import.file_name'))
                     ->searchable()
@@ -71,10 +82,6 @@ class ImportResource extends Resource implements HasShieldPermissions
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('importer')
-                    ->label(__('import.importer'))
-                    ->searchable()
-                    ->sortable(),
                 TextColumn::make('total_rows')
                     ->label(__('import.total_rows'))
                     ->numeric()
@@ -91,7 +98,8 @@ class ImportResource extends Resource implements HasShieldPermissions
                     ->label(__('import.user'))
                     ->searchable()
                     ->sortable()
-                    ->visible(static::canViewAll()),
+                    ->visible(static::canViewAll())
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('completed_at')
                     ->label(__('import.completed_at'))
                     ->dateTime()
