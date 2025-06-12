@@ -15,7 +15,11 @@ class ExportPolicy
      */
     public function view(User $user, Export $export): bool
     {
-        return false;
+        if ($user->isNot($export->user) && ! $this->viewAll($user)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -59,6 +63,6 @@ class ExportPolicy
             return false;
         }
 
-        return $user->can('delete_export');
+        return true;
     }
 }
