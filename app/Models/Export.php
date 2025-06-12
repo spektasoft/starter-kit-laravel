@@ -8,4 +8,18 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 class Export extends FilamentExport
 {
     use HasUlids;
+
+    protected static function booted(): void
+    {
+        parent::booted();
+
+        static::deleted(function (Export $export) {
+            $disk = $export->getFileDisk();
+            $directory = $export->getFileDirectory();
+
+            if ($disk->exists($directory)) {
+                $disk->deleteDirectory($directory);
+            }
+        });
+    }
 }
