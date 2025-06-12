@@ -1,0 +1,122 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
+use App\Filament\Resources\ExportResource\Pages;
+use App\Models\Export;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
+
+class ExportResource extends Resource implements HasShieldPermissions
+{
+    protected static ?string $model = Export::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-arrow-path-rounded-square';
+
+    public static function canViewAll(): bool
+    {
+        return static::can('viewAll');
+    }
+
+    /**
+     * @return Builder<Export>
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        /** @var Builder<Export> */
+        $query = parent::getEloquentQuery();
+
+        if (! static::canViewAll()) {
+            $query->where('creator_id', Auth::id());
+        }
+
+        return $query;
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('export.navigation_group');
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListExports::route('/'),
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getPermissionPrefixes(): array
+    {
+        return ['view_all'];
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('exporter')
+                    ->label(__('export.exporter'))
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('file_name')
+                    ->label(__('export.file_name'))
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('file_disk')
+                    ->label(__('export.file_disk'))
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('total_rows')
+                    ->label(__('export.total_rows'))
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('processed_rows')
+                    ->label(__('export.processed_rows'))
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('successful_rows')
+                    ->label(__('export.successful_rows'))
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label(__('export.initiated_by'))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('completed_at')
+                    ->label(__('export.completed_at'))
+                    ->dateTime()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->label(ucfirst(__('validation.attributes.created_at')))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->label(ucfirst(__('validation.attributes.updated_at')))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('creator.name')
+                    ->label(ucfirst(__('validation.attributes.creator')))
+                    ->searchable(),
+            ])
+            ->actions([
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    ReferenceAwareDeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+}
