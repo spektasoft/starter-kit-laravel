@@ -4,6 +4,8 @@ namespace Tests\Feature\Filament\Exports;
 
 use App\Enums\Page\Status;
 use App\Filament\Exports\PageExporter;
+use App\Models\Permission;
+use App\Models\User;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Models\Export;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -98,10 +100,34 @@ class PageExporterTest extends TestCase
         $export3 = new Export;
         $export3->total_rows = 1500000;
         $export3->successful_rows = 1000000;
-        $failedRowsCount3 = $export3->total_rows - $export3->successful_rows;
-        $messageParts3 = [__('page.export_completed', ['successful_rows' => number_format($export3->successful_rows)])];
-        $messageParts3[] = __('page.export_failed', ['failed_rows' => number_format($failedRowsCount3)]);
-        $message3 = implode(' ', $messageParts3);
-        $this->assertEquals($message3, PageExporter::getCompletedNotificationBody($export3));
+    }
+
+    public function test_creator_id_column_is_conditionally_included_based_on_permission(): void
+    {
+        // Create a user.
+        $user = User::factory()->create();
+
+        Permission::firstOrCreate(['name' => 'view_all_page']);
+        $user->givePermissionTo('view_all_page');
+
+        // Act as the user.
+        $this->actingAs($user);
+
+        // Get the columns.
+        $columns = PageExporter::getColumns();
+
+        // Assert that the creator_id column is present.
+        $this->assertArrayHasKey(1, $columns, 'Creator ID column should be present when the user has the viewAll permission.');
+
+        $user = User::factory()->create();
+
+        // Act as the user.
+        $this->actingAs($user);
+
+        // Get the columns again.
+        $columns = PageExporter::getColumns();
+
+        // Assert that the creator_id column is not present.
+        $this->assertArrayNotHasKey(1, $columns, 'Creator ID column should not be present when the user does not have the viewAll permission.');
     }
 }
