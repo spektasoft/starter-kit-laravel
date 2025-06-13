@@ -17,19 +17,25 @@ class PageImporter extends Importer
 
     public static function getColumns(): array
     {
-        return [
+        return array_filter([
             ImportColumn::make('id')
                 ->label('ID'),
-            ImportColumn::make('creator_id'),
-            ImportColumn::make('title'),
-            ImportColumn::make('content'),
+            Gate::check('viewAll', Page::class) ? ImportColumn::make('creator_id') : null,
+            ImportColumn::make('title')
+                ->castStateUsing(function (string $state): array {
+                    return [app()->getLocale() => $state];
+                }),
+            ImportColumn::make('content')
+                ->castStateUsing(function (string $state): array {
+                    return [app()->getLocale() => $state];
+                }),
             ImportColumn::make('status')
                 ->castStateUsing(function (string $state, array $options): mixed {
                     return Status::from($state);
                 }),
             ImportColumn::make('created_at'),
             ImportColumn::make('updated_at'),
-        ];
+        ]);
     }
 
     public function resolveRecord(): ?Model
@@ -40,10 +46,19 @@ class PageImporter extends Importer
         $keyColumnName = $this->columnMap[$keyName] ?? $keyName;
 
         /** @var ?Page */
-        $page = Page::find($this->data[$keyColumnName]);
+        $page = null;
 
-        if (! $page) {
+        if (isset($this->data[$keyColumnName])) {
+            $page = Page::find($this->data[$keyColumnName]);
+        } else {
             $page = new Page;
+        }
+
+        if ($page !== null) {
+            /** @var Page $page */
+            $page->fill($this->data);
+
+            // Ensure creator_id is set based on permissions only if a new page is being created.
             if (Auth::check()) {
                 /** @var string */
                 $currentUserId = Auth::id();
@@ -59,6 +74,8 @@ class PageImporter extends Importer
                     $page->creator_id = $currentUserId;
                 }
             }
+        } else {
+            throw new \Exception('Could not resolve or create Page model.');
         }
 
         return $page;
