@@ -8,8 +8,10 @@ use App\Models\Import;
 use App\Models\Page;
 use App\Models\Permission;
 use App\Models\User;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use ValueError;
 
 class PageImporterTest extends TestCase
 {
@@ -302,5 +304,218 @@ class PageImporterTest extends TestCase
 
         // Assert
         $this->assertEquals(Status::Publish, $page->status);
+    }
+
+    public function test_authorization_failure_when_updating_page_without_ownership_or_view_all_permission(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $otherUser = User::factory()->create();
+        $existingPage = Page::factory()->create(['creator_id' => $otherUser->id]);
+
+        $data = [
+            'id' => $existingPage->id,
+            'title' => ['en' => 'Updated Title'],
+            'content' => ['en' => 'Updated Content'],
+            'status' => 'publish',
+            'creator_id' => $otherUser->id,
+        ];
+
+        // Act
+        $import = Import::factory()->create([
+            'total_rows' => 0,
+            'successful_rows' => 0,
+            'user_id' => $user->id,
+        ]);
+
+        $columnMap = [
+            'id' => 'id',
+            'title' => 'title',
+            'content' => 'content',
+            'status' => 'status',
+            'creator_id' => 'creator_id',
+        ];
+        $importer = new PageImporter($import, $columnMap, []);
+        $importer($data);
+        $page = $importer->getRecord();
+
+        // Assert
+        $this->assertNull($page);
+    }
+
+    public function test_invalid_status_value_results_in_failed_import_row(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $data = [
+            'title' => ['en' => 'Test Page'],
+            'content' => ['en' => 'Test Content'],
+            'status' => 'pending', // Invalid status
+            'creator_id' => $user->id,
+        ];
+
+        // Act
+        $import = Import::factory()->create([
+            'total_rows' => 1,
+            'successful_rows' => 0,
+            'user_id' => $user->id,
+        ]);
+
+        $columnMap = [
+            'title' => 'title',
+            'content' => 'content',
+            'status' => 'status',
+            'creator_id' => 'creator_id',
+        ];
+        $importer = new PageImporter($import, $columnMap, []);
+        try {
+            $importer($data);
+        } catch (ValueError $e) {
+            $page = $importer->getRecord();
+
+            // Assert
+            $this->assertNull($page);
+
+            return;
+        }
+
+        $this->fail('Expected exception was not thrown.');
+    }
+
+    public function test_invalid_json_string_for_title_fails_the_row(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $data = [
+            'title' => 'invalid json',
+            'content' => ['en' => 'Test Content'],
+            'status' => 'draft',
+            'creator_id' => $user->id,
+        ];
+
+        // Act
+        $import = Import::factory()->create([
+            'total_rows' => 1,
+            'successful_rows' => 0,
+            'user_id' => $user->id,
+        ]);
+
+        $columnMap = [
+            'title' => 'title',
+            'content' => 'content',
+            'status' => 'status',
+            'creator_id' => 'creator_id',
+        ];
+        $importer = new PageImporter($import, $columnMap, []);
+        try {
+            $importer($data);
+        } catch (Exception $e) {
+            $page = $importer->getRecord();
+
+            // Assert
+            $this->assertNull($page);
+
+            return;
+        }
+
+        $this->fail('Expected exception was not thrown.');
+    }
+
+    public function test_invalid_creator_id_fails_the_row(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $data = [
+            'title' => ['en' => 'Test Page'],
+            'content' => ['en' => 'Test Content'],
+            'status' => 'draft',
+            'creator_id' => 9999, // Non-existent user ID
+        ];
+
+        // Act
+        $import = Import::factory()->create([
+            'total_rows' => 1,
+            'successful_rows' => 0,
+            'user_id' => $user->id,
+        ]);
+
+        $columnMap = [
+            'title' => 'title',
+            'content' => 'content',
+            'status' => 'status',
+            'creator_id' => 'creator_id',
+        ];
+        $importer = new PageImporter($import, $columnMap, []);
+        $importer($data);
+        $page = $importer->getRecord();
+
+        // Assert
+        $this->assertNull($page);
+    }
+
+    public function test_handles_null_creator_id_bug(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        /** @var ?Page */
+        $existingPage = null;
+
+        try {
+            $existingPage = Page::factory()->create(['creator_id' => null]);
+        } catch (Exception $e) {
+            $this->assertNull($existingPage);
+
+            return;
+        }
+
+        $this->fail('Expected exception was not thrown.');
+    }
+
+    public function test_update_non_existent_record_creates_new_record(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $initialPageCount = Page::count();
+
+        $data = [
+            'id' => '9999', // Non-existent ID
+            'title' => ['en' => 'Test Page'],
+            'content' => ['en' => 'Test Content'],
+            'status' => 'draft',
+            'creator_id' => $user->id,
+        ];
+
+        // Act
+        $import = Import::factory()->create([
+            'total_rows' => 0,
+            'successful_rows' => 0,
+            'user_id' => $user->id,
+        ]);
+
+        $columnMap = [
+            'id' => 'id',
+            'title' => 'title',
+            'content' => 'content',
+            'status' => 'status',
+            'creator_id' => 'creator_id',
+        ];
+        $importer = new PageImporter($import, $columnMap, []);
+        $importer($data);
+        $page = $importer->getRecord();
+
+        // Assert
+        $this->assertInstanceOf(Page::class, $page);
+        $this->assertEquals($initialPageCount + 1, Page::count());
     }
 }
