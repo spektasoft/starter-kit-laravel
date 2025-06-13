@@ -26,7 +26,7 @@ class PageExporter extends Exporter
                 ->state(fn (Page $record) => $record->getTranslations('content'))
                 ->listAsJson(),
             ExportColumn::make('status')
-                ->formatStateUsing(fn (Status $state): string => $state->value),
+                ->formatStateUsing(fn (Status $state): string => static::formatStatus($state)),
             ExportColumn::make('created_at'),
             ExportColumn::make('updated_at'),
         ]);
@@ -41,5 +41,10 @@ class PageExporter extends Exporter
         }
 
         return $body;
+    }
+
+    public static function formatStatus(Status $state): string
+    {
+        return $state->value;
     }
 }

@@ -6,7 +6,6 @@ use App\Enums\Page\Status;
 use App\Filament\Exports\PageExporter;
 use App\Models\Permission;
 use App\Models\User;
-use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Models\Export;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -19,28 +18,8 @@ class PageExporterTest extends TestCase
 
     public function test_status_column_correctly_formats_state(): void
     {
-        $columns = PageExporter::getColumns();
-        $statusColumn = collect($columns)->first(fn (ExportColumn $column) => $column->getName() === 'status');
-        $this->assertNotNull($statusColumn, 'Status column not found.');
-
-        // Access the formatStateUsing closure directly from the column's internal properties
-        // This is a workaround as getFormatStateUsing() is not public.
-        // In a real application, you might test the output of the exporter directly.
-        $reflection = new \ReflectionClass($statusColumn);
-        $property = $reflection->getProperty('formatStateUsing');
-        $property->setAccessible(true);
-        $formatStateUsing = $property->getValue($statusColumn);
-
-        $this->assertIsCallable($formatStateUsing);
-
-        // Test with a specific Status enum value
-        $draftStatus = Status::Draft;
-        $formattedDraft = $formatStateUsing($draftStatus);
-        $this->assertEquals($draftStatus->value, $formattedDraft);
-
-        $publishedStatus = Status::Publish;
-        $formattedPublished = $formatStateUsing($publishedStatus);
-        $this->assertEquals($publishedStatus->value, $formattedPublished);
+        $this->assertEquals(Status::Draft->value, PageExporter::formatStatus(Status::Draft));
+        $this->assertEquals(Status::Publish->value, PageExporter::formatStatus(Status::Publish));
     }
 
     public function test_returns_correct_notification_body_for_successful_export(): void
