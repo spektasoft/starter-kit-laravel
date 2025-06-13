@@ -18,8 +18,8 @@ class ImportFactory extends Factory
     public function definition(): array
     {
         return [
-            'completed_at' => $this->faker->boolean(70) ? $this->faker->dateTimeBetween('-1 month', 'now') : null,
-            'file_name' => $this->faker->boolean(80) ? 'imports/'.\Illuminate\Support\Str::ulid().'.csv' : null,
+            'completed_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
+            'file_name' => 'imports/'.\Illuminate\Support\Str::ulid().'.csv',
             'file_path' => 'imports/'.\Illuminate\Support\Str::ulid().'.csv',
             'importer' => $this->faker->randomElement(['UserImporter', 'ProductImporter', 'OrderImporter']),
             'processed_rows' => $processed = $this->faker->numberBetween(10, 1000),
