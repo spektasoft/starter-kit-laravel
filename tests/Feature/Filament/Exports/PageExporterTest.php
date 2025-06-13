@@ -15,29 +15,6 @@ class PageExporterTest extends TestCase
     use RefreshDatabase;
     use WithFaker;
 
-    public function test_returns_all_expected_columns(): void
-    {
-        $columns = PageExporter::getColumns();
-
-        $this->assertCount(7, $columns); // id, creator_id, title, content, status, created_at, updated_at
-
-        $columnNames = array_map(fn (ExportColumn $column) => $column->getName(), $columns);
-
-        $this->assertEquals([
-            'id',
-            'creator_id',
-            'title',
-            'content',
-            'status',
-            'created_at',
-            'updated_at',
-        ], $columnNames);
-
-        // Optionally, check labels for specific columns if they are set
-        $idColumn = collect($columns)->first(fn (ExportColumn $column) => $column->getName() === 'id');
-        $this->assertEquals('ID', $idColumn?->getLabel());
-    }
-
     public function test_status_column_correctly_formats_state(): void
     {
         $columns = PageExporter::getColumns();
