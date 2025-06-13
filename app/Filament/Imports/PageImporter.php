@@ -56,7 +56,7 @@ class PageImporter extends Importer
             // Page exists, check permissions to update
             if (Gate::forUser($importingUser)->check('viewAll', Page::class)) {
                 // User has permission to view all pages, update the page
-                $page->fill($this->data);
+                $page->fill(Arr::only($this->data, $page->getFillable()));
             } else {
                 // User doesn't have permission to view all pages, check if they own the page
                 if ($page->creator->is($importingUser)) {
@@ -65,7 +65,7 @@ class PageImporter extends Importer
                     // Prevent a user from changing the owner of their own page
                     $updateData = Arr::except($this->data, ['creator_id', 'id']);
 
-                    $page->fill($updateData);
+                    $page->fill(Arr::only($updateData, $page->getFillable()));
                 } else {
                     // User doesn't own the page and doesn't have viewAll permission, skip the row
                     return null;
@@ -100,8 +100,7 @@ class PageImporter extends Importer
             // All requirements are met, create a new page
             $page = new Page;
             $this->data['creator_id'] = $creatorId;
-            $fillableData = array_intersect_key($this->data, array_flip($page->getFillable()));
-            $page->fill($fillableData);
+            $page->fill(Arr::only($this->data, $page->getFillable()));
         }
 
         return $page;
@@ -131,10 +130,6 @@ class PageImporter extends Importer
 
             if (json_last_error() === JSON_ERROR_NONE) {
                 $data[$field] = $decoded;
-            } else {
-                // Option 1: Throw an exception to fail the row
-                throw new \Exception("Invalid JSON in '{$field}' field.");
-                // Option 2: Do nothing, let validation handle the non-array data
             }
         }
 
