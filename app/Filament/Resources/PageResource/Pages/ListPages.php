@@ -16,6 +16,7 @@ class ListPages extends ListRecords
     {
         return [
             ImportAction::make()
+                ->label(__('Import :name', ['name' => trans_choice('page.resource.model_label', 2)]))
                 ->importer(PageImporter::class),
             Actions\CreateAction::make(),
         ];
