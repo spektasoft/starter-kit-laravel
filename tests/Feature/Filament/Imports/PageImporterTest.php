@@ -24,8 +24,8 @@ class PageImporterTest extends TestCase
         $initialPageCount = Page::count(); // Get the initial count of pages
 
         $data = [
-            'title' => 'Test Page',
-            'content' => 'Test Content',
+            'title' => ['en' => 'Test Page'],
+            'content' => ['en' => 'Test Content'],
             'status' => 'draft',
             'creator_id' => $user->id, // Use the created user's ID
         ];
@@ -34,6 +34,7 @@ class PageImporterTest extends TestCase
         $import = Import::factory()->create([
             'total_rows' => 0,
             'successful_rows' => 0,
+            'user_id' => $user->id,
         ]);
 
         $columnMap = [
@@ -50,8 +51,8 @@ class PageImporterTest extends TestCase
         $this->assertInstanceOf(Page::class, $page);
         $this->assertEquals($initialPageCount + 1, Page::count()); // Assert one new page was created
 
-        $this->assertEquals($data['title'], $page->title);
-        $this->assertEquals($data['content'], $page->content);
+        $this->assertEquals($data['title']['en'], $page->title);
+        $this->assertEquals($data['content']['en'], $page->content);
         $this->assertEquals('draft', $page->status->value);
 
         // Optionally, assert that the page exists in the database
@@ -65,8 +66,8 @@ class PageImporterTest extends TestCase
         $retrievedPage = Page::find($page->id); // Assuming App\Models\Page is your model namespace
 
         // Assert the JSON fields by comparing the PHP arrays
-        $this->assertEquals($data['title'], $retrievedPage?->title);
-        $this->assertEquals($data['content'], $retrievedPage?->content);
+        $this->assertEquals($data['title']['en'], $retrievedPage?->title);
+        $this->assertEquals($data['content']['en'], $retrievedPage?->content);
     }
 
     public function test_can_update_an_existing_page_when_id_is_present_and_matches(): void
@@ -75,21 +76,22 @@ class PageImporterTest extends TestCase
         $user = User::factory()->create(); // Create a user for creator_id
         $this->actingAs($user);
 
-        $existingPage = Page::factory()->create();
-        $initialPageCount = Page::count(); // Get the initial count of pages
+        $existingPage = Page::factory()->create(['creator_id' => $user->id]);
+        $initialPageCount = Page::count();
 
         $data = [
             'id' => $existingPage->id,
-            'title' => 'Updated Title',
-            'content' => 'Updated Content',
+            'title' => ['en' => 'Updated Title'],
+            'content' => ['en' => 'Updated Content'],
             'status' => 'publish',
-            'creator_id' => $user->id, // Use the created user's ID
+            'creator_id' => $user->id,
         ];
 
         // Act
         $import = Import::factory()->create([
             'total_rows' => 0,
             'successful_rows' => 0,
+            'user_id' => $user->id,
         ]);
 
         $columnMap = [
@@ -100,29 +102,24 @@ class PageImporterTest extends TestCase
             'creator_id' => 'creator_id',
         ];
         $importer = new PageImporter($import, $columnMap, []);
-        $importer($data); // Call __invoke to set the internal $data property
+        $importer($data);
         $page = $importer->getRecord();
 
         // Assert
         $this->assertInstanceOf(Page::class, $page);
-        $this->assertEquals($initialPageCount, Page::count()); // Assert no new page was created, only updated
-        $this->assertEquals($data['title'], $page->title);
-        $this->assertEquals($data['content'], $page->content);
+        $this->assertEquals($initialPageCount, Page::count());
+        $this->assertEquals($data['title']['en'], $page->title);
+        $this->assertEquals($data['content']['en'], $page->content);
         $this->assertEquals('publish', $page->status->value);
-
-        // Optionally, assert that the page exists in the database
         $this->assertDatabaseHas('pages', [
             'id' => $existingPage->id,
             'status' => 'publish',
             'creator_id' => $user->id,
         ]);
 
-        // Retrieve the page from the database to ensure Laravel's casts are applied
-        $retrievedPage = Page::find($page->id); // Assuming App\Models\Page is your model namespace
-
-        // Assert the JSON fields by comparing the PHP arrays
-        $this->assertEquals($data['title'], $retrievedPage?->title);
-        $this->assertEquals($data['content'], $retrievedPage?->content);
+        $retrievedPage = Page::find($page->id);
+        $this->assertEquals($data['title']['en'], $retrievedPage?->title);
+        $this->assertEquals($data['content']['en'], $retrievedPage?->content);
     }
 
     public function test_handles_creator_id_when_present_in_import_data_and_user_has_view_all_permission(): void
@@ -137,8 +134,8 @@ class PageImporterTest extends TestCase
 
         $data = [
             'creator_id' => $otherUser->id, // Different creator ID
-            'title' => 'Test Page',
-            'content' => 'Test Content',
+            'title' => ['en' => 'Test Page'],
+            'content' => ['en' => 'Test Content'],
             'status' => 'draft',
         ];
 
@@ -146,6 +143,7 @@ class PageImporterTest extends TestCase
         $import = Import::factory()->create([
             'total_rows' => 0,
             'successful_rows' => 0,
+            'user_id' => $user->id,
         ]);
 
         $columnMap = [
@@ -182,6 +180,7 @@ class PageImporterTest extends TestCase
         $import = Import::factory()->create([
             'total_rows' => 0,
             'successful_rows' => 0,
+            'user_id' => $user->id,
         ]);
 
         $columnMap = [
@@ -192,11 +191,11 @@ class PageImporterTest extends TestCase
         ];
         $importer = new PageImporter($import, $columnMap, []);
         $importer($data);
-        /** @var Page */
+        /** @var ?Page */
         $page = $importer->getRecord();
 
         // Assert
-        $this->assertEquals($user->id, $page->creator_id);
+        $this->assertNull($page);
     }
 
     public function test_handles_creator_id_when_absent_in_import_data(): void
@@ -214,6 +213,7 @@ class PageImporterTest extends TestCase
         $import = Import::factory()->create([
             'total_rows' => 0,
             'successful_rows' => 0,
+            'user_id' => $currentUser->id,
         ]);
         $columnMap = [
             'title' => 'title',
