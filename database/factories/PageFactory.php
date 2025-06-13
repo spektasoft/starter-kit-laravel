@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\Page\Status;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -27,6 +28,7 @@ class PageFactory extends Factory
             'creator_id' => $creator->id,
             'title' => json_encode($title),
             'content' => $content ? json_encode(['en' => $content]) : null,
+            'status' => Status::Draft,
         ];
     }
 }
