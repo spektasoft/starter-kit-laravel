@@ -11,6 +11,7 @@ use Filament\Actions\Imports\Models\Import;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class PageImporter extends Importer
 {
@@ -104,6 +105,24 @@ class PageImporter extends Importer
         }
 
         return $page;
+    }
+
+    public function getValidationRules(): array
+    {
+        return [
+            // Allow nullable for new records
+            'id' => ['nullable', Rule::exists('pages', 'id')],
+
+            // Add validation for creator_id if the column exists
+            'creator_id' => ['required', Rule::exists('users', 'id')],
+
+            // Title and content are handled by decodeTranslatableData,
+            // but you could add basic checks here if desired.
+            'title' => ['required', 'array'],
+            'content' => ['required', 'array'],
+
+            'status' => ['required', Rule::enum(Status::class)],
+        ];
     }
 
     public static function getCompletedNotificationBody(Import $import): string
