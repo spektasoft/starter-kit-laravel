@@ -7,6 +7,7 @@ use App\Models\Page;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
+use Illuminate\Support\Facades\Gate;
 
 class PageExporter extends Exporter
 {
@@ -14,17 +15,21 @@ class PageExporter extends Exporter
 
     public static function getColumns(): array
     {
-        return [
+        return array_filter([
             ExportColumn::make('id')
                 ->label('ID'),
-            ExportColumn::make('creator_id'),
-            ExportColumn::make('title'),
-            ExportColumn::make('content'),
+            Gate::check('viewAll', Page::class) ? ExportColumn::make('creator_id') : null,
+            ExportColumn::make('title')
+                ->state(fn (Page $record) => $record->getTranslations('title'))
+                ->listAsJson(),
+            ExportColumn::make('content')
+                ->state(fn (Page $record) => $record->getTranslations('content'))
+                ->listAsJson(),
             ExportColumn::make('status')
                 ->formatStateUsing(fn (Status $state): string => $state->value),
             ExportColumn::make('created_at'),
             ExportColumn::make('updated_at'),
-        ];
+        ]);
     }
 
     public static function getCompletedNotificationBody(Export $export): string

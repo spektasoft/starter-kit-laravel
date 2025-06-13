@@ -4,11 +4,11 @@ namespace App\Filament\Imports;
 
 use App\Enums\Page\Status;
 use App\Models\Page;
+use App\Models\User;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class PageImporter extends Importer
@@ -21,14 +21,8 @@ class PageImporter extends Importer
             ImportColumn::make('id')
                 ->label('ID'),
             Gate::check('viewAll', Page::class) ? ImportColumn::make('creator_id') : null,
-            ImportColumn::make('title')
-                ->castStateUsing(function (string $state): array {
-                    return [app()->getLocale() => $state];
-                }),
-            ImportColumn::make('content')
-                ->castStateUsing(function (string $state): array {
-                    return [app()->getLocale() => $state];
-                }),
+            ImportColumn::make('title'),
+            ImportColumn::make('content'),
             ImportColumn::make('status')
                 ->castStateUsing(function (string $state, array $options): mixed {
                     return Status::from($state);
@@ -40,6 +34,8 @@ class PageImporter extends Importer
 
     public function resolveRecord(): ?Model
     {
+        /** @var User */
+        $importingUser = $this->import->user;
         /** @var Model */
         $model = app(static::getModel());
         $keyName = $model->getKeyName();
@@ -50,32 +46,60 @@ class PageImporter extends Importer
 
         if (isset($this->data[$keyColumnName])) {
             $page = Page::find($this->data[$keyColumnName]);
-        } else {
-            $page = new Page;
         }
 
-        if ($page !== null) {
-            /** @var Page $page */
-            $page->fill($this->data);
-
-            // Ensure creator_id is set based on permissions only if a new page is being created.
-            if (Auth::check()) {
-                /** @var string */
-                $currentUserId = Auth::id();
-                // Check if the current user has the 'viewAll' permission for the Page model
-                if (Gate::check('viewAll', Page::class)) {
-                    // If user can view all pages, allow setting creator_id from import data,
-                    // otherwise default to current user's ID.
-                    /** @var ?string */
-                    $importedCreatorId = $this->data['creator_id'] ?? null;
-                    $page->creator_id = $importedCreatorId ?: $currentUserId;
+        if ($page instanceof Page) {
+            // Page exists, check permissions to update
+            if (Gate::forUser($importingUser)->check('viewAll', Page::class)) {
+                // User has permission to view all pages, update the page
+                $this->data = $this->decodeTranslatableData($this->data, 'title');
+                $this->data = $this->decodeTranslatableData($this->data, 'content');
+                $page->fill($this->data);
+            } else {
+                // User doesn't have permission to view all pages, check if they own the page
+                if ($page->creator->is($importingUser)) {
+                    // User owns the page, update it
+                    $this->data = $this->decodeTranslatableData($this->data, 'title');
+                    $this->data = $this->decodeTranslatableData($this->data, 'content');
+                    $page->fill($this->data);
                 } else {
-                    // If user cannot view all pages, force creator_id to current user's ID.
-                    $page->creator_id = $currentUserId;
+                    // User doesn't own the page and doesn't have viewAll permission, skip the row
+                    return null;
                 }
             }
         } else {
-            throw new \Exception('Could not resolve or create Page model.');
+            // Page doesn't exist, check requirements before creating
+            /** @var string */
+            $currentUserId = $importingUser->id;
+
+            // Check if the current user has the 'viewAll' permission for the Page model
+            if (Gate::forUser($importingUser)->check('viewAll', Page::class)) {
+                // If user can view all pages, allow setting creator_id from import data
+                /** @var ?string */
+                $importedCreatorId = $this->data['creator_id'] ?? null;
+                if (! $importedCreatorId) {
+                    // creator_id is empty, assign uploader id
+                    $importedCreatorId = $currentUserId;
+                }
+                $creatorId = $importedCreatorId;
+            } else {
+                // If user cannot view all pages,
+                // if creator_id is not uploader id, skip the page.
+                /** @var ?string */
+                $importedCreatorId = $this->data['creator_id'] ?? null;
+                if ($importedCreatorId && $importedCreatorId != $currentUserId) {
+                    return null;
+                }
+                $creatorId = $currentUserId;
+            }
+
+            // All requirements are met, create a new page
+            $page = new Page;
+            $this->data = $this->decodeTranslatableData($this->data, 'title');
+            $this->data = $this->decodeTranslatableData($this->data, 'content');
+            $fillableData = array_intersect_key($this->data, array_flip($page->getFillable()));
+            $page->fill($fillableData);
+            $page->creator_id = $creatorId;
         }
 
         return $page;
@@ -83,12 +107,27 @@ class PageImporter extends Importer
 
     public static function getCompletedNotificationBody(Import $import): string
     {
-        $body = '<strong>'.number_format($import->successful_rows).'</strong> '.str('row')->plural($import->successful_rows).' '.__('page.import_completed', ['successful_rows' => $import->successful_rows]);
+        // Use the existing translation strings, which already contain HTML and pluralization.
+        // The lang files may need to be adjusted for better pluralization using trans_choice.
+        $body = __('page.import_completed', ['successful_rows' => number_format($import->successful_rows)]);
 
         if ($failedRows = $import->getFailedRowsCount()) {
-            $body .= ' <strong>'.number_format($failedRows).'</strong> '.str('row')->plural($failedRows).' '.__('page.import_failed', ['failed_rows' => $failedRows]);
+            $body .= ' '.__('page.import_failed', ['failed_rows' => number_format($failedRows)]);
         }
 
         return $body;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function decodeTranslatableData(array $data, string $field): array
+    {
+        if (isset($data[$field]) && is_string($data[$field])) {
+            $data[$field] = json_decode($data[$field], true);
+        }
+
+        return $data;
     }
 }
