@@ -122,6 +122,52 @@ class PageImporterTest extends TestCase
         $this->assertEquals($data['content']['en'], $retrievedPage?->content);
     }
 
+    public function test_cannot_update_creator_id_when_user_owns_page(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $existingPage = Page::factory()->create(['creator_id' => $user->id]);
+        $originalCreatorId = $existingPage->creator_id;
+
+        $data = [
+            'id' => $existingPage->id,
+            'title' => ['en' => 'Updated Title'],
+            'content' => ['en' => 'Updated Content'],
+            'status' => 'publish',
+            'creator_id' => User::factory()->create()->id, // Attempt to change the creator_id
+        ];
+
+        // Act
+        $import = Import::factory()->create([
+            'total_rows' => 0,
+            'successful_rows' => 0,
+            'user_id' => $user->id,
+        ]);
+
+        $columnMap = [
+            'id' => 'id',
+            'title' => 'title',
+            'content' => 'content',
+            'status' => 'status',
+            'creator_id' => 'creator_id',
+        ];
+
+        $importer = new PageImporter($import, $columnMap, []);
+        $importer($data);
+        /** @var ?Page */
+        $page = $importer->getRecord();
+
+        // Assert
+        $this->assertEquals($originalCreatorId, $page?->creator_id);
+
+        $this->assertDatabaseHas('pages', [
+            'id' => $existingPage->id,
+            'creator_id' => $originalCreatorId,
+        ]);
+    }
+
     public function test_handles_creator_id_when_present_in_import_data_and_user_has_view_all_permission(): void
     {
         // Arrange
@@ -171,8 +217,8 @@ class PageImporterTest extends TestCase
 
         $data = [
             'creator_id' => $otherUser->id, // Different creator ID
-            'title' => 'Test Page',
-            'content' => 'Test Content',
+            'title' => ['en' => 'Test Page'],
+            'content' => ['en' => 'Test Content'],
             'status' => 'draft',
         ];
 
@@ -204,8 +250,8 @@ class PageImporterTest extends TestCase
         $currentUser = User::factory()->create();
         $this->actingAs($currentUser);
         $data = [
-            'title' => 'Test Page',
-            'content' => 'Test Content',
+            'title' => ['en' => 'Test Page'],
+            'content' => ['en' => 'Test Content'],
             'status' => 'draft',
         ];
 
@@ -234,8 +280,8 @@ class PageImporterTest extends TestCase
         // Arrange
         $this->actingAs(User::factory()->create());
         $data = [
-            'title' => 'Test Page',
-            'content' => 'Test Content',
+            'title' => ['en' => 'Test Page'],
+            'content' => ['en' => 'Test Content'],
             'status' => 'publish',
         ];
 

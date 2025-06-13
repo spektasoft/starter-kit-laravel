@@ -43,10 +43,10 @@ class Page extends Model
         'status' => Status::class,
     ];
 
-    /*
-     * @var string[]
+    /**
+     * @var list<string>
      */
-    protected $guarded = [];
+    protected $fillable = ['creator_id', 'title', 'content', 'status'];
 
     public function isReferenced(): bool
     {

@@ -9,6 +9,7 @@ use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 
 class PageImporter extends Importer
@@ -48,20 +49,23 @@ class PageImporter extends Importer
             $page = Page::find($this->data[$keyColumnName]);
         }
 
+        $this->data = $this->decodeTranslatableData($this->data, 'title');
+        $this->data = $this->decodeTranslatableData($this->data, 'content');
+
         if ($page instanceof Page) {
             // Page exists, check permissions to update
             if (Gate::forUser($importingUser)->check('viewAll', Page::class)) {
                 // User has permission to view all pages, update the page
-                $this->data = $this->decodeTranslatableData($this->data, 'title');
-                $this->data = $this->decodeTranslatableData($this->data, 'content');
                 $page->fill($this->data);
             } else {
                 // User doesn't have permission to view all pages, check if they own the page
                 if ($page->creator->is($importingUser)) {
                     // User owns the page, update it
-                    $this->data = $this->decodeTranslatableData($this->data, 'title');
-                    $this->data = $this->decodeTranslatableData($this->data, 'content');
-                    $page->fill($this->data);
+
+                    // Prevent a user from changing the owner of their own page
+                    $updateData = Arr::except($this->data, ['creator_id', 'id']);
+
+                    $page->fill($updateData);
                 } else {
                     // User doesn't own the page and doesn't have viewAll permission, skip the row
                     return null;
@@ -95,11 +99,9 @@ class PageImporter extends Importer
 
             // All requirements are met, create a new page
             $page = new Page;
-            $this->data = $this->decodeTranslatableData($this->data, 'title');
-            $this->data = $this->decodeTranslatableData($this->data, 'content');
+            $this->data['creator_id'] = $creatorId;
             $fillableData = array_intersect_key($this->data, array_flip($page->getFillable()));
             $page->fill($fillableData);
-            $page->creator_id = $creatorId;
         }
 
         return $page;
@@ -125,7 +127,15 @@ class PageImporter extends Importer
     private function decodeTranslatableData(array $data, string $field): array
     {
         if (isset($data[$field]) && is_string($data[$field])) {
-            $data[$field] = json_decode($data[$field], true);
+            $decoded = json_decode($data[$field], true);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $data[$field] = $decoded;
+            } else {
+                // Option 1: Throw an exception to fail the row
+                throw new \Exception("Invalid JSON in '{$field}' field.");
+                // Option 2: Do nothing, let validation handle the non-array data
+            }
         }
 
         return $data;
