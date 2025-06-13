@@ -2,11 +2,14 @@
 
 namespace App\Filament\Imports;
 
+use App\Enums\Page\Status;
 use App\Models\Page;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class PageImporter extends Importer
 {
@@ -20,7 +23,10 @@ class PageImporter extends Importer
             ImportColumn::make('creator_id'),
             ImportColumn::make('title'),
             ImportColumn::make('content'),
-            ImportColumn::make('status'),
+            ImportColumn::make('status')
+                ->castStateUsing(function (string $state, array $options): mixed {
+                    return Status::from($state);
+                }),
             ImportColumn::make('created_at'),
             ImportColumn::make('updated_at'),
         ];
@@ -38,6 +44,21 @@ class PageImporter extends Importer
 
         if (! $page) {
             $page = new Page;
+            if (Auth::check()) {
+                /** @var string */
+                $currentUserId = Auth::id();
+                // Check if the current user has the 'viewAll' permission for the Page model
+                if (Gate::check('viewAll', Page::class)) {
+                    // If user can view all pages, allow setting creator_id from import data,
+                    // otherwise default to current user's ID.
+                    /** @var ?string */
+                    $importedCreatorId = $this->data['creator_id'] ?? null;
+                    $page->creator_id = $importedCreatorId ?: $currentUserId;
+                } else {
+                    // If user cannot view all pages, force creator_id to current user's ID.
+                    $page->creator_id = $currentUserId;
+                }
+            }
         }
 
         return $page;
