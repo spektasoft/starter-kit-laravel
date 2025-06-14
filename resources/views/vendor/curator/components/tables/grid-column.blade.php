@@ -1,6 +1,6 @@
 @php
     $record = $getRecord();
-    $canViewAll = \App\Utils\Authorizer::check('viewAll', \App\Models\Media::class);
+    $canViewAll = \Illuminate\Support\Facades\Gate::allows('viewAll', \App\Models\Media::class);
 @endphp
 
 <div
