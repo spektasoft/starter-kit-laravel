@@ -57,7 +57,9 @@ class PageImporter extends Importer
             // Page exists, check permissions to update
             if (Gate::forUser($importingUser)->check('viewAll', Page::class)) {
                 // User has permission to view all pages, update the page
-                $page->fill(Arr::only($this->data, $page->getFillable()));
+                /** @var array<string, mixed> */
+                $updateData = Arr::only($this->data, $page->getFillable());
+                $page->fill($updateData);
             } else {
                 // User doesn't have permission to view all pages, check if they own the page
                 if ($page->creator->is($importingUser)) {
@@ -65,8 +67,9 @@ class PageImporter extends Importer
 
                     // Prevent a user from changing the owner of their own page
                     $updateData = Arr::except($this->data, ['creator_id', 'id']);
-
-                    $page->fill(Arr::only($updateData, $page->getFillable()));
+                    /** @var array<string, mixed> */
+                    $updateData = Arr::only($updateData, $page->getFillable());
+                    $page->fill($updateData);
                 } else {
                     // User doesn't own the page and doesn't have viewAll permission, skip the row
                     return null;
@@ -97,11 +100,12 @@ class PageImporter extends Importer
                 }
                 $creatorId = $currentUserId;
             }
-
             // All requirements are met, create a new page
             $page = new Page;
             $this->data['creator_id'] = $creatorId;
-            $page->fill(Arr::only($this->data, $page->getFillable()));
+            /** @var array<string, mixed> */
+            $fillableData = Arr::only($this->data, $page->getFillable());
+            $page->fill($fillableData);
         }
 
         return $page;
