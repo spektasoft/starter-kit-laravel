@@ -24,8 +24,6 @@
 /vendor
 Homestead.json
 Homestead.yaml
-npm-debug.log
 Thumbs.db
-yarn-error.log
 /tmp
 _ide_helper*
