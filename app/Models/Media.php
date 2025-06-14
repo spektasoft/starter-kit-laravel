@@ -33,8 +33,12 @@ use Illuminate\Support\Facades\Gate;
  * @property string|null $caption
  * @property array<string, string>|null $exif
  * @property array<string, mixed>|null $curations
+ * @property string $size_for_humans
+ * @property string $pretty_name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @method static \Database\Factories\MediaFactory factory(...$parameters)
  */
 #[ObservedBy([MediaObserver::class])]
 class Media extends CuratorMedia
