@@ -30,6 +30,13 @@
             </div>
 
             <div class="flex flex-row items-center gap-2">
+                @auth
+                    <!-- Notifications Trigger -->
+                    <div class="relative">
+                        @livewire('database-notifications')
+                    </div>
+                @endauth
+
                 <!-- Language Switcher -->
                 <div class="relative">
                     <x-navigation-menu.language-switcher />

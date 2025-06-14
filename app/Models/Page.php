@@ -18,6 +18,8 @@ use Spatie\Translatable\HasTranslations;
  * @property Status $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @method static \Database\Factories\PageFactory factory(...$parameters)
  */
 class Page extends Model
 {
@@ -41,10 +43,10 @@ class Page extends Model
         'status' => Status::class,
     ];
 
-    /*
-     * @var string[]
+    /**
+     * @var list<string>
      */
-    protected $guarded = [];
+    protected $fillable = ['creator_id', 'title', 'content', 'status'];
 
     public function isReferenced(): bool
     {

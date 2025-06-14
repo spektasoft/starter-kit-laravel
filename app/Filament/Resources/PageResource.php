@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Concerns\HasLocales;
 use App\Enums\Page\Status;
+use App\Filament\Exports\PageExporter;
 use App\Filament\Resources\PageResource\Pages;
 use App\Filament\Resources\UserResource\Utils\Creator;
 use App\Models\Page;
@@ -14,6 +15,7 @@ use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Table;
 use FilamentTiptapEditor\TiptapEditor;
 use Illuminate\Database\Eloquent\Builder;
@@ -170,6 +172,8 @@ class PageResource extends Resource implements HasShieldPermissions
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ExportBulkAction::make()
+                        ->exporter(PageExporter::class),
                 ]),
             ]);
     }

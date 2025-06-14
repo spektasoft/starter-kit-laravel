@@ -12,4 +12,8 @@ return [
         ],
         'title' => 'Judul',
     ],
+    'export_completed' => 'Ekspor halaman Anda telah selesai dan :successful_rows baris berhasil diekspor.',
+    'export_failed' => ':failed_rows baris gagal diekspor.',
+    'import_completed' => ':successful_rows baris berhasil diimpor.',
+    'import_failed' => ':failed_rows baris gagal diimpor.',
 ];

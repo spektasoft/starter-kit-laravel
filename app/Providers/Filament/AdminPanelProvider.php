@@ -80,6 +80,8 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label(fn () => __('Administration')),
                 NavigationGroup::make()
+                    ->label(fn () => __('Data Management')),
+                NavigationGroup::make()
                     ->label(fn () => __('filament-spatie-backup::backup.pages.backups.navigation.group')),
                 NavigationGroup::make()
                     ->label(fn () => __('filament-shield::filament-shield.nav.group')),
@@ -138,6 +140,7 @@ class AdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/app.css')
             ->widgets([
                 \Awcodes\Overlook\Widgets\OverlookWidget::class,
-            ]);
+            ])
+            ->databaseNotifications();
     }
 }
