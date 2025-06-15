@@ -5,6 +5,7 @@ namespace Tests\Feature\Filament\Resources;
 use App\Filament\Resources\UserResource;
 use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Resources\UserResource\Pages\EditUser;
+use App\Models\Page;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
@@ -292,5 +293,16 @@ class UserResourceTest extends TestCase
         $this->assertFalse($users->contains($authenticatedSuperUser));
         $this->assertTrue($users->contains($anotherSuperUser));
         $this->assertTrue($users->contains($regularUser));
+    }
+
+    public function test_cannot_delete_a_user_that_is_referenced(): void
+    {
+        // Assuming a User has a relationship with another model, e.g., Page
+        $userToDelete = User::factory()->has(Page::factory())->create();
+
+        Livewire::test(UserResource\Pages\ListUsers::class)
+            ->assertTableActionHidden('delete', $userToDelete);
+
+        $this->assertModelExists($userToDelete);
     }
 }
