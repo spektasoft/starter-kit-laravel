@@ -209,7 +209,7 @@ class UserResourceTest extends TestCase
 
         $livewire = Livewire::test(UserResource\Pages\ListUsers::class);
         $livewire->callTableAction(
-            \Filament\Tables\Actions\DeleteAction::class,
+            'delete',
             $userToDelete
         );
         $livewire->assertHasNoTableActionErrors();
@@ -223,7 +223,7 @@ class UserResourceTest extends TestCase
 
         $livewire = Livewire::test(UserResource\Pages\ListUsers::class);
         $livewire->callTableBulkAction(
-            \App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction::class,
+            'delete',
             $usersToDelete
         );
         $livewire->assertHasNoTableBulkActionErrors();
