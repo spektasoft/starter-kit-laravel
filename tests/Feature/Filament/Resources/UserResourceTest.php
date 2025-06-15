@@ -22,6 +22,7 @@ class UserResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        config(['auth.super_users' => ['super@example.com', 'super2@example.com']]);
         $user = User::factory()->create();
         $this->actingAs($user);
         Permission::firstOrCreate(['name' => 'view_any_user']);
