@@ -17,14 +17,6 @@ class Permission extends SpatiePermission
         'download-backup',
     ];
 
-    public static function boot()
-    {
-        parent::boot();
-
-        collect(static::$customPermissions)
-            ->each(fn (string $permission) => static::firstOrCreate(['name' => $permission]));
-    }
-
     public function isReferenced(): bool
     {
         if ($this->roles()->exists()) {

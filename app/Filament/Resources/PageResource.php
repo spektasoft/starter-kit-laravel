@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Concerns\HasLocales;
 use App\Enums\Page\Status;
+use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Exports\PageExporter;
 use App\Filament\Resources\PageResource\Pages;
 use App\Filament\Resources\UserResource\Utils\Creator;
@@ -171,7 +172,7 @@ class PageResource extends Resource implements HasShieldPermissions
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    ReferenceAwareDeleteBulkAction::make(),
                     ExportBulkAction::make()
                         ->exporter(PageExporter::class),
                 ]),

@@ -62,6 +62,12 @@ ULIDs are used as the default ID type.
     php artisan migrate
     ```
 
+1. Run the seeder to create custom permissions:
+
+    ```
+    php artisan permission:seed
+    ```
+
 1. Run the app:
 
     ```
@@ -104,6 +110,7 @@ To develop a universal app, follow the additional instructions below:
     ```
 
 1. Run the app:
+
     ```
     composer run dev:host
     ```
@@ -112,13 +119,13 @@ To develop a universal app, follow the additional instructions below:
 
 To apply changes from this repository to another Laravel project:
 
-1.  Generate a diff file:
+1. Generate a diff file:
 
     ```
     git diff <COMMIT_HASH_FROM> <COMMIT_HASH_TO> > diff.patch
     ```
 
-1.  Apply the diff in the destination repository:
+1. Apply the diff in the destination repository:
 
     ```
     git apply --reject diff.patch
@@ -142,7 +149,7 @@ php artisan llm:pr
 
 ## Upstream
 
-Apply any changes available from the Laravel [12.x branch](https://github.com/laravel/laravel/compare/047ed5add8cea8d36147b10cdc02a1a59c5e3495...12.x).
+Apply any changes available from the Laravel [12.x branch](https://github.com/laravel/laravel/compare/78600b89b7ffe70fce639b3c8af2b4b365856ce0...12.x).
 
 ## License
 

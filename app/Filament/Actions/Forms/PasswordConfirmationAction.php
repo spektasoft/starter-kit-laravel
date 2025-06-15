@@ -1,11 +1,12 @@
 <?php
+
 /**
  * @source https://github.com/ArtMin96/filament-jet/blob/main/src/Filament/Actions/AlwaysAskPasswordConfirmationAction.php
  *
  * @license MIT
  */
 
-namespace App\Filament\Actions;
+namespace App\Filament\Actions\Forms;
 
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;

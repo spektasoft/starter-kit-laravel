@@ -5,7 +5,7 @@ namespace App\Livewire\EditProfile;
 use App\Concerns\CanRestoreSession;
 use App\Concerns\HasUser;
 use App\Data\SessionData;
-use App\Filament\Actions\PasswordConfirmationAction;
+use App\Filament\Actions\Forms\PasswordConfirmationAction;
 use App\Models\Session;
 use Carbon\Carbon;
 use Filament\Forms\Components\Section;

@@ -3,7 +3,7 @@
 namespace App\Livewire\EditProfile;
 
 use App\Concerns\HasUser;
-use App\Filament\Actions\PasswordConfirmationAction;
+use App\Filament\Actions\Forms\PasswordConfirmationAction;
 use App\Models\User;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Section;
