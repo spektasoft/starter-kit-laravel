@@ -33,6 +33,47 @@ class PageResourceTest extends TestCase
         $user->givePermissionTo('delete_page');
     }
 
+    public function test_cannot_render_create_page_without_permission(): void
+    {
+        $user = User::factory()->create(); // User without 'create_page' permission
+        $this->actingAs($user);
+
+        $this->get(PageResource::getUrl('create'))->assertForbidden();
+    }
+
+    public function test_cannot_render_edit_page_without_permission(): void
+    {
+        $user = User::factory()->create(); // User without 'update_page' permission
+        $this->actingAs($user);
+        $page = Page::factory()->create(['creator_id' => $user->id]);
+
+        $this->get(PageResource::getUrl('edit', ['record' => $page]))->assertForbidden();
+    }
+
+    public function test_cannot_delete_page_without_permission(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user); // User without 'delete_page' permission
+        $user->givePermissionTo('view_any_page');
+        $page = Page::factory()->create();
+
+        $listPages = Livewire::test(PageResource\Pages\ListPages::class);
+        $listPages->assertTableActionHidden('delete', $page);
+    }
+
+    public function test_cannot_bulk_delete_pages_without_permission(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user); // User without 'delete_page' permission
+        $user->givePermissionTo('view_any_page');
+        $pages = Page::factory(3)->create();
+
+        $listPages = Livewire::test(PageResource\Pages\ListPages::class);
+        $listPages->callTableBulkAction('delete', $pages->pluck('id')->toArray());
+
+        $this->assertEquals(Page::count(), 3);
+    }
+
     public function test_list_pages_page_can_be_rendered(): void
     {
         $this->get(PageResource::getUrl('index'))->assertSuccessful();
