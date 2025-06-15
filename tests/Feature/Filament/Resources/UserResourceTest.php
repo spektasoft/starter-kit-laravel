@@ -167,17 +167,26 @@ class UserResourceTest extends TestCase
         }
     }
 
-    public function test_roles_column_displays_super_user_correctly(): void
+    public function test_super_users_are_not_listed_for_non_super_admin(): void
     {
-        /** @var array<int, ?string> */
-        $superUserConfig = config('auth.super_users');
-        $superUser = User::factory()->create([
-            'email' => $superUserConfig[0],
-        ]);
+        // setUp() user is a non-super-admin
+        config(['auth.super_users' => ['super@example.com']]);
+        $superUser = User::factory()->create(['email' => 'super@example.com']);
+
+        Livewire::test(UserResource\Pages\ListUsers::class)
+            ->assertCanNotSeeTableRecords([$superUser]);
+    }
+
+    public function test_super_users_are_listed_for_super_admin(): void
+    {
+        config(['auth.super_users' => ['super1@example.com', 'super2@example.com']]);
+        $superAdmin = User::factory()->create(['email' => 'super1@example.com']);
+        $otherSuperUser = User::factory()->create(['email' => 'super2@example.com']);
+        $this->actingAs($superAdmin);
 
         $livewire = Livewire::test(UserResource\Pages\ListUsers::class);
-        $livewire->assertCanNotSeeTableRecords([$superUser]);
-        $livewire->assertTableColumnStateSet('roles', '["Super User"]', $superUser);
+        $livewire->assertCanSeeTableRecords([$otherSuperUser]);
+        $livewire->assertTableColumnStateSet('roles', '["Super User"]', $otherSuperUser);
     }
 
     public function test_roles_column_displays_assigned_roles_correctly(): void
