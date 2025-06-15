@@ -62,6 +62,12 @@ ULIDs are used as the default ID type.
     php artisan migrate
     ```
 
+1. Run the seeder to create custom permissions:
+
+    ```
+    php artisan permission:seed
+    ```
+
 1. Run the app:
 
     ```
