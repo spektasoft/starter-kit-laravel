@@ -306,4 +306,46 @@ class UserResourceTest extends TestCase
 
         $this->assertModelExists($userToDelete);
     }
+
+    public function test_cannot_render_create_page_without_permission(): void
+    {
+        $user = User::factory()->create(); // User without 'create_user' permission
+        $this->actingAs($user);
+
+        $this->get(UserResource::getUrl('create'))->assertForbidden();
+    }
+
+    public function test_cannot_render_edit_page_without_permission(): void
+    {
+        $user = User::factory()->create(); // User without 'update_user' permission
+        $this->actingAs($user);
+        $userToEdit = User::factory()->create();
+
+        $this->get(UserResource::getUrl('edit', ['record' => $userToEdit]))->assertForbidden();
+    }
+
+    public function test_cannot_delete_user_without_permission(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user); // User without 'delete_user' permission
+        $user->givePermissionTo('view_any_user');
+        $userToDelete = User::factory()->create();
+
+        $listUsers = Livewire::test(UserResource\Pages\ListUsers::class);
+        $listUsers->assertTableActionHidden('delete', $userToDelete);
+    }
+
+    public function test_cannot_bulk_delete_users_without_permission(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user); // User without 'delete_user' permission
+        $user->givePermissionTo('view_any_user');
+        $user->givePermissionTo('delete_any_user');
+        $usersToDelete = User::factory(2)->create();
+
+        $listUsers = Livewire::test(UserResource\Pages\ListUsers::class);
+        $listUsers->callTableBulkAction('delete', $usersToDelete);
+
+        $this->assertEquals(User::count(), 4); // 3 users + the initial user
+    }
 }
