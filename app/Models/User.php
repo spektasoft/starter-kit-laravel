@@ -3,16 +3,21 @@
 namespace App\Models;
 
 use App\Concerns\SuperUserAuthorizable;
+use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Fortify;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -23,13 +28,41 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
- * @method static \Database\Factories\UserFactory factory(mixed $count = null)
+ * @property string $id
+ * @property ?string $profile_photo_media_id
+ * @property string $name
+ * @property string $email
+ * @property ?Carbon $email_verified_at
+ * @property string $password
+ * @property ?string $two_factor_secret
+ * @property ?string $two_factor_recovery_codes
+ * @property ?string $two_factor_confirmed_at
+ * @property ?string $remember_token
+ * @property ?string $current_team_id
+ * @property ?string $profile_photo_path
+ * @property ?Carbon $created_at
+ * @property ?Carbon $updated_at
+ * @property-read Collection<int, DatabaseNotification> $notifications
+ * @property-read ?int $notifications_count
+ * @property-read Collection<int, PersonalAccessToken> $tokens
+ * @property-read ?int $tokens_count
+ * @property-read Media|null $profilePhotoMedia
+ * @property-read Collection<int, Role> $roles
+ * @property-read ?int $roles_count
+ * @property-read string $profile_photo_url
+ *
+ * @method static UserFactory factory($count = null, $state = [])
+ * @method static Builder|User newModelQuery()
+ * @method static Builder|User newQuery()
+ * @method static Builder|User permission($permissions)
+ * @method static Builder|User query()
+ * @method static Builder|User role($roles, $guard = null)
  */
 class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerifyEmail
 {
     use HasApiTokens;
 
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory;
 
     use HasProfilePhoto;
