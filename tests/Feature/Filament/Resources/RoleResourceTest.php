@@ -56,4 +56,21 @@ class RoleResourceTest extends TestCase
         $this->assertArrayHasKey('delete-backup', $options);
         $this->assertArrayHasKey('download-backup', $options);
     }
+
+    public function test_cannot_render_create_page_without_permission(): void
+    {
+        $user = User::factory()->create(); // User without 'create_role' permission
+        $this->actingAs($user);
+
+        $this->get(RoleResource::getUrl('create'))->assertForbidden();
+    }
+
+    public function test_cannot_render_edit_page_without_permission(): void
+    {
+        $user = User::factory()->create(); // User without 'update_role' permission
+        $this->actingAs($user);
+        $role = Role::factory()->create(['name' => 'test role']);
+
+        $this->get(RoleResource::getUrl('edit', ['record' => $role]))->assertForbidden();
+    }
 }
