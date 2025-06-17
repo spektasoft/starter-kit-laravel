@@ -1,13 +1,16 @@
 <?php
 
 return [
-    'file_name' => 'Nama Berkas',
-    'importer' => 'Pengimpor',
-    'total_rows' => 'Total Baris',
-    'processed_rows' => 'Baris Diproses',
-    'user' => 'Pengguna',
-    'failed_imports' => 'Impor Gagal',
-    'file_path' => 'Jalur Berkas',
-    'successful_rows' => 'Baris Berhasil',
-    'completed_at' => 'Selesai Pada',
+    'resource' => [
+        'completed_at' => 'Selesai Pada',
+        'failed_imports' => 'Impor Gagal',
+        'file_name' => 'Nama Berkas',
+        'file_path' => 'Jalur Berkas',
+        'importer' => 'Pengimpor',
+        'model_label' => 'Impor|Impor',
+        'processed_rows' => 'Baris Diproses',
+        'successful_rows' => 'Baris Berhasil',
+        'total_rows' => 'Total Baris',
+        'user' => 'Pengguna',
+    ],
 ];

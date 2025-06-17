@@ -39,6 +39,11 @@ class ExportResource extends Resource implements HasShieldPermissions
         return $query;
     }
 
+    public static function getModelLabel(): string
+    {
+        return trans_choice('export.resource.model_label', 1);
+    }
+
     public static function getNavigationGroup(): ?string
     {
         return __('Data Management');
@@ -59,12 +64,17 @@ class ExportResource extends Resource implements HasShieldPermissions
         return ['view_all'];
     }
 
+    public static function getPluralModelLabel(): string
+    {
+        return trans_choice('export.resource.model_label', 2);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('exporter')
-                    ->label(__('export.exporter'))
+                    ->label(__('export.resource.exporter'))
                     ->searchable()
                     ->sortable()
                     ->formatStateUsing(function (string $state): string {
@@ -75,34 +85,39 @@ class ExportResource extends Resource implements HasShieldPermissions
                         return trans_choice("{$lowercasedModelName}.resource.model_label", 1);
                     }),
                 Tables\Columns\TextColumn::make('file_name')
-                    ->label(__('export.file_name'))
+                    ->label(__('export.resource.file_name'))
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('file_disk')
-                    ->label(__('export.file_disk'))
+                    ->label(__('export.resource.file_disk'))
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('total_rows')
-                    ->label(__('export.total_rows'))
+                    ->label(__('export.resource.total_rows'))
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('processed_rows')
-                    ->label(__('export.processed_rows'))
+                    ->label(__('export.resource.processed_rows'))
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('successful_rows')
-                    ->label(__('export.successful_rows'))
+                    ->label(__('export.resource.successful_rows'))
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label(__('export.initiated_by'))
+                    ->label(__('export.resource.user'))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->visible(static::canViewAll()),
+                Tables\Columns\TextColumn::make('creator.name')
+                    ->label(ucfirst(__('validation.attributes.creator')))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->visible(static::canViewAll()),
                 Tables\Columns\TextColumn::make('completed_at')
-                    ->label(__('export.completed_at'))
+                    ->label(__('export.resource.completed_at'))
                     ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -120,13 +135,13 @@ class ExportResource extends Resource implements HasShieldPermissions
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('download_csv')
-                        ->label(__('export.download_name', ['name' => 'CSV']))
+                        ->label(__('export.resource.download_name', ['name' => 'CSV']))
                         ->icon('heroicon-o-document-arrow-down')
                         ->url(fn (Export $record): string => route('filament.exports.download', ['export' => $record->id, 'format' => 'csv']))
                         ->openUrlInNewTab()
                         ->visible(fn (Export $record) => filled($record->file_name) && filled($record->file_disk)),
                     Tables\Actions\Action::make('download_xlsx')
-                        ->label(__('export.download_name', ['name' => 'XLSX']))
+                        ->label(__('export.resource.download_name', ['name' => 'XLSX']))
                         ->icon('heroicon-o-document-arrow-down')
                         ->url(fn (Export $record): string => route('filament.exports.download', ['export' => $record->id, 'format' => 'xlsx']))
                         ->openUrlInNewTab()
