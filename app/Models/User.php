@@ -51,6 +51,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read ?int $roles_count
  * @property-read string $profile_photo_url
  * @property-read Collection<int, Export> $exports
+ * @property-read Collection<int, Import> $imports
  *
  * @method static UserFactory factory($count = null, $state = [])
  * @method static Builder|User newModelQuery()
@@ -144,6 +145,14 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         $this->forceFill([
             'profile_photo_media_id' => null,
         ])->save();
+    }
+
+    /**
+     * @return HasMany<Import, $this>
+     */
+    public function imports(): HasMany
+    {
+        return $this->hasMany(Import::class, 'creator_id');
     }
 
     /**
