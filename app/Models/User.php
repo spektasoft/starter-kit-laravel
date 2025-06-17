@@ -50,6 +50,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read Collection<int, Role> $roles
  * @property-read ?int $roles_count
  * @property-read string $profile_photo_url
+ * @property-read Collection<int, Export> $exports
  *
  * @method static UserFactory factory($count = null, $state = [])
  * @method static Builder|User newModelQuery()
@@ -145,6 +146,14 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         ])->save();
     }
 
+    /**
+     * @return HasMany<Export, $this>
+     */
+    public function exports(): HasMany
+    {
+        return $this->hasMany(Export::class, 'creator_id');
+    }
+
     public function getFilamentAvatarUrl(): ?string
     {
         if (Jetstream::managesProfilePhotos() && $this->profilePhotoMedia !== null) {
@@ -160,6 +169,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
 
     public function isReferenced(): bool
     {
+        if ($this->exports()->exists()) {
+            return true;
+        }
         if ($this->media()->exists()) {
             return true;
         }

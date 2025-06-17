@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('exports', function (Blueprint $table) {
             $table->ulid('id')->primary();
+            $table->foreignUlid('creator_id')->constrained('users');
             $table->timestamp('completed_at')->nullable();
             $table->string('file_disk');
             $table->string('file_name')->nullable();
