@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Auth;
  * @property ?Carbon $updated_at
  * @property string $creator_id
  * @property-read User $creator
+ * @property-read User $user
  *
  * @method static \Database\Factories\ImportFactory factory(...$parameters)
  */
