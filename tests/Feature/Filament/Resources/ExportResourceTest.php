@@ -58,8 +58,8 @@ class ExportResourceTest extends TestCase
         ]);
 
         $this->get(ExportResource::getUrl('index'))
-            ->assertSee(__('export.download_name', ['name' => 'CSV']))
-            ->assertSee(__('export.download_name', ['name' => 'XLSX']));
+            ->assertSee(__('export.resource.download_name', ['name' => 'CSV']))
+            ->assertSee(__('export.resource.download_name', ['name' => 'XLSX']));
     }
 
     public function test_get_eloquent_query_filters_results_for_non_admin_users(): void
@@ -67,13 +67,24 @@ class ExportResourceTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        Export::factory()->create(['user_id' => $user->id]);
-        Export::factory()->create(['user_id' => User::factory()->create()->id]);
+        // Create an export with the current user as the user_id
+        Export::factory()->create(['user_id' => $user->id, 'creator_id' => User::factory()->create()->id]);
+        // Create an export with the current user as the creator_id
+        Export::factory()->create(['user_id' => User::factory()->create()->id, 'creator_id' => $user->id]);
+        // Create an export that should not be included in the results
+        Export::factory()->create(['user_id' => User::factory()->create()->id, 'creator_id' => User::factory()->create()->id]);
 
         $exports = ExportResource::getEloquentQuery()->get();
 
-        $this->assertCount(1, $exports);
-        $this->assertEquals($user->id, $exports->first()?->user_id);
+        $this->assertCount(2, $exports);
+
+        $this->assertTrue($exports->contains(function ($export) use ($user) {
+            return $export->user_id === $user->id;
+        }));
+
+        $this->assertTrue($exports->contains(function ($export) use ($user) {
+            return $export->creator_id === $user->id;
+        }));
     }
 
     public function test_get_eloquent_query_does_not_filter_results_for_view_all_users(): void
@@ -120,5 +131,49 @@ class ExportResourceTest extends TestCase
 
         Livewire::test(ListExports::class)
             ->assertTableColumnHidden('user.name');
+    }
+
+    public function test_correct_records_are_listed(): void
+    {
+        // Arrange
+        $userA = User::factory()->create();
+        $userB = User::factory()->create();
+        $userC = User::factory()->create();
+
+        $this->actingAs($userA);
+
+        Export::factory()->create([
+            'user_id' => $userA->id,
+            'creator_id' => $userA->id,
+        ]);
+
+        Export::factory()->create([
+            'user_id' => $userB->id,
+            'creator_id' => $userA->id,
+        ]);
+
+        $this->actingAs($userB);
+
+        Export::factory()->create([
+            'user_id' => $userC->id,
+            'creator_id' => $userB->id,
+        ]);
+
+        $this->actingAs($userA);
+
+        // Act & Assert
+        $exportsUserA = Export::where(function ($query) use ($userA) {
+            $query->where('user_id', $userA->id)
+                ->orWhere('creator_id', $userA->id);
+        })->get();
+
+        $exportsNotUserA = Export::where(function ($query) use ($userA) {
+            $query->where('user_id', '!=', $userA->id)
+                ->where('creator_id', '!=', $userA->id);
+        })->get();
+
+        $livewire = Livewire::test(ExportResource\Pages\ListExports::class);
+        $livewire->assertCanSeeTableRecords($exportsUserA);
+        $livewire->assertCanNotSeeTableRecords($exportsNotUserA);
     }
 }

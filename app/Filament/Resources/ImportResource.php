@@ -34,10 +34,19 @@ class ImportResource extends Resource implements HasShieldPermissions
         $query = parent::getEloquentQuery();
 
         if (! static::canViewAll()) {
-            $query->where('user_id', Auth::id());
+            // Use a closure to group the WHERE conditions correctly
+            $query->where(function (Builder $query) {
+                $query->where('user_id', Auth::id())
+                    ->orWhere('creator_id', Auth::id());
+            });
         }
 
         return $query;
+    }
+
+    public static function getModelLabel(): string
+    {
+        return trans_choice('import.resource.model_label', 1);
     }
 
     public static function getNavigationGroup(): ?string
@@ -58,12 +67,17 @@ class ImportResource extends Resource implements HasShieldPermissions
         return ['view_all'];
     }
 
+    public static function getPluralModelLabel(): string
+    {
+        return trans_choice('import.resource.model_label', 2);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 TextColumn::make('importer')
-                    ->label(__('import.importer'))
+                    ->label(__('import.resource.importer'))
                     ->searchable()
                     ->sortable()
                     ->formatStateUsing(function (string $state): string {
@@ -74,34 +88,39 @@ class ImportResource extends Resource implements HasShieldPermissions
                         return trans_choice("{$lowercasedModelName}.resource.model_label", 1);
                     }),
                 TextColumn::make('file_name')
-                    ->label(__('import.file_name'))
+                    ->label(__('import.resource.file_name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('file_path')
-                    ->label(__('import.file_path'))
+                    ->label(__('import.resource.file_path'))
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('total_rows')
-                    ->label(__('import.total_rows'))
+                    ->label(__('import.resource.total_rows'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('processed_rows')
-                    ->label(__('import.processed_rows'))
+                    ->label(__('import.resource.processed_rows'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('successful_rows')
-                    ->label(__('import.successful_rows'))
+                    ->label(__('import.resource.successful_rows'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('user.name')
-                    ->label(__('import.user'))
+                    ->label(__('import.resource.user'))
                     ->searchable()
                     ->sortable()
                     ->visible(static::canViewAll())
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('creator.name')
+                    ->label(ucfirst(__('validation.attributes.creator')))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->visible(static::canViewAll()),
                 TextColumn::make('completed_at')
-                    ->label(__('import.completed_at'))
+                    ->label(__('import.resource.completed_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

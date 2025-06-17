@@ -1,13 +1,16 @@
 <?php
 
 return [
-    'file_name' => 'File Name',
-    'importer' => 'Importer',
-    'total_rows' => 'Total Rows',
-    'processed_rows' => 'Processed Rows',
-    'user' => 'User',
-    'failed_imports' => 'Failed Imports',
-    'file_path' => 'File Path',
-    'successful_rows' => 'Successful Rows',
-    'completed_at' => 'Completed At',
+    'resource' => [
+        'completed_at' => 'Completed At',
+        'failed_imports' => 'Failed Imports',
+        'file_name' => 'File Name',
+        'file_path' => 'File Path',
+        'importer' => 'Importer',
+        'model_label' => 'Import|Imports',
+        'processed_rows' => 'Processed Rows',
+        'successful_rows' => 'Successful Rows',
+        'total_rows' => 'Total Rows',
+        'user' => 'User',
+    ],
 ];

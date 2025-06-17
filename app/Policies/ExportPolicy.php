@@ -15,11 +15,11 @@ class ExportPolicy
      */
     public function view(User $user, Export $export): bool
     {
-        if ($user->isNot($export->user) && ! $this->viewAll($user)) {
-            return false;
+        if ($user->is($export->user) || $user->is($export->creator) || $this->viewAll($user)) {
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -59,10 +59,10 @@ class ExportPolicy
      */
     public function delete(User $user, Export $export): bool
     {
-        if ($user->isNot($export->user) && ! $this->viewAll($user)) {
-            return false;
+        if ($user->is($export->user) || $user->is($export->creator) || $this->viewAll($user)) {
+            return true;
         }
 
-        return true;
+        return false;
     }
 }

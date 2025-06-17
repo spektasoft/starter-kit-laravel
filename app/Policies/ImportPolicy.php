@@ -15,11 +15,11 @@ class ImportPolicy
      */
     public function view(User $user, Import $import): bool
     {
-        if ($user->isNot($import->user) && ! $this->viewAll($user)) {
-            return false;
+        if ($user->is($import->user) || $user->is($import->creator) || $this->viewAll($user)) {
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -59,10 +59,10 @@ class ImportPolicy
      */
     public function delete(User $user, Import $import): bool
     {
-        if ($user->isNot($import->user) && ! $this->viewAll($user)) {
-            return false;
+        if ($user->is($import->user) || $user->is($import->creator) || $this->viewAll($user)) {
+            return true;
         }
 
-        return true;
+        return false;
     }
 }
