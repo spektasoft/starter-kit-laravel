@@ -181,6 +181,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         if ($this->exports()->exists()) {
             return true;
         }
+        if ($this->imports()->exists()) {
+            return true;
+        }
         if ($this->media()->exists()) {
             return true;
         }
