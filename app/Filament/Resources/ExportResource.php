@@ -32,8 +32,11 @@ class ExportResource extends Resource implements HasShieldPermissions
         $query = parent::getEloquentQuery();
 
         if (! static::canViewAll()) {
-            $query->where('user_id', Auth::id())
-                ->orWhere('creator_id', Auth::id());
+            // Use a closure to group the WHERE conditions correctly
+            $query->where(function (Builder $query) {
+                $query->where('user_id', Auth::id())
+                    ->orWhere('creator_id', Auth::id());
+            });
         }
 
         return $query;

@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
+use App\Services\CreatorService;
 use Filament\Actions\Imports\Models\Import as FilamentImport;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * @property string $id
@@ -39,12 +39,12 @@ class Import extends FilamentImport
         parent::booted();
 
         static::creating(function (Import $import) {
-            /** @var ?string */
-            $creatorId = Auth::id();
-            if ($creatorId === null) {
-                return false;
+            // If creator_id is not already set, assign it.
+            // This prevents overriding a manually set ID (e.g., in tests).
+            // @phpstan-ignore-next-line
+            if (is_null($import->creator_id)) {
+                $import->creator_id = CreatorService::getCreatorOrFail()->id;
             }
-            $import->creator_id = $creatorId;
         });
     }
 

@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
+use App\Services\CreatorService;
 use Filament\Actions\Exports\Models\Export as FilamentExport;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * @property string $user_id
@@ -38,12 +38,12 @@ class Export extends FilamentExport
         parent::booted();
 
         static::creating(function (Export $export) {
-            /** @var ?string */
-            $creatorId = Auth::id();
-            if ($creatorId === null) {
-                return false;
+            // If creator_id is not already set, assign it.
+            // This prevents overriding a manually set ID (e.g., in tests).
+            // @phpstan-ignore-next-line
+            if (is_null($export->creator_id)) {
+                $export->creator_id = CreatorService::getCreatorOrFail()->id;
             }
-            $export->creator_id = $creatorId;
         });
 
         static::deleted(function (Export $export) {
