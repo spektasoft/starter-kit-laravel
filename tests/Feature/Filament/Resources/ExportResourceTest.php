@@ -121,4 +121,48 @@ class ExportResourceTest extends TestCase
         Livewire::test(ListExports::class)
             ->assertTableColumnHidden('user.name');
     }
+
+    public function test_correct_records_are_listed(): void
+    {
+        // Arrange
+        $userA = User::factory()->create();
+        $userB = User::factory()->create();
+        $userC = User::factory()->create();
+
+        $this->actingAs($userA);
+
+        Export::factory()->create([
+            'user_id' => $userA->id,
+            'creator_id' => $userA->id,
+        ]);
+
+        Export::factory()->create([
+            'user_id' => $userB->id,
+            'creator_id' => $userA->id,
+        ]);
+
+        $this->actingAs($userB);
+
+        Export::factory()->create([
+            'user_id' => $userC->id,
+            'creator_id' => $userB->id,
+        ]);
+
+        $this->actingAs($userA);
+
+        // Act & Assert
+        $exportsUserA = Export::where(function ($query) use ($userA) {
+            $query->where('user_id', $userA->id)
+                ->orWhere('creator_id', $userA->id);
+        })->get();
+
+        $exportsNotUserA = Export::where(function ($query) use ($userA) {
+            $query->where('user_id', '!=', $userA->id)
+                ->where('creator_id', '!=', $userA->id);
+        })->get();
+
+        $livewire = Livewire::test(ExportResource\Pages\ListExports::class);
+        $livewire->assertCanSeeTableRecords($exportsUserA);
+        $livewire->assertCanNotSeeTableRecords($exportsNotUserA);
+    }
 }
