@@ -32,3 +32,7 @@ if (Jetstream::hasTermsAndPrivacyPolicyFeature()) {
 }
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
+
+Route::fallback(function () {
+    return response()->view('errors.404', [], 404);
+});
