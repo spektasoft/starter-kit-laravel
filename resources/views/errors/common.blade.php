@@ -1,7 +1,9 @@
 @extends('errors.minimal')
 
 @php
-    $exceptionMessage = isset($exception) ? ($exception->getMessage() ?: __('Server Error')) : __('Server Error');
+    $defaultMessage = __('Server Error');
+    $exceptionMessage =
+        config('app.debug') && isset($exception) ? ($exception->getMessage() ?: $defaultMessage) : $defaultMessage;
 @endphp
 
 @section('title')
