@@ -1,6 +1,6 @@
 <nav x-data="navigationMenu" x-on:scroll.window.throttle.100ms="scroll"
     :class="{
-        '-translate-y-0': show,
+        '': show,
         '-translate-y-full': !show
     }"
     class="sticky top-0 left-0 z-20 w-full duration-500 bg-white transition-top dark:bg-gray-900 dark:border-gray-950/5">
@@ -57,7 +57,7 @@
 
     <!-- Drawer Overlay -->
     <div :class="{
-        '-translate-x-0': open,
+        '': open,
         '-translate-x-full': !open
     }"
         class="fixed left-0 z-30 w-full h-screen p-4 overflow-y-auto -translate-x-full bg-gray-950/50 dark:bg-gray-950/75 top-16">
@@ -65,7 +65,7 @@
 
     <!-- Drawer -->
     <div :class="{
-        '-translate-x-0': open,
+        '': open,
         '-translate-x-full': !open
     }"
         class="fixed left-0 z-40 w-64 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white top-16 dark:bg-gray-900"
