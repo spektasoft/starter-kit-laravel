@@ -15,9 +15,9 @@
                         <table border="0" cellpadding="0" cellspacing="0" role="presentation">
                             <tr>
                                 <td
-                                    style="border-radius: 8px; background-color: rgb({{ $buttonColor }}); padding: 0.5rem 0.75rem;">
-                                    <a href="{{ $url }}" class="button" target="_blank" rel="noopener"
-                                        style="background-color: transparent; display: inline-block;">{!! $slot !!}</a>
+                                    style="background-color: rgb({{ $buttonColor }}); border-radius: 8px; padding: 0.5rem 0.75rem;">
+                                    <a href="{{ $url }}" target="_blank" rel="noopener"
+                                        style="color: #fff; overflow: hidden; text-decoration: none;">{!! $slot !!}</a>
                                 </td>
                             </tr>
                         </table>
