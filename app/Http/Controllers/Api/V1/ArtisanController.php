@@ -7,6 +7,11 @@ use Illuminate\Support\Facades\Artisan;
 
 class ArtisanController
 {
+    public function apiKeyGenerate(): JsonResponse
+    {
+        return $this->callArtisanCommand('api-key:generate');
+    }
+
     public function keyGenerate(): JsonResponse
     {
         return $this->callArtisanCommand('key:generate');

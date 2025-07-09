@@ -50,6 +50,12 @@ ULIDs are used as the default ID type.
     php artisan key:generate
     ```
 
+1. Generate the `API_KEY`:
+
+    ```
+    php artisan api-key:generate
+    ```
+
 1. Create the symbolic link for storage:
 
     ```
