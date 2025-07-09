@@ -35,6 +35,8 @@ Route::group(['middleware' => ['json', 'throttle:api'], 'prefix' => 'v1'], funct
                 ->name('artisan.migrate');
             Route::post('artisan/optimize', [ArtisanController::class, 'optimize'])
                 ->name('artisan.optimize');
+            Route::post('artisan/seed-permissions', [ArtisanController::class, 'seedPermissions'])
+                ->name('artisan.seed.permissions');
             Route::post('artisan/storage-link', [ArtisanController::class, 'storageLink'])
                 ->name('artisan.storage.link');
         });

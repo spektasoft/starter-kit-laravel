@@ -9,37 +9,47 @@ class ArtisanController
 {
     public function keyGenerate(): JsonResponse
     {
-        $result = Artisan::call('key:generate');
-
-        return response()->json([
-            'result' => $result,
-        ]);
+        return $this->callArtisanCommand('key:generate');
     }
 
     public function migrate(): JsonResponse
     {
-        $result = Artisan::call('migrate --force');
-
-        return response()->json([
-            'result' => $result,
-        ]);
+        return $this->callArtisanCommand('migrate --force');
     }
 
     public function optimize(): JsonResponse
     {
-        $result = Artisan::call('optimize');
+        return $this->callArtisanCommand('optimize');
+    }
 
-        return response()->json([
-            'result' => $result,
-        ]);
+    public function seedPermissions(): JsonResponse
+    {
+        return $this->callArtisanCommand('seed:permissions');
     }
 
     public function storageLink(): JsonResponse
     {
-        $result = Artisan::call('storage:link');
+        return $this->callArtisanCommand('storage:link');
+    }
 
-        return response()->json([
-            'result' => $result,
-        ]);
+    private function callArtisanCommand(string $command): JsonResponse
+    {
+        try {
+            Artisan::call($command);
+            $output = Artisan::output();
+
+            return response()->json([
+                'status' => 'success',
+                'command' => $command,
+                'output' => $output,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'command' => $command,
+                'message' => $e->getMessage(),
+                'output' => Artisan::output(),
+            ], 500);
+        }
     }
 }
