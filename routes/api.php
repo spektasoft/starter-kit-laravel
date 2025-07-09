@@ -29,13 +29,14 @@ Route::group(['middleware' => ['json', 'throttle:api'], 'prefix' => 'v1'], funct
     Route::name('api.v1.')
         ->middleware(['verify.api.artisan', 'verify.api.key'])
         ->group(function () {
-            Route::post('artisan/key-generate', [ArtisanController::class, 'keyGenerate'])
-                ->name('artisan.key.generate');
-            Route::post('artisan/migrate', [ArtisanController::class, 'migrate'])
-                ->name('artisan.migrate');
-            Route::post('artisan/optimize', [ArtisanController::class, 'optimize'])
-                ->name('artisan.optimize');
-            Route::post('artisan/storage-link', [ArtisanController::class, 'storageLink'])
-                ->name('artisan.storage.link');
+            Route::prefix('artisan')
+                ->controller(ArtisanController::class)
+                ->group(function () {
+                    Route::post('key-generate', 'keyGenerate')->name('artisan.key.generate');
+                    Route::post('migrate', 'migrate')->name('artisan.migrate');
+                    Route::post('optimize', 'optimize')->name('artisan.optimize');
+                    Route::post('seed-permissions', 'seedPermissions')->name('artisan.seed.permissions');
+                    Route::post('storage-link', 'storageLink')->name('artisan.storage.link');
+                });
         });
 });
