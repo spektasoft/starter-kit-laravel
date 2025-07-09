@@ -37,6 +37,7 @@ class GenerateApiKeys extends Command
         if (Str::contains($currentEnvContent, 'API_KEY=')) {
             if (! $this->confirm('An API key already exists. Do you want to overwrite it?')) {
                 $this->info('API key generation cancelled.');
+
                 return;
             }
         }
@@ -67,15 +68,16 @@ class GenerateApiKeys extends Command
                 return;
             }
 
-            if (Str::contains($currentContent, 'API_KEY=')) {
-                file_put_contents($path, preg_replace(
+            if (preg_match('/^API_KEY=/m', $currentContent)) {
+                $currentContent = preg_replace(
                     '/^API_KEY=.*$/m',
                     'API_KEY='.$key,
                     $currentContent
-                ));
+                );
             } else {
-                file_put_contents($path, $currentContent.PHP_EOL.'API_KEY='.$key);
+                $currentContent .= PHP_EOL.'API_KEY='.$key;
             }
+            file_put_contents($path, $currentContent);
         }
     }
 }
