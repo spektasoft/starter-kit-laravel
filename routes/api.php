@@ -32,7 +32,6 @@ Route::group(['middleware' => ['json', 'throttle:api'], 'prefix' => 'v1'], funct
             Route::prefix('artisan')
                 ->controller(ArtisanController::class)
                 ->group(function () {
-                    Route::post('api-key-generate', 'apiKeyGenerate')->name('artisan.api.key.generate');
                     Route::post('key-generate', 'keyGenerate')->name('artisan.key.generate');
                     Route::post('migrate', 'migrate')->name('artisan.migrate');
                     Route::post('optimize', 'optimize')->name('artisan.optimize');
