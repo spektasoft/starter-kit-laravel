@@ -26,6 +26,21 @@ class GenerateApiKeys extends Command
      */
     public function handle(): void
     {
+        $envPath = base_path('.env');
+        $currentEnvContent = file_exists($envPath) ? @file_get_contents($envPath) : '';
+
+        if ($currentEnvContent === false) {
+            $this->error('Could not read .env file to check for existing API key. Proceeding without confirmation.');
+            $currentEnvContent = '';
+        }
+
+        if (Str::contains($currentEnvContent, 'API_KEY=')) {
+            if (! $this->confirm('An API key already exists. Do you want to overwrite it?')) {
+                $this->info('API key generation cancelled.');
+                return;
+            }
+        }
+
         $key = Str::random(32);
 
         $this->setKeyInEnvironmentFile($key);
@@ -48,6 +63,7 @@ class GenerateApiKeys extends Command
 
             if ($currentContent === false) {
                 $this->error('Could not read .env file.');
+
                 return;
             }
 
@@ -58,7 +74,7 @@ class GenerateApiKeys extends Command
                     $currentContent
                 ));
             } else {
-                file_put_contents($path, $currentContent . PHP_EOL . 'API_KEY=' . $key);
+                file_put_contents($path, $currentContent.PHP_EOL.'API_KEY='.$key);
             }
         }
     }
