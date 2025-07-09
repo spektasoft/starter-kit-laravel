@@ -12,7 +12,7 @@ class SeedCustomPermissions extends Command
      *
      * @var string
      */
-    protected $signature = 'permissions:seed';
+    protected $signature = 'seed:permissions';
 
     /**
      * The console command description.

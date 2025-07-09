@@ -65,7 +65,7 @@ ULIDs are used as the default ID type.
 1. Run the seeder to create custom permissions:
 
     ```
-    php artisan permission:seed
+    php artisan seed:permissions
     ```
 
 1. Run the app:
