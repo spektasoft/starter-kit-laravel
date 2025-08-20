@@ -1,5 +1,5 @@
 <div>
-    <x-header :breadcrumbs="$this->getBreadcrumbs()">
+    <x-header :breadcrumbs="$this->getBreadcrumbs()" :actions="$this->getActions()">
         {{ $page->title }}
     </x-header>
 
