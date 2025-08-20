@@ -14,17 +14,10 @@ class ViewPage extends Component
 
     public function mount(Page $record): void
     {
-        $description = Str::limit(strip_tags($record->content), 160, '...');
+        $description = Str::limit(strip_tags($record->content), 160, '…');
 
         SEOTools::setTitle($record->title);
         SEOTools::setDescription($description);
-        SEOTools::opengraph()->setTitle($record->title);
-        SEOTools::opengraph()->setDescription($description);
-        SEOTools::twitter()->setTitle($record->title);
-        SEOTools::twitter()->setDescription($description);
-        SEOTools::jsonLd()->setTitle($record->title);
-        SEOTools::jsonLd()->setDescription($description);
-        SEOTools::jsonLd()->setType('WebPage');
 
         $this->page = $record;
     }
