@@ -2,9 +2,13 @@
 
 namespace App\Livewire\Page;
 
+use App\Enums\Page\Status;
+use App\Filament\Resources\PageResource;
 use App\Models\Page;
 use Artesaos\SEOTools\Facades\SEOTools;
+use Filament\Actions\Action;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
@@ -14,17 +18,14 @@ class ViewPage extends Component
 
     public function mount(Page $record): void
     {
-        $description = Str::limit(strip_tags($record->content), 160, '...');
+        if ($record->status !== Status::Publish && ! Gate::allows('update', $record)) {
+            abort(404);
+        }
+
+        $description = Str::limit(strip_tags($record->content), 160, '…');
 
         SEOTools::setTitle($record->title);
         SEOTools::setDescription($description);
-        SEOTools::opengraph()->setTitle($record->title);
-        SEOTools::opengraph()->setDescription($description);
-        SEOTools::twitter()->setTitle($record->title);
-        SEOTools::twitter()->setDescription($description);
-        SEOTools::jsonLd()->setTitle($record->title);
-        SEOTools::jsonLd()->setDescription($description);
-        SEOTools::jsonLd()->setType('WebPage');
 
         $this->page = $record;
     }
@@ -41,6 +42,20 @@ class ViewPage extends Component
         ];
 
         return $breadcrumbs;
+    }
+
+    /**
+     * @return array<Action>
+     */
+    public function getActions(): array
+    {
+        $actions = [];
+        $actions[] = Action::make('edit')
+            ->authorize(PageResource::canEdit($this->page))
+            ->label(__('page.action.edit'))
+            ->url(route('filament.admin.resources.pages.edit', $this->page));
+
+        return $actions;
     }
 
     public function render(): View

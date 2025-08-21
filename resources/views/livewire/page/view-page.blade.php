@@ -1,5 +1,5 @@
 <div>
-    <x-header :breadcrumbs="$this->getBreadcrumbs()">
+    <x-header :breadcrumbs="$this->getBreadcrumbs()" :actions="$this->getActions()">
         {{ $page->title }}
     </x-header>
 
@@ -7,7 +7,7 @@
         <section class="flex flex-col items-center min-h-screen pt-6 sm:pt-0">
             <div
                 class="w-full p-6 mt-6 overflow-hidden prose bg-white shadow-md sm:max-w-2xl dark:bg-gray-900 sm:rounded-lg dark:prose-invert">
-                {!! $page->content !!}
+                {!! str($page->content)->sanitizeHtml() !!}
             </div>
         </section>
     </x-container>

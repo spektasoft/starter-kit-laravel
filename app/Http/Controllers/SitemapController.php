@@ -24,7 +24,7 @@ class SitemapController extends Controller
 
         $pages = Page::where('status', \App\Enums\Page\Status::Publish)->get();
         foreach ($pages as $page) {
-            $sitemap->add(Url::create(route('pages.view', ['record' => $page]))
+            $sitemap->add(Url::create(route('pages.show', ['record' => $page]))
                 ->setLastModificationDate(Carbon::parse($page->updated_at))
                 ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
                 ->setPriority(0.9));
