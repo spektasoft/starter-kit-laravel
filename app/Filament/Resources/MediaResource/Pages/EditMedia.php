@@ -4,12 +4,12 @@ namespace App\Filament\Resources\MediaResource\Pages;
 
 use App\Filament\Resources\MediaResource;
 use App\Models\Media;
-use Awcodes\Curator\Resources\MediaResource\EditMedia as BaseEditMedia;
+use Awcodes\Curator\Resources\MediaResource\EditMedia as CuratorEditMedia;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 
-class EditMedia extends BaseEditMedia
+class EditMedia extends CuratorEditMedia
 {
     protected static string $resource = MediaResource::class;
 
