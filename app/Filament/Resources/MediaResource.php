@@ -47,6 +47,7 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
         return [
             ...parent::getPages(),
             'index' => Pages\ListMedia::route('/'),
+            'edit' => Pages\EditMedia::route('/{record}/edit'),
         ];
     }
 
