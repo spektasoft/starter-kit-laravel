@@ -33,8 +33,8 @@ class MediaFactory extends Factory
             'title' => $this->faker->optional()->sentence,
             'description' => $this->faker->optional()->paragraph,
             'caption' => $this->faker->optional()->paragraph,
-            'exif' => $this->faker->optional()->paragraph,
-            'curations' => $this->faker->optional()->paragraph,
+            'exif' => [],
+            'curations' => [],
         ];
     }
 }
