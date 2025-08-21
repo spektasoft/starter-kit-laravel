@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\Media;
 use Awcodes\Curator\Models\Media as CuratorMedia;
 use Awcodes\Curator\Observers\MediaObserver as CuratorMediaObserver;
+use Awcodes\Curator\PathGenerators\UserPathGenerator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -38,6 +39,61 @@ class MediaObserver extends CuratorMediaObserver
     {
         $this->removeExif($media);
         $this->convertToWebP($media);
+    }
+
+    /**
+     * Handle the Media "updated" event.
+     */
+    public function updated(Media $media): void
+    {
+        // Get the configured path generator class
+        $pathGeneratorClass = config('curator.path_generator');
+
+        // Only apply this file moving logic if creator_id is dirty AND UserPathGenerator is in use
+        if ($media->isDirty('creator_id') && $pathGeneratorClass === UserPathGenerator::class) {
+            $newCreatorId = $media->creator_id;
+
+            /** @var string $oldFullPath */
+            $oldFullPath = $media->getOriginal('path');
+            $filename = pathinfo($oldFullPath, PATHINFO_BASENAME);
+
+            // Determine the new creator folder (e.g., '1' or 'guest')
+            $newCreatorFolder = $newCreatorId ? (string) $newCreatorId : 'guest';
+
+            // Get the base directory from Curator's config, defaulting to 'media'
+            $baseDirectoryConfig = config('curator.directory', 'media');
+
+            // Ensure $baseDirectoryConfig is a string
+            if (! is_string($baseDirectoryConfig)) {
+                Log::warning('Curator directory config is not a string. Defaulting to "media".', ['config_value' => $baseDirectoryConfig]);
+                $baseDirectoryConfig = 'media';
+            }
+
+            // Construct the new base directory (e.g., 'media/1' or 'media/guest')
+            $newBaseDirectory = "{$baseDirectoryConfig}/{$newCreatorFolder}";
+
+            // Construct the new full path (e.g., 'media/1/filename.ext')
+            $newFullPath = "{$newBaseDirectory}/{$filename}";
+
+            // Ensure the new directory exists
+            Storage::disk($media->disk)->makeDirectory($newBaseDirectory);
+
+            // Move the file only if the old path exists and the old and new paths are different
+            if ($oldFullPath && Storage::disk($media->disk)->exists($oldFullPath) && $oldFullPath !== $newFullPath) {
+                Storage::disk($media->disk)->move($oldFullPath, $newFullPath);
+
+                // Update the media model's path and directory attributes
+                $media->path = $newFullPath;
+                $media->directory = $newBaseDirectory;
+
+                // Save the model quietly to prevent re-triggering the observer
+                $media->saveQuietly();
+            } elseif ($oldFullPath && ! Storage::disk($media->disk)->exists($oldFullPath)) {
+                Log::warning("File not found at old path: {$oldFullPath} for media ID: {$media->id}");
+            }
+        }
+        // If the path generator is not UserPathGenerator, or creator_id is not dirty,
+        // this custom file moving logic is skipped.
     }
 
     private function convertToWebP(Media $media): void

@@ -65,15 +65,18 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
      */
     public static function getAdditionalInformationFormSchema(): array
     {
-        // @phpstan-ignore-next-line
+        /** @var array<Forms\Components\Component> */
+        $parentComponents = parent::getAdditionalInformationFormSchema();
+
         return [
-            ...parent::getAdditionalInformationFormSchema(),
+            ...$parentComponents,
             static::canViewAll() ? Forms\Components\Select::make('creator_id')
                 ->label(__('attributes.created_by'))
                 ->relationship('creator', titleAttribute: 'name')
                 ->default(User::auth()?->id)
                 ->native(false)
-                ->searchable() : Forms\Components\Hidden::make('creator_id')
+                ->searchable()
+                ->required() : Forms\Components\Hidden::make('creator_id')
                 ->dehydrateStateUsing(fn () => User::auth()?->id),
         ];
     }
