@@ -22,12 +22,14 @@ class PageFactory extends Factory
         $title = [
             'en' => $this->faker->words(5, true),
         ];
-        $content = $this->faker->optional()->text;
+        $content = [
+            'en' => $this->faker->text,
+        ];
 
         return [
             'creator_id' => $creator->id,
-            'title' => json_encode($title),
-            'content' => $content ? json_encode(['en' => $content]) : null,
+            'title' => $title,
+            'content' => $content,
             'status' => Status::Draft,
         ];
     }

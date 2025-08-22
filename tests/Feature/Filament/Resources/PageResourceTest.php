@@ -118,7 +118,7 @@ class PageResourceTest extends TestCase
 
         // Assert the JSON fields by comparing the PHP arrays
         $this->assertEquals($newData->title, $retrievedPage?->title);
-        $this->assertEquals($newData->content, $retrievedPage?->content);
+        $this->assertEquals('<p>'.$newData->content.'</p>', $retrievedPage?->content);
     }
 
     public function test_can_edit_pages(): void
@@ -149,7 +149,7 @@ class PageResourceTest extends TestCase
         /** @var ?Page */
         $updatedPage = Page::find($page->getKey());
         $this->assertEquals($newData->title, $updatedPage?->title);
-        $this->assertEquals($newData->content, $updatedPage?->content);
+        $this->assertEquals('<p>'.$newData->content.'</p>', $updatedPage?->content);
     }
 
     public function test_can_delete_page(): void
