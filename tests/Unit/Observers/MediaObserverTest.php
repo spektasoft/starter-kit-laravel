@@ -300,15 +300,19 @@ class MediaObserverTest extends TestCase
         ]);
     }
 
-    public function test_does_not_assign_creator_when_no_user_is_authenticated(): void
+    public function test_throws_exception_when_creating_media_without_authentication(): void
     {
         // 1. Arrange
-        // Ensure no user is authenticated for this test
+        // Ensure no user is authenticated for this test.
         Auth::logout();
 
-        $this->expectException(\Exception::class);
+        // 2. Assert
+        $this->expectException(\Illuminate\Auth\AuthenticationException::class);
+        $this->expectExceptionMessage(
+            'Cannot create Media without an authenticated user to assign as the creator.'
+        );
 
-        // 2. Act
+        // 3. Act
         Media::factory()->create([
             'creator_id' => null,
         ]);
