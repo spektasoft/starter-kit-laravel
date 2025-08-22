@@ -9,6 +9,7 @@ use Awcodes\Curator\PathGenerators\UserPathGenerator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Intervention\Image\Facades\Image;
 
 class MediaObserver extends CuratorMediaObserver
@@ -80,14 +81,26 @@ class MediaObserver extends CuratorMediaObserver
 
             // Move the file only if the old path exists and the old and new paths are different
             if ($oldFullPath && Storage::disk($media->disk)->exists($oldFullPath) && $oldFullPath !== $newFullPath) {
-                Storage::disk($media->disk)->move($oldFullPath, $newFullPath);
+                DB::beginTransaction();
+                try {
+                    Storage::disk($media->disk)->move($oldFullPath, $newFullPath);
 
-                // Update the media model's path and directory attributes
-                $media->path = $newFullPath;
-                $media->directory = $newBaseDirectory;
+                    // Update the media model's path and directory attributes
+                    $media->path = $newFullPath;
+                    $media->directory = $newBaseDirectory;
 
-                // Save the model quietly to prevent re-triggering the observer
-                $media->saveQuietly();
+                    // Save the model quietly to prevent re-triggering the observer
+                    $media->saveQuietly();
+
+                    DB::commit();
+                } catch (\Throwable $e) {
+                    DB::rollBack();
+                    // Optionally re-throw the exception or log it for forensics
+                    Log::error("Failed to move media file for media ID: {$media->id}. Rolled back transaction.", ['exception' => $e]);
+                    // If you re-throw, the original update operation that triggered the observer will fail.
+                    // This is often the desired behavior.
+                    throw $e;
+                }
             } elseif ($oldFullPath && ! Storage::disk($media->disk)->exists($oldFullPath)) {
                 Log::warning("File not found at old path: {$oldFullPath} for media ID: {$media->id}");
             }
