@@ -260,4 +260,23 @@ class MediaObserverTest extends TestCase
             throw $e; // Re-throw the exception to satisfy expectException
         }
     }
+
+    public function test_assigns_authenticated_user_as_creator_when_creating_media_without_one(): void
+    {
+        // 1. Arrange
+        $user = User::factory()->create();
+        $this->actingAs($user); // Authenticate the user
+
+        // 2. Act
+        // The factory will trigger the 'creating' event
+        $media = Media::factory()->create([
+            'creator_id' => null, // Explicitly create without a creator
+        ]);
+
+        // 3. Assert
+        $this->assertDatabaseHas('media', [
+            'id' => $media->id,
+            'creator_id' => $user->id,
+        ]);
+    }
 }
