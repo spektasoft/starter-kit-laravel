@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Gate;
  * @property string $id
  * @property string $disk
  * @property string $path
- * @property string|null $creator_id
+ * @property string $creator_id
  * @property User $creator
  * @property string $directory
  * @property string $visibility
