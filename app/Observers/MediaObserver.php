@@ -6,6 +6,7 @@ use App\Models\Media;
 use Awcodes\Curator\Models\Media as CuratorMedia;
 use Awcodes\Curator\Observers\MediaObserver as CuratorMediaObserver;
 use Awcodes\Curator\PathGenerators\UserPathGenerator;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -26,8 +27,14 @@ class MediaObserver extends CuratorMediaObserver
      */
     public function creating(CuratorMedia $media): void
     {
-        if ($media instanceof Media && $media->creator === null && Auth::check()) {
-            $media->creator()->associate(Auth::user());
+        if ($media instanceof Media && $media->creator === null) {
+            if (Auth::check()) {
+                $media->creator()->associate(Auth::user());
+            } else {
+                throw new AuthenticationException(
+                    'Cannot create Media without an authenticated user to assign as the creator.'
+                );
+            }
         }
         parent::creating($media);
     }
