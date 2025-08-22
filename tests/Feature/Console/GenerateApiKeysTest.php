@@ -22,6 +22,11 @@ class GenerateApiKeysTest extends TestCase
     {
         parent::setUp();
 
+        // This is the key change. It tears down the old application instance
+        // and boots a completely new one, ensuring no environment variables,
+        // config, or bound services leak from the previous test.
+        $this->refreshApplication();
+
         $this->envPath = base_path('.env');
         $this->backupEnvPath = base_path('.env.backup');
 
@@ -31,15 +36,9 @@ class GenerateApiKeysTest extends TestCase
             File::move($this->envPath, $this->backupEnvPath);
         }
 
-        // Create a fresh .env file for testing
+        // Create a fresh .env file for testing. The newly refreshed
+        // application will now load its environment from this file.
         File::put($this->envPath, '');
-
-        // Ensure the application reloads environment variables for each test
-        // This is crucial because the command modifies the .env file directly.
-        $this->app->bootstrapWith([
-            \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
-            \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
-        ]);
     }
 
     protected function tearDown(): void

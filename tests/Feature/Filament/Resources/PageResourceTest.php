@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Filament\Resources;
 
+use App\Enums\Page\Status;
 use App\Filament\Resources\PageResource;
 use App\Filament\Resources\PageResource\Pages\CreatePage;
 use App\Models\Page;
@@ -118,7 +119,7 @@ class PageResourceTest extends TestCase
 
         // Assert the JSON fields by comparing the PHP arrays
         $this->assertEquals($newData->title, $retrievedPage?->title);
-        $this->assertEquals($newData->content, $retrievedPage?->content);
+        $this->assertEquals('<p>'.$newData->content.'</p>', $retrievedPage?->content);
     }
 
     public function test_can_edit_pages(): void
@@ -149,7 +150,7 @@ class PageResourceTest extends TestCase
         /** @var ?Page */
         $updatedPage = Page::find($page->getKey());
         $this->assertEquals($newData->title, $updatedPage?->title);
-        $this->assertEquals($newData->content, $updatedPage?->content);
+        $this->assertEquals('<p>'.$newData->content.'</p>', $updatedPage?->content);
     }
 
     public function test_can_delete_page(): void
@@ -174,5 +175,28 @@ class PageResourceTest extends TestCase
         foreach ($pages as $page) {
             $this->assertDatabaseMissing(Page::class, ['id' => $page->getKey()]);
         }
+    }
+
+    public function test_malicious_html_content_is_sanitized_on_save(): void
+    {
+        $maliciousContent = '<p>Test</p><script>alert("xss");</script>';
+        $sanitizedContent = '<p>Test</p>';
+
+        // Create the page with malicious content
+        /** @var Testable */
+        $livewire = Livewire::test(CreatePage::class)
+            ->fillForm([
+                'title' => ['en' => 'XSS Test'],
+                'content' => ['en' => $maliciousContent],
+                'status' => Status::Draft->value,
+            ]);
+
+        $livewire->assertHasNoFormErrors();
+        $livewire->call('create');
+
+        // Assert the content stored in the database is sanitized
+        $this->assertDatabaseHas('pages', [
+            'content->en' => $sanitizedContent,
+        ]);
     }
 }

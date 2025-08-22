@@ -59,11 +59,13 @@ class ImportResourceTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
+        $otherUser = User::factory()->create();
+
         // Ensure the user does NOT have 'view_all_import' permission
         // No permission assignment needed here as it's the default state
 
-        Import::factory()->create(['user_id' => $user->id]);
-        Import::factory()->create(['user_id' => User::factory()->create()->id]); // Another user's import
+        Import::factory()->create(['user_id' => $user->id, 'creator_id' => $user->id]);
+        Import::factory()->create(['user_id' => $otherUser->id, 'creator_id' => $otherUser->id]); // Another user's import
 
         $imports = ImportResource::getEloquentQuery()->get();
 
