@@ -26,7 +26,7 @@ class MediaObserver extends CuratorMediaObserver
      */
     public function creating(CuratorMedia $media): void
     {
-        if ($media instanceof Media && $media->creator === null) {
+        if ($media instanceof Media && $media->creator === null && Auth::check()) {
             $media->creator()->associate(Auth::user());
         }
         parent::creating($media);
