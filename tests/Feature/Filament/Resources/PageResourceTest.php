@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Filament\Resources;
 
+use App\Enums\Page\Status;
 use App\Filament\Resources\PageResource;
 use App\Filament\Resources\PageResource\Pages\CreatePage;
 use App\Models\Page;
@@ -174,5 +175,28 @@ class PageResourceTest extends TestCase
         foreach ($pages as $page) {
             $this->assertDatabaseMissing(Page::class, ['id' => $page->getKey()]);
         }
+    }
+
+    public function test_malicious_html_content_is_sanitized_on_save(): void
+    {
+        $maliciousContent = '<p>Test</p><script>alert("xss");</script>';
+        $sanitizedContent = '<p>Test</p>';
+
+        // Create the page with malicious content
+        /** @var Testable */
+        $livewire = Livewire::test(CreatePage::class)
+            ->fillForm([
+                'title' => ['en' => 'XSS Test'],
+                'content' => ['en' => $maliciousContent],
+                'status' => Status::Draft->value,
+            ]);
+
+        $livewire->assertHasNoFormErrors();
+        $livewire->call('create');
+
+        // Assert the content stored in the database is sanitized
+        $this->assertDatabaseHas('pages', [
+            'content->en' => $sanitizedContent,
+        ]);
     }
 }
