@@ -7,6 +7,7 @@ use App\Models\User;
 use Awcodes\Curator\PathGenerators\UserPathGenerator;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
@@ -277,6 +278,39 @@ class MediaObserverTest extends TestCase
         $this->assertDatabaseHas('media', [
             'id' => $media->id,
             'creator_id' => $user->id,
+        ]);
+    }
+
+    public function test_does_not_overwrite_existing_creator_when_creating_media(): void
+    {
+        // 1. Arrange
+        $originalCreator = User::factory()->create();
+        $loggedInUser = User::factory()->create();
+        $this->actingAs($loggedInUser);
+
+        // 2. Act
+        $media = Media::factory()->create([
+            'creator_id' => $originalCreator->id,
+        ]);
+
+        // 3. Assert
+        $this->assertDatabaseHas('media', [
+            'id' => $media->id,
+            'creator_id' => $originalCreator->id, // Assert it's the original creator
+        ]);
+    }
+
+    public function test_does_not_assign_creator_when_no_user_is_authenticated(): void
+    {
+        // 1. Arrange
+        // Ensure no user is authenticated for this test
+        Auth::logout();
+
+        $this->expectException(\Exception::class);
+
+        // 2. Act
+        Media::factory()->create([
+            'creator_id' => null,
         ]);
     }
 }
