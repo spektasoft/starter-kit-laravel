@@ -8,6 +8,7 @@ use App\Filament\Exports\PageExporter;
 use App\Filament\Resources\PageResource\Pages;
 use App\Filament\Resources\UserResource\Utils\Creator;
 use App\Filament\Tables\Columns\TranslatableTextColumn;
+use App\Forms\Components\LocalesAwareTranslate;
 use App\Models\Page;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
@@ -20,7 +21,6 @@ use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Table;
 use FilamentTiptapEditor\TiptapEditor;
 use Illuminate\Database\Eloquent\Builder;
-use SolutionForest\FilamentTranslateField\Forms\Component\Translate;
 
 class PageResource extends Resource implements HasShieldPermissions
 {
@@ -42,7 +42,7 @@ class PageResource extends Resource implements HasShieldPermissions
                     'sm' => 6,
                 ])->schema([
                     Forms\Components\Group::make([
-                        Translate::make()
+                        LocalesAwareTranslate::make()
                             ->schema(function (Get $get) {
                                 /** @var array<?string> */
                                 $titles = $get('title');
@@ -58,7 +58,6 @@ class PageResource extends Resource implements HasShieldPermissions
                                 ];
                             })
                             ->columnSpanFull()
-                            ->locales(fn (Page $record) => $record->getPrioritizedLocales())
                             ->suffixLocaleLabel(),
                     ])->columnSpan([
                         'default' => 1,
