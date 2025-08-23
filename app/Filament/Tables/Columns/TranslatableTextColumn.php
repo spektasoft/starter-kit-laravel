@@ -24,9 +24,8 @@ class TranslatableTextColumn extends TextColumn
         bool $isIndividual = false,
         bool $isGlobal = true
     ): static {
-        parent::searchable();
         // If the developer wants to disable search (e.g., ->searchable(false)),
-        // we respect that and pass it to the parent method.
+        // we respect that and pass it to the parent method immediately.
         if ($condition === false) {
             return parent::searchable(false);
         }
