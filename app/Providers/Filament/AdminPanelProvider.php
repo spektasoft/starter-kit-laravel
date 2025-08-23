@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Colors\Color;
 use App\Filament\Pages\Backups;
 use App\Filament\Resources\MediaResource;
+use App\Filament\Resources\PageResource;
 use App\Filament\Resources\PermissionResource;
 use App\Filament\Resources\RoleResource;
 use App\Filament\Resources\UserResource;
@@ -103,6 +104,7 @@ class AdminPanelProvider extends PanelProvider
                     ])
                     ->includes([
                         MediaResource::class,
+                        PageResource::class,
                         UserResource::class,
                         PermissionResource::class,
                         RoleResource::class,
