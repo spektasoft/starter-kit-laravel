@@ -86,18 +86,21 @@ trait HandlesTranslatableAttributes
     {
         /** @var array<string> */
         $attributes = $this->getTranslatableAttributes();
+        $availableLocales = collect();
 
-        return collect($attributes)
-            ->flatMap(function ($attribute) {
-                /** @var array<string, ?string> */
-                $translations = $this->getTranslations($attribute);
+        foreach ($attributes as $attribute) {
+            /** @var array<string, ?string> */
+            $translations = $this->getTranslations($attribute);
 
-                return $translations;
-            })
-            ->filter(fn ($value) => $value !== null && trim((string) $value) !== '')
-            ->keys()
-            ->unique()
-            ->values()
-            ->all();
+            collect($translations)
+                ->filter(fn ($value) => $value !== null && trim((string) $value) !== '' && ! preg_match('/^\s*(<[^>]+>\s*)*$/', (string) $value))
+                ->keys()
+                ->each(fn ($locale) => $availableLocales->add($locale));
+        }
+
+        /** @var array<string> */
+        $uniqueAvailableLocales = $availableLocales->unique()->values()->all();
+
+        return $uniqueAvailableLocales;
     }
 }
