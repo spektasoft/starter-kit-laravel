@@ -5,6 +5,8 @@ namespace Tests\Feature\Filament\Resources;
 use App\Enums\Page\Status;
 use App\Filament\Resources\PageResource;
 use App\Filament\Resources\PageResource\Pages\CreatePage;
+use App\Filament\Resources\PageResource\Pages\EditPage;
+use App\Filament\Resources\PageResource\Pages\ListPages;
 use App\Models\Page;
 use App\Models\Permission;
 use App\Models\User;
@@ -32,6 +34,8 @@ class PageResourceTest extends TestCase
         $user->givePermissionTo('update_page');
         Permission::firstOrCreate(['name' => 'delete_page']);
         $user->givePermissionTo('delete_page');
+
+        config()->set('app.supported_locales', ['en', 'es', 'fr']);
     }
 
     public function test_cannot_render_create_page_without_permission(): void
@@ -198,5 +202,69 @@ class PageResourceTest extends TestCase
         $this->assertDatabaseHas('pages', [
             'content->en' => $sanitizedContent,
         ]);
+    }
+
+    public function test_title_column_is_searchable_across_locales(): void
+    {
+        $pageEn = Page::factory()->create(['title' => ['en' => 'English Title', 'es' => 'Titulo Español']]);
+        $pageEs = Page::factory()->create(['title' => ['en' => 'Another English', 'es' => 'Otro Titulo']]);
+        $pageFr = Page::factory()->create(['title' => ['en' => 'French Page', 'fr' => 'Page Française']]);
+
+        $livewire = Livewire::test(ListPages::class);
+        $livewire->assertCanSeeTableRecords([$pageEn, $pageEs, $pageFr]);
+        $livewire->searchTable('English');
+        $livewire->assertCanSeeTableRecords([$pageEn, $pageEs]);
+        $livewire->assertCanNotSeeTableRecords([$pageFr]);
+        $livewire->searchTable('Titulo');
+        $livewire->assertCanSeeTableRecords([$pageEn, $pageEs]);
+        $livewire->assertCanNotSeeTableRecords([$pageFr]);
+        $livewire->searchTable('French');
+        $livewire->assertCanSeeTableRecords([$pageFr]);
+        $livewire->assertCanNotSeeTableRecords([$pageEn, $pageEs]);
+    }
+
+    public function test_locale_tabs_are_ordered_correctly_on_edit_page(): void
+    {
+        app()->setLocale('es');
+
+        $page = Page::factory()->create([
+            'title' => [
+                'en' => 'English Title',
+                'es' => 'Spanish Title',
+                'fr' => 'French Title',
+            ],
+            'content' => [
+                'en' => 'English Content',
+                'es' => 'Spanish Content',
+                'fr' => 'French Content',
+            ],
+        ]);
+
+        $livewire = Livewire::test(EditPage::class, [
+            'record' => $page->id,
+        ]);
+
+        // The expected order is 'es' (current locale with content), then 'en' and 'fr' (other locales with content)
+        $livewire->assertSeeInOrder(['es', 'en', 'fr']);
+
+        // Assert the values of individual locale fields
+        $livewire->assertSet('data.title.es', 'Spanish Title');
+        $livewire->assertSet('data.title.en', 'English Title');
+        $livewire->assertSet('data.title.fr', 'French Title');
+    }
+
+    public function test_locale_tabs_are_empty_on_create_page(): void
+    {
+        app()->setLocale('es');
+
+        $livewire = Livewire::test(CreatePage::class);
+
+        // The expected order is 'es' (current locale), then 'en' and 'fr' (other configured locales)
+        $livewire->assertSeeInOrder(['es', 'en', 'fr']);
+
+        // Assert the values of individual locale fields are empty
+        $livewire->assertSet('data.title.es', null);
+        $livewire->assertSet('data.title.en', null);
+        $livewire->assertSet('data.title.fr', null);
     }
 }
