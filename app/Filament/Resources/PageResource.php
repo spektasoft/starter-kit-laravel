@@ -7,6 +7,7 @@ use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Exports\PageExporter;
 use App\Filament\Resources\PageResource\Pages;
 use App\Filament\Resources\UserResource\Utils\Creator;
+use App\Filament\Tables\Columns\TranslatableTextColumn;
 use App\Models\Page;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
@@ -136,14 +137,16 @@ class PageResource extends Resource implements HasShieldPermissions
     public static function table(Table $table): Table
     {
         return $table
-            ->columns(array_filter([
-                Tables\Columns\TextColumn::make('title')
-                    ->label(__('page.resource.title')),
+            ->columns([
+                TranslatableTextColumn::make('title')
+                    ->label(__('page.resource.title'))
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),
-                static::canViewAll() ? Tables\Columns\TextColumn::make('creator.name')
+                Tables\Columns\TextColumn::make('creator.name')
                     ->label(ucfirst(__('validation.attributes.creator')))
-                    ->searchable() : null,
+                    ->searchable()
+                    ->visible(static::canViewAll()),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->label(ucfirst(__('validation.attributes.created_at')))
@@ -154,7 +157,7 @@ class PageResource extends Resource implements HasShieldPermissions
                     ->label(ucfirst(__('validation.attributes.updated_at')))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-            ]))
+            ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
