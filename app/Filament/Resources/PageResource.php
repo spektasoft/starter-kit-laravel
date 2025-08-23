@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Concerns\HasLocales;
 use App\Enums\Page\Status;
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Exports\PageExporter;
@@ -24,8 +23,6 @@ use SolutionForest\FilamentTranslateField\Forms\Component\Translate;
 
 class PageResource extends Resource implements HasShieldPermissions
 {
-    use HasLocales;
-
     protected static ?string $model = Page::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document';
@@ -55,18 +52,12 @@ class PageResource extends Resource implements HasShieldPermissions
                                         ->label(__('page.resource.title'))
                                         ->lazy()
                                         ->required($required),
+                                    TiptapEditor::make('content')
+                                        ->label(__('page.resource.content')),
                                 ];
                             })
                             ->columnSpanFull()
-                            ->locales(static::getSortedLocales())
-                            ->suffixLocaleLabel(),
-                        Translate::make()
-                            ->schema([
-                                TiptapEditor::make('content')
-                                    ->label(__('page.resource.content')),
-                            ])
-                            ->columnSpanFull()
-                            ->locales(static::getSortedLocales())
+                            ->locales(fn (Page $record) => $record->getPrioritizedLocales())
                             ->suffixLocaleLabel(),
                     ])->columnSpan([
                         'default' => 1,

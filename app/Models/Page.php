@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
+use App\Concerns\HandlesTranslatableAttributes;
 use App\Concerns\HasCreatorAttribute;
 use App\Enums\Page\Status;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
 
 /**
  * @property string $id
@@ -23,12 +23,12 @@ use Spatie\Translatable\HasTranslations;
  */
 class Page extends Model
 {
+    use HandlesTranslatableAttributes;
+
     use HasCreatorAttribute;
 
     /** @use HasFactory<\Database\Factories\PageFactory> */
     use HasFactory;
-
-    use HasTranslations;
     use HasUlids;
 
     /**
