@@ -2,7 +2,6 @@
 
 namespace App\Concerns;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Spatie\Translatable\HasTranslations;
@@ -17,6 +16,7 @@ use Spatie\Translatable\HasTranslations;
 trait HandlesTranslatableAttributes
 {
     use HasLocales;
+    use HasTranslatableScopes;
     use HasTranslations;
 
     /**
@@ -37,83 +37,67 @@ trait HandlesTranslatableAttributes
         // Get the locales that have content for this specific model instance.
         $availableLocales = collect($this->getAvailableLocales());
 
-        // If there's no content yet (e.g., a new model), just return all locales.
+        $currentLocale = app()->getLocale();
+
+        // Case 1: No translatable content at all (or new model instance)
         if ($availableLocales->isEmpty()) {
+            // If the current locale is not already at the front, move it there.
+            // This ensures new models still prioritize the current locale.
+            if ($allLocales->first() !== $currentLocale && $allLocales->contains($currentLocale)) {
+                return $allLocales->filter(fn ($locale) => $locale !== $currentLocale)->prepend($currentLocale)->values();
+            }
+
             return $allLocales;
         }
 
-        $currentLocale = app()->getLocale();
+        $localesWithContent = $availableLocales;
+        $localesWithoutContent = collect(); // Initialize an empty collection
 
-        // If the current locale has content, move it to the front.
-        if ($availableLocales->contains($currentLocale)) {
-            $availableLocales = $availableLocales->filter(fn ($locale) => $locale !== $currentLocale)->prepend($currentLocale);
-        }
+        // Determine if the current locale has content
+        $hasCurrentLocaleContent = $localesWithContent->contains($currentLocale);
 
-        // Remove the available locales from the main list to avoid duplication.
-        $remainingLocales = $allLocales->filter(fn ($locale) => ! $availableLocales->contains($locale));
-
-        // Prepend the content-filled locales to the front and re-index.
-        return $availableLocales->merge($remainingLocales)->values();
-    }
-
-    /**
-     * Adds a where clause to the query for a translatable JSON column.
-     *
-     * @param  Builder<self>  $query
-     * @param  string  $column  The name of the translatable column.
-     * @param  string  $search  The search term.
-     * @return Builder<self>
-     */
-    public function scopeWhereTranslatable(Builder $query, string $column, string $search): Builder
-    {
-        return $query->where(function (Builder $query) use ($column, $search) {
-            $locales = static::getSortedLocales();
-            $search = strtolower($search);
-
-            /** @var \Illuminate\Database\Connection $connection */
-            $connection = $query->getConnection();
-            $grammar = $connection->getQueryGrammar();
-            $driver = $connection->getDriverName();
-            $isPostgres = $driver === 'pgsql';
-
-            foreach ($locales as $locale) {
-                $wrappedColumn = $grammar->wrap($column);
-
-                if ($isPostgres) {
-                    // PostgreSQL syntax: "LOWER(column->>'locale') LIKE ?"
-                    $query->orWhereRaw("LOWER({$wrappedColumn}->>?) LIKE ?", [$locale, "%{$search}%"]);
+        // Build localesWithoutContent, prioritizing currentLocale if it has no content
+        foreach ($allLocales as $locale) {
+            if (! $localesWithContent->contains($locale)) { // If locale has no content
+                if ($locale === $currentLocale && ! $hasCurrentLocaleContent) {
+                    // If it's the current locale and it has no content, prepend it
+                    $localesWithoutContent->prepend($locale);
                 } else {
-                    // MySQL/MariaDB syntax: "LOWER(column->>'$."locale"') LIKE ?"
-                    // Note the quotes around the JSON path key.
-                    $query->orWhereRaw("LOWER({$wrappedColumn}->>\"$.{$locale}\") LIKE ?", ["%{$search}%"]);
+                    // Otherwise, just add it
+                    $localesWithoutContent->push($locale);
                 }
             }
-        });
+        }
+
+        // If current locale has content, move it to the front of localesWithContent
+        if ($hasCurrentLocaleContent) {
+            $localesWithContent = $localesWithContent->filter(fn ($locale) => $locale !== $currentLocale)->prepend($currentLocale);
+        }
+
+        // Combine: content locales (with current locale prioritized if it has content)
+        // followed by empty locales (with current locale prioritized if it doesn't have content but is current)
+        return $localesWithContent->merge($localesWithoutContent->filter(fn ($locale) => is_string($locale))->values()->all())->values();
     }
 
     /**
-     * Get the available locales by checking all translatable attributes.
-     *
-     * A locale is considered "available" if it has a non-empty translation
-     * for at least one of the model's translatable attributes.
-     *
-     * @return array<int, string> An array of available locales for the model.
+     * @return array<string>
      */
     private function getAvailableLocales(): array
     {
-        $availableLocales = [];
+        /** @var array<string> */
+        $attributes = $this->getTranslatableAttributes();
 
-        foreach ($this->getTranslatableAttributes() as $attribute) {
-            /** @var string $attribute */
-            $translations = $this->getTranslations((string) $attribute);
-            foreach ($translations as $locale => $value) {
-                /** @var string $value */
-                if (! empty(trim((string) $value))) {
-                    $availableLocales[] = $locale;
-                }
-            }
-        }
+        return collect($attributes)
+            ->flatMap(function ($attribute) {
+                /** @var array<string, ?string> */
+                $translations = $this->getTranslations($attribute);
 
-        return array_values(array_unique($availableLocales));
+                return $translations;
+            })
+            ->filter(fn ($value) => $value !== null && trim((string) $value) !== '')
+            ->keys()
+            ->unique()
+            ->values()
+            ->all();
     }
 }
