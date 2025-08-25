@@ -25,8 +25,10 @@ class RegisterTest extends TestCase
         $testable->assertFormExists();
         $testable->assertFormFieldExists('name');
         $testable->assertSeeHtml('name="name"');
+        $testable->assertSeeHtml('autocomplete="name"');
         $testable->assertFormFieldExists('email');
         $testable->assertSeeHtml('name="email"');
+        $testable->assertSeeHtml('autocomplete="email"');
         $testable->assertFormFieldExists('password');
         $testable->assertSeeHtml('name="password"');
         $testable->assertFormFieldExists('passwordConfirmation');
@@ -73,6 +75,24 @@ class RegisterTest extends TestCase
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('filament.admin.pages.dashboard', absolute: false));
+    }
+
+    public function test_name_and_email_fields_repopulate_on_validation_error(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'not-matching-password',
+            'terms' => \Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature(),
+        ]);
+
+        $response->assertSessionHasErrors(['password']);
+        $response->assertSessionHas('_old_input', [
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'terms' => \Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature(),
+        ]);
     }
 
     public function test_honeypot_field_is_present(): void
