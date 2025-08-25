@@ -2,14 +2,15 @@
 
 namespace App\Console\Commands\Llm;
 
+use App\Console\Commands\Llm\Concerns\HandlesLlmOutput;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 use Prism\Prism\Prism;
 use Symfony\Component\Process\Process;
 
 class Pr extends Command
 {
+    use HandlesLlmOutput;
+
     /**
      * The name and signature of the console command.
      *
@@ -118,56 +119,5 @@ commit range using Prism';
         $this->info("Completion tokens: {$response->usage->completionTokens}");
 
         $this->openInEditor($proposedMessage, 'pull request message');
-    }
-
-    /**
-     * Opens content in a user-specified editor.
-     */
-    protected function openInEditor(string $content, string $type): void
-    {
-        /** @var ?string */
-        $editor = $this->option('editor');
-
-        if (! $editor) {
-            $editInEditor = $this->confirm("Do you want to open this {$type} in an editor to make changes?");
-        } else {
-            $editInEditor = true;
-        }
-
-        if ($editInEditor) {
-            if (! $editor) {
-                // If no editor is found, ask the user
-                /** @var ?string */
-                $editor = $this->ask('Please enter the command for your preferred editor (e.g., nano, vim, code --wait):');
-            }
-
-            if ($editor) {
-                // Create a unique temporary file path
-                $tempFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'llm_'.Str::slug($type).'_'.Str::uuid()->toString().'.md';
-
-                // Write the content to the temporary file
-                File::put($tempFilePath, $content);
-
-                $this->info("Opening {$type} in editor: '{$editor} {$tempFilePath}'");
-
-                // Construct the process command string, escaping the file path
-                $command = "{$editor} ".escapeshellarg($tempFilePath);
-
-                $process = Process::fromShellCommandline($command);
-                $process->setTimeout(null); // Allow indefinite editing time
-                $process->setTty(Process::isTtySupported()); // Enable TTY for interactive editors
-
-                try {
-                    $process->run(); // Execute the editor process
-                } catch (\Exception $e) {
-                    $this->error('Error during editor execution: '.$e->getMessage());
-                } finally {
-                    // Clean up the temporary file
-                    File::delete($tempFilePath);
-                }
-            } else {
-                $this->warn('No editor command provided. Skipping editor step.');
-            }
-        }
     }
 }
