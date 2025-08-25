@@ -5,6 +5,7 @@ namespace Tests\Feature\Filament\Resources;
 use App\Filament\Resources\UserResource;
 use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Resources\UserResource\Pages\EditUser;
+use App\Filament\Resources\UserResource\Pages\ListUsers;
 use App\Models\Page;
 use App\Models\Permission;
 use App\Models\Role;
@@ -162,11 +163,25 @@ class UserResourceTest extends TestCase
         $livewire->assertCanRenderTableColumn('email');
         $livewire->assertCanRenderTableColumn('roles');
         $livewire->assertCanRenderTableColumn('email_verified_at');
+        $livewire->assertCanRenderTableColumn('created_at');
+        $livewire->assertCanRenderTableColumn('updated_at');
 
         if (Jetstream::managesProfilePhotos()) {
             Livewire::test(UserResource\Pages\ListUsers::class)
                 ->assertCanRenderTableColumn('profile_photo_media_id');
         }
+    }
+
+    public function test_created_at_and_updated_at_columns_are_hidden_by_default(): void
+    {
+        User::factory()->create();
+
+        /** @var ListUsers */
+        $livewire = Livewire::test(ListUsers::class)->instance();
+        $table = $livewire->getTable();
+
+        $this->assertTrue($table->getColumn('created_at')?->isToggledHidden());
+        $this->assertTrue($table->getColumn('updated_at')?->isToggledHidden());
     }
 
     public function test_super_users_are_not_listed_for_non_super_admin(): void
