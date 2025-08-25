@@ -139,6 +139,16 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->label(__('user.resource.email_verified_at'))
                     ->dateTime(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->label(ucfirst(__('validation.attributes.created_at')))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->label(ucfirst(__('validation.attributes.updated_at')))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ]))
             ->filters([
                 //
