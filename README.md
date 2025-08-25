@@ -153,6 +153,11 @@ To generate a pull request message based on a commit range:
 php artisan llm:pr
 ```
 
+Both `llm:commit` and `llm:pr` commands support the following options:
+- `--editor`: Specify an editor to open the generated message for further editing (e.g., `--editor="nano"`, `--editor="vim"`, `--editor="code --wait"`).
+- `--only-prompt`: Only generate and output the prompt that would be sent to the language model, without actually sending it.
+
+
 ## Upstream
 
 Apply any changes available from the Laravel [12.x branch](https://github.com/laravel/laravel/compare/d9d449413dd458f031127085f82389ef18aa0079...12.x).
