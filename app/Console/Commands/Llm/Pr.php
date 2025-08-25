@@ -15,7 +15,7 @@ class Pr extends Command
      *
      * @var string
      */
-    protected $signature = 'llm:pr {--editor= : Specify the editor to use (e.g., nano, vim, code --wait)}';
+    protected $signature = 'llm:pr {--editor= : Specify the editor to use (e.g., nano, vim, code --wait)} {--only-prompt : Only generate and output the prompt without sending it to the agent}';
 
     /**
      * The console command description.
@@ -82,6 +82,15 @@ commit range using Prism';
             ':commit_messages' => $commitMessages,
         ]);
 
+        if ($this->option('only-prompt')) {
+            $this->info('Generated Prompt:');
+            $this->line($prompt);
+
+            $this->openInEditor($prompt, 'prompt');
+
+            return;
+        }
+
         /** @var string */
         $usingProvider = config('prism.using.provider');
         /** @var string */
@@ -108,11 +117,19 @@ commit range using Prism';
         $this->info("Prompt tokens: {$response->usage->promptTokens}");
         $this->info("Completion tokens: {$response->usage->completionTokens}");
 
+        $this->openInEditor($proposedMessage, 'pull request message');
+    }
+
+    /**
+     * Opens content in a user-specified editor.
+     */
+    protected function openInEditor(string $content, string $type): void
+    {
         /** @var ?string */
         $editor = $this->option('editor');
 
         if (! $editor) {
-            $editInEditor = $this->confirm('Do you want to open this message in an editor to make changes?');
+            $editInEditor = $this->confirm("Do you want to open this {$type} in an editor to make changes?");
         } else {
             $editInEditor = true;
         }
@@ -125,13 +142,13 @@ commit range using Prism';
             }
 
             if ($editor) {
-                // Create a unique temporary file path for the PR message
-                $tempFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'llm_pr_'.Str::uuid()->toString().'.md';
+                // Create a unique temporary file path
+                $tempFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'llm_'.Str::slug($type).'_'.Str::uuid()->toString().'.md';
 
-                // Write the proposed message to the temporary file
-                File::put($tempFilePath, $proposedMessage);
+                // Write the content to the temporary file
+                File::put($tempFilePath, $content);
 
-                $this->info("Opening pull request message in editor: '{$editor} {$tempFilePath}'");
+                $this->info("Opening {$type} in editor: '{$editor} {$tempFilePath}'");
 
                 // Construct the process command string, escaping the file path
                 $command = "{$editor} ".escapeshellarg($tempFilePath);
