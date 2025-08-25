@@ -154,9 +154,9 @@ php artisan llm:pr
 ```
 
 Both `llm:commit` and `llm:pr` commands support the following options:
-- `--editor`: Specify an editor to open the generated message for further editing (e.g., `--editor="nano"`, `--editor="vim"`, `--editor="code --wait"`).
-- `--only-prompt`: Only generate and output the prompt that would be sent to the language model, without actually sending it.
 
+-   `--editor`: Specify an editor to open the generated content for further editing (e.g., `--editor="nano"`, `--editor="vim"`, `--editor="code --wait"`). If not provided, you will be prompted to open the content in an editor.
+-   `--only-prompt`: Prevents sending the request to the LLM. Instead, it generates and displays the prompt that _would_ have been sent, offering to open it in an editor for inspection.
 
 ## Upstream
 
