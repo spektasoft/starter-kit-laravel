@@ -42,7 +42,7 @@ trait HandlesLlmOutput
                 // Construct the process command string, escaping the file path
                 $command = "{$editor} ".escapeshellarg($tempFilePath);
 
-                $process = Process::fromShellCommandline($command);
+                $process = $this->makeProcess($command);
                 $process->setTimeout(null); // Allow indefinite editing time
                 $process->setTty(Process::isTtySupported()); // Enable TTY for interactive editors
 
@@ -63,5 +63,14 @@ trait HandlesLlmOutput
                 $this->warn('No editor command provided. Skipping editor step.');
             }
         }
+    }
+
+    /**
+     * Creates a new Process instance.
+     * This method is isolated to allow for easy mocking in tests.
+     */
+    protected function makeProcess(string $command): Process
+    {
+        return Process::fromShellCommandline($command);
     }
 }
