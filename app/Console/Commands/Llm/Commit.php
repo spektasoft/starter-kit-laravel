@@ -152,11 +152,18 @@ class Commit extends Command
 
                 try {
                     $process->run(); // Execute the editor process
+
+                    if (! $process->isSuccessful()) {
+                        $this->error("The editor process failed. Please check if '{$editor}' is a valid command.");
+                        $this->error($process->getErrorOutput()); // Output the process error for more details
+                    }
                 } catch (\Exception $e) {
                     $this->error('Error during editor execution: '.$e->getMessage());
                 } finally {
                     // Clean up the temporary file
-                    File::delete($tempFilePath);
+                    if (File::exists($tempFilePath)) {
+                        File::delete($tempFilePath);
+                    }
                 }
             } else {
                 $this->warn('No editor command provided. Skipping editor step.');
