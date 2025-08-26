@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands\Llm;
 
-use App\Console\Commands\Llm\Concerns\HandlesLlmOutput;
 use App\Console\Commands\Llm\Concerns\InteractsWithPrism;
 use App\Console\Commands\Llm\Concerns\RunsInDevelopment;
 use Illuminate\Console\Command;
@@ -10,7 +9,6 @@ use Symfony\Component\Process\Process;
 
 class Pr extends Command
 {
-    use HandlesLlmOutput;
     use InteractsWithPrism;
     use RunsInDevelopment;
 
@@ -42,7 +40,7 @@ class Pr extends Command
         /** @var string */
         $commit_hash_2 = $this->ask('Please enter second commit hash (newer)');
 
-        $process = new Process(['git', 'log', '--format=%B%n---%n', '--reverse', "$commit_hash_1..$commit_hash_2"]);
+        $process = resolve(Process::class, ['git', 'log', '--format=%B%n---%n', '--reverse', "$commit_hash_1..$commit_hash_2"]);
         $process->run();
 
         if (! $process->isSuccessful()) {
