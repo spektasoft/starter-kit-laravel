@@ -40,7 +40,7 @@ class Pr extends Command
         /** @var string */
         $commit_hash_2 = $this->ask('Please enter second commit hash (newer)');
 
-        $process = resolve(Process::class, ['git', 'log', '--format=%B%n---%n', '--reverse', "$commit_hash_1..$commit_hash_2"]);
+        $process = resolve(Process::class, ['command' => ['git', 'log', '--format=%B%n---%n', '--reverse', "$commit_hash_1..$commit_hash_2"]]);
         $process->run();
 
         if (! $process->isSuccessful()) {
