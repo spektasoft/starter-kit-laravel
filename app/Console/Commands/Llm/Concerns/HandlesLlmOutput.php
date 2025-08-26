@@ -15,7 +15,7 @@ trait HandlesLlmOutput
     /**
      * Opens content in a user-specified editor.
      */
-    protected function openInEditor(string $content, string $type): void
+    protected function output(string $content, string $type): void
     {
         /** @var ?string */
         $editor = $this->option('editor');
@@ -34,37 +34,42 @@ trait HandlesLlmOutput
             }
 
             if ($editor) {
-                // Create a unique temporary file path
-                $tempFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'llm_'.Str::slug($type).'_'.Str::uuid()->toString().'.md';
-
-                // Write the content to the temporary file
-                File::put($tempFilePath, $content);
-
-                $this->info("Opening {$type} in editor: '{$editor} {$tempFilePath}'");
-
-                // Construct the process command string, escaping the file path
-                $command = "{$editor} ".escapeshellarg($tempFilePath);
-
-                $process = $this->makeProcess($command);
-                $process->setTimeout(null); // Allow indefinite editing time
-                $process->setTty(Process::isTtySupported()); // Enable TTY for interactive editors
-
-                try {
-                    $process->run(); // Execute the editor process
-
-                    // Add error handling for process execution
-                    if (! $process->isSuccessful()) {
-                        $this->error('Editor process failed: '.$process->getErrorOutput());
-                    }
-                } catch (\Exception $e) {
-                    $this->error('Error during editor execution: '.$e->getMessage());
-                } finally {
-                    // Clean up the temporary file
-                    File::delete($tempFilePath);
-                }
+                $this->openInEditor($content, $type, $editor);
             } else {
                 $this->warn('No editor command provided. Skipping editor step.');
             }
+        }
+    }
+
+    protected function openInEditor(string $content, string $type, string $editor): void
+    {
+        // Create a unique temporary file path
+        $tempFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'llm_'.Str::slug($type).'_'.Str::uuid()->toString().'.md';
+
+        // Write the content to the temporary file
+        File::put($tempFilePath, $content);
+
+        $this->info("Opening {$type} in editor: '{$editor} {$tempFilePath}'");
+
+        // Construct the process command string, escaping the file path
+        $command = "{$editor} ".escapeshellarg($tempFilePath);
+
+        $process = $this->makeProcess($command);
+        $process->setTimeout(null); // Allow indefinite editing time
+        $process->setTty(Process::isTtySupported()); // Enable TTY for interactive editors
+
+        try {
+            $process->run(); // Execute the editor process
+
+            // Add error handling for process execution
+            if (! $process->isSuccessful()) {
+                $this->error('Editor process failed: '.$process->getErrorOutput());
+            }
+        } catch (\Exception $e) {
+            $this->error('Error during editor execution: '.$e->getMessage());
+        } finally {
+            // Clean up the temporary file
+            File::delete($tempFilePath);
         }
     }
 

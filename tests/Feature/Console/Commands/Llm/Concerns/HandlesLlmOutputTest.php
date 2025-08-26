@@ -24,9 +24,9 @@ class TestCommandUsingTrait extends Command
     protected $signature = 'test:command';
 
     // This public method allows us to call the protected trait method from our test.
-    public function invokeOpenInEditor(string $content, string $type): void
+    public function invokeOutput(string $content, string $type): void
     {
-        $this->openInEditor($content, $type);
+        $this->output($content, $type);
     }
 }
 
@@ -127,7 +127,7 @@ class HandlesLlmOutputTest extends TestCase
 
         /** @var TestCommandUsingTrait */
         $command = $this->command;
-        $command->invokeOpenInEditor($content, $type);
+        $command->invokeOutput($content, $type);
     }
 
     public function test_prompts_for_editor_when_option_is_not_provided_and_user_confirms(): void
@@ -183,7 +183,7 @@ class HandlesLlmOutputTest extends TestCase
 
         /** @var TestCommandUsingTrait */
         $command = $this->command;
-        $command->invokeOpenInEditor($content, $type);
+        $command->invokeOutput($content, $type);
     }
 
     public function test_does_nothing_if_user_declines_to_open_editor(): void
@@ -211,7 +211,7 @@ class HandlesLlmOutputTest extends TestCase
 
         /** @var TestCommandUsingTrait */
         $command = $this->command;
-        $command->invokeOpenInEditor('content', 'test');
+        $command->invokeOutput('content', 'test');
     }
 
     public function test_warns_and_skips_if_user_provides_no_editor_command(): void
@@ -244,7 +244,7 @@ class HandlesLlmOutputTest extends TestCase
 
         /** @var TestCommandUsingTrait */
         $command = $this->command;
-        $command->invokeOpenInEditor('content', 'test');
+        $command->invokeOutput('content', 'test');
     }
 
     public function test_handles_a_failed_editor_process_and_cleans_up_file(): void
@@ -297,7 +297,7 @@ class HandlesLlmOutputTest extends TestCase
 
         /** @var TestCommandUsingTrait */
         $command = $this->command;
-        $command->invokeOpenInEditor('content', 'test');
+        $command->invokeOutput('content', 'test');
     }
 
     public function test_handles_an_exception_during_process_execution_and_cleans_up_file(): void
@@ -343,6 +343,6 @@ class HandlesLlmOutputTest extends TestCase
 
         /** @var TestCommandUsingTrait */
         $command = $this->command;
-        $command->invokeOpenInEditor('content', 'test');
+        $command->invokeOutput('content', 'test');
     }
 }

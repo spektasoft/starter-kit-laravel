@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands\Llm;
 
-use App\Console\Commands\Llm\Concerns\HandlesLlmOutput;
 use App\Console\Commands\Llm\Concerns\InteractsWithPrism;
 use App\Console\Commands\Llm\Concerns\RunsInDevelopment;
 use Illuminate\Console\Command;
@@ -10,7 +9,6 @@ use Symfony\Component\Process\Process;
 
 class Commit extends Command
 {
-    use HandlesLlmOutput;
     use InteractsWithPrism;
     use RunsInDevelopment;
 

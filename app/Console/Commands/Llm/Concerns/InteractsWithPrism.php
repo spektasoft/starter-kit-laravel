@@ -10,13 +10,15 @@ use Prism\Prism\Prism;
  */
 trait InteractsWithPrism
 {
+    use HandlesLlmOutput;
+
     protected function generateLlmResponse(string $prompt, string $messageType): void
     {
         if ($this->option('only-prompt')) {
             $this->info('Generated Prompt:');
             $this->line($prompt);
 
-            $this->openInEditor($prompt, 'prompt');
+            $this->output($prompt, 'prompt');
 
             return;
         }
@@ -48,7 +50,6 @@ trait InteractsWithPrism
         $this->info("Prompt tokens: {$response->usage->promptTokens}");
         $this->info("Completion tokens: {$response->usage->completionTokens}");
 
-        $this->openInEditor($proposedMessage, $messageType);
-
+        $this->output($proposedMessage, $messageType);
     }
 }
