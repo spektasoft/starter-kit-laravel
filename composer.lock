@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2805ca706f3c204eeb5e8f82a9cf8bc5",
+    "content-hash": "abb106291d0a5150cc8c83e062d10c5d",
     "packages": [
         {
             "name": "adhocore/jwt",
@@ -15248,26 +15248,27 @@
         },
         {
             "name": "prism-php/prism",
-            "version": "v0.59.0",
+            "version": "v0.86.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/prism-php/prism.git",
-                "reference": "356f0ddbe02b9559ca141359377cad4046d7e5f3"
+                "reference": "1b9910fba9946c99323e6ddbe9719c2c4ad7dacb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prism-php/prism/zipball/356f0ddbe02b9559ca141359377cad4046d7e5f3",
-                "reference": "356f0ddbe02b9559ca141359377cad4046d7e5f3",
+                "url": "https://api.github.com/repos/prism-php/prism/zipball/1b9910fba9946c99323e6ddbe9719c2c4ad7dacb",
+                "reference": "1b9910fba9946c99323e6ddbe9719c2c4ad7dacb",
                 "shasum": ""
             },
             "require": {
+                "ext-fileinfo": "*",
                 "laravel/framework": "^11.0|^12.0",
                 "php": "^8.2"
             },
             "require-dev": {
                 "laravel/pint": "^1.14",
                 "mockery/mockery": "^1.6",
-                "orchestra/testbench": "^9.4",
+                "orchestra/testbench": "^10",
                 "pestphp/pest": "^3.0",
                 "pestphp/pest-plugin-arch": "^3.0",
                 "pestphp/pest-plugin-laravel": "^3.0",
@@ -15292,6 +15293,9 @@
                 }
             },
             "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
                 "psr-4": {
                     "Prism\\Prism\\": "src/"
                 }
@@ -15309,7 +15313,7 @@
             "description": "A powerful Laravel package for integrating Large Language Models (LLMs) into your applications.",
             "support": {
                 "issues": "https://github.com/prism-php/prism/issues",
-                "source": "https://github.com/prism-php/prism/tree/v0.59.0"
+                "source": "https://github.com/prism-php/prism/tree/v0.86.0"
             },
             "funding": [
                 {
@@ -15317,7 +15321,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-04-10T18:21:01+00:00"
+            "time": "2025-08-22T07:19:48+00:00"
         },
         {
             "name": "sebastian/cli-parser",
