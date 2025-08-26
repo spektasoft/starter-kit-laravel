@@ -2,8 +2,12 @@
 
 namespace App\Console\Commands\Llm\Concerns;
 
+use Illuminate\Console\Command;
 use Prism\Prism\Prism;
 
+/**
+ * @mixin Command
+ */
 trait InteractsWithPrism
 {
     protected function generateLlmResponse(string $prompt, string $messageType): void

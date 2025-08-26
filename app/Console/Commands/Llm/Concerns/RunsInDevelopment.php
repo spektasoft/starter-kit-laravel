@@ -2,6 +2,11 @@
 
 namespace App\Console\Commands\Llm\Concerns;
 
+use Illuminate\Console\Command;
+
+/**
+ * @mixin Command
+ */
 trait RunsInDevelopment
 {
     protected function ensureDevelopmentEnvironment(): bool
