@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Console\Commands\Llm;
+namespace Tests\Feature\Console\Commands\Llm;
 
 use App\Console\Commands\Llm\Commit;
 use Illuminate\Console\Command;
