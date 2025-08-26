@@ -47,6 +47,19 @@ class CommitTest extends TestCase
         ]);
     }
 
+    protected function mockSuccessfulGitDiff(): void
+    {
+        /** @var Expectation $expectation */
+        $expectation = $this->processMock->shouldReceive('run');
+        $expectation->once();
+        /** @var Expectation $expectation */
+        $expectation = $this->processMock->shouldReceive('isSuccessful');
+        $expectation->once()->andReturn(true);
+        /** @var Expectation $expectation */
+        $expectation = $this->processMock->shouldReceive('getOutput');
+        $expectation->once()->andReturn($this->fakeGitDiff);
+    }
+
     public function test_aborts_in_production_environment(): void
     {
         $this->app->detectEnvironment(fn () => 'production');
@@ -102,15 +115,7 @@ class CommitTest extends TestCase
     public function test_only_generates_and_outputs_the_prompt_with_only_prompt_option(): void
     {
         // Arrange: Git diff returns fake git diff
-        /** @var Expectation $expectation */
-        $expectation = $this->processMock->shouldReceive('run');
-        $expectation->once();
-        /** @var Expectation $expectation */
-        $expectation = $this->processMock->shouldReceive('isSuccessful');
-        $expectation->once()->andReturn(true);
-        /** @var Expectation $expectation */
-        $expectation = $this->processMock->shouldReceive('getOutput');
-        $expectation->once()->andReturn($this->fakeGitDiff);
+        $this->mockSuccessfulGitDiff();
 
         /** @var PendingCommand */
         $command = $this->artisan('llm:commit --only-prompt');
@@ -122,15 +127,7 @@ class CommitTest extends TestCase
     public function test_calls_api_and_proposes_commit_message(): void
     {
         // Arrange: Git diff returns fake git diff
-        /** @var Expectation $expectation */
-        $expectation = $this->processMock->shouldReceive('run');
-        $expectation->once();
-        /** @var Expectation $expectation */
-        $expectation = $this->processMock->shouldReceive('isSuccessful');
-        $expectation->once()->andReturn(true);
-        /** @var Expectation $expectation */
-        $expectation = $this->processMock->shouldReceive('getOutput');
-        $expectation->once()->andReturn($this->fakeGitDiff);
+        $this->mockSuccessfulGitDiff();
 
         /** @var PendingCommand */
         $command = $this->artisan('llm:commit');
@@ -138,5 +135,102 @@ class CommitTest extends TestCase
             ->expectsOutput('Hello from Prism')
             ->expectsQuestion('Do you want to open this commit message in an editor to make changes?', false)
             ->assertExitCode(Command::SUCCESS);
+    }
+
+    public function test_editor_interaction_flow_with_only_prompt_and_user_confirms(): void
+    {
+        // Arrange: Git diff returns fake git diff
+        $this->mockSuccessfulGitDiff();
+
+        // Create a partial mock of the command to spy on the protected method
+        $commitMock = $this->mock(Commit::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        /** @var Expectation $expectation */
+        $expectation = $commitMock->shouldReceive('openInEditor');
+        $expectation->once();
+        /** @var Commit $commitMock */
+        $commitMock->__construct();
+
+        // Act & Assert
+        /** @var PendingCommand */
+        $command = $this->artisan('llm:commit --only-prompt');
+        $command
+            ->expectsConfirmation('Do you want to open this prompt in an editor to make changes?', 'yes')
+            ->expectsQuestion('Please enter the command for your preferred editor (e.g., nano, vim, code --wait):', 'vim')
+            ->assertExitCode(Command::SUCCESS);
+    }
+
+    public function test_editor_interaction_flow_with_only_prompt_and_editor_option(): void
+    {
+        // Arrange: Git diff returns fake git diff
+        $this->mockSuccessfulGitDiff();
+
+        // Arrange: Mock the Commit command to assert openInEditor is called
+        $commitMock = $this->mock(Commit::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        /** @var Expectation $expectation */
+        $expectation = $commitMock->shouldReceive('openInEditor');
+        $expectation->once();
+        /** @var Commit $commitMock */
+        $commitMock->__construct();
+
+        // Act & Assert
+        /** @var PendingCommand */
+        $command = $this->artisan('llm:commit --only-prompt --editor=vim');
+        $command
+            ->doesntExpectOutput('Do you want to open this prompt in an editor to make changes?')
+            ->assertExitCode(Command::SUCCESS);
+    }
+
+    public function test_standard_flow_opens_editor_on_user_confirmation(): void
+    {
+        $this->mockSuccessfulGitDiff();
+
+        // Arrange: Mock the Commit command to assert openInEditor is called
+        $commitMock = $this->mock(Commit::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        /** @var Expectation $expectation */
+        $expectation = $commitMock->shouldReceive('openInEditor');
+        $expectation->once();
+        /** @var Commit $commitMock */
+        $commitMock->__construct();
+
+        /** @var PendingCommand */
+        $command = $this->artisan('llm:commit');
+        $command
+            ->expectsConfirmation('Do you want to open this commit message in an editor to make changes?', 'yes')
+            ->expectsQuestion('Please enter the command for your preferred editor (e.g., nano, vim, code --wait):', 'vim')
+            ->assertExitCode(Command::SUCCESS);
+    }
+
+    public function test_standard_flow_does_not_open_editor_if_user_declines(): void
+    {
+        $this->mockSuccessfulGitDiff();
+
+        // Arrange: Mock the Commit command to assert openInEditor is called
+        $commitMock = $this->mock(Commit::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $commitMock->shouldNotReceive('openInEditor');
+        /** @var Commit $commitMock */
+        $commitMock->__construct();
+
+        /** @var PendingCommand */
+        $command = $this->artisan('llm:commit');
+        $command->expectsConfirmation('Do you want to open this commit message in an editor to make changes?', 'no')
+            ->assertExitCode(Command::SUCCESS);
+    }
+
+    public function test_standard_flow_with_editor_flag_opens_editor_directly(): void
+    {
+        $this->mockSuccessfulGitDiff();
+
+        // Arrange: Mock the Commit command to assert openInEditor is called
+        $commitMock = $this->mock(Commit::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        /** @var Expectation $expectation */
+        $expectation = $commitMock->shouldReceive('openInEditor');
+        $expectation->once();
+        /** @var Commit $commitMock */
+        $commitMock->__construct();
+
+        /** @var PendingCommand */
+        $command = $this->artisan('llm:commit', ['--editor' => 'code --wait']);
+        $command->doesntExpectOutput('Do you want to open this commit message in an editor to make changes?')
+            ->assertSuccessful();
     }
 }
