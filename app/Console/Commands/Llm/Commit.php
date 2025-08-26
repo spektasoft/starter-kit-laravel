@@ -76,6 +76,8 @@ class Commit extends Command
             ':git_diff' => $gitDiff,
         ]);
 
-        return $this->generateLlmResponse($prompt, 'commit message');
+        $this->generateLlmResponse($prompt, 'commit message');
+
+        return self::SUCCESS;
     }
 }

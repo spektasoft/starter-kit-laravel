@@ -83,6 +83,8 @@ class Pr extends Command
             ':commit_messages' => $commitMessages,
         ]);
 
-        return $this->generateLlmResponse($prompt, 'pull request message');
+        $this->generateLlmResponse($prompt, 'pull request message');
+
+        return self::SUCCESS;
     }
 }

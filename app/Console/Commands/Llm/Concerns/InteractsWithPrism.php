@@ -6,7 +6,7 @@ use Prism\Prism\Prism;
 
 trait InteractsWithPrism
 {
-    protected function generateLlmResponse(string $prompt, string $messageType): int
+    protected function generateLlmResponse(string $prompt, string $messageType): void
     {
         if ($this->option('only-prompt')) {
             $this->info('Generated Prompt:');
@@ -14,7 +14,7 @@ trait InteractsWithPrism
 
             $this->openInEditor($prompt, 'prompt');
 
-            return self::SUCCESS;
+            return;
         }
 
         /** @var string */
@@ -46,6 +46,5 @@ trait InteractsWithPrism
 
         $this->openInEditor($proposedMessage, $messageType);
 
-        return self::SUCCESS;
     }
 }
