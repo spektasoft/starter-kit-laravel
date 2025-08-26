@@ -3,13 +3,16 @@
 namespace App\Console\Commands\Llm;
 
 use App\Console\Commands\Llm\Concerns\HandlesLlmOutput;
+use App\Console\Commands\Llm\Concerns\InteractsWithPrism;
+use App\Console\Commands\Llm\Concerns\RunsInDevelopment;
 use Illuminate\Console\Command;
-use Prism\Prism\Prism;
 use Symfony\Component\Process\Process;
 
 class Commit extends Command
 {
     use HandlesLlmOutput;
+    use InteractsWithPrism;
+    use RunsInDevelopment;
 
     /**
      * The name and signature of the console command.
@@ -30,9 +33,7 @@ class Commit extends Command
      */
     public function handle(): int
     {
-        if (app()->environment('production')) {
-            $this->error('This command can only be run in a development environment.');
-
+        if (! $this->ensureDevelopmentEnvironment()) {
             return self::FAILURE;
         }
 
@@ -75,44 +76,6 @@ class Commit extends Command
             ':git_diff' => $gitDiff,
         ]);
 
-        if ($this->option('only-prompt')) {
-            $this->info('Generated Prompt:');
-            $this->line($prompt);
-
-            $this->openInEditor($prompt, 'prompt');
-
-            return self::SUCCESS;
-        }
-
-        /** @var string */
-        $usingProvider = config('prism.using.provider');
-        /** @var string */
-        $usingModel = config('prism.using.model');
-
-        $startTime = microtime(true);
-
-        $response = Prism::text()
-            ->using($usingProvider, $usingModel)
-            ->withPrompt($prompt)
-            ->asText();
-
-        $endTime = microtime(true);
-        $elapsedTime = $endTime - $startTime;
-
-        $proposedMessage = trim($response->text);
-
-        $this->newLine();
-        $this->info('Proposed commit message:');
-        $this->info('------------------------');
-        $this->line($proposedMessage);
-        $this->info('------------------------');
-
-        $this->info('Elapsed time: '.round($elapsedTime, 2).' seconds');
-        $this->info("Prompt tokens: {$response->usage->promptTokens}");
-        $this->info("Completion tokens: {$response->usage->completionTokens}");
-
-        $this->openInEditor($proposedMessage, 'commit message');
-
-        return self::SUCCESS;
+        return $this->generateLlmResponse($prompt, 'commit message');
     }
 }

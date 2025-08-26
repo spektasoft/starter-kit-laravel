@@ -3,13 +3,16 @@
 namespace App\Console\Commands\Llm;
 
 use App\Console\Commands\Llm\Concerns\HandlesLlmOutput;
+use App\Console\Commands\Llm\Concerns\InteractsWithPrism;
+use App\Console\Commands\Llm\Concerns\RunsInDevelopment;
 use Illuminate\Console\Command;
-use Prism\Prism\Prism;
 use Symfony\Component\Process\Process;
 
 class Pr extends Command
 {
     use HandlesLlmOutput;
+    use InteractsWithPrism;
+    use RunsInDevelopment;
 
     /**
      * The name and signature of the console command.
@@ -23,18 +26,15 @@ class Pr extends Command
      *
      * @var string
      */
-    protected $description = 'Generates a conventional pull request message based on
-commit range using Prism';
+    protected $description = 'Generates a conventional pull request message based on commit range using Prism';
 
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle(): int
     {
-        if (app()->environment('production')) {
-            $this->error('This command can only be run in a development environment.');
-
-            return;
+        if (! $this->ensureDevelopmentEnvironment()) {
+            return self::FAILURE;
         }
 
         /** @var string */
@@ -48,7 +48,7 @@ commit range using Prism';
         if (! $process->isSuccessful()) {
             $this->error('Failed to get commit messages: '.$process->getErrorOutput());
 
-            return;
+            return self::FAILURE;
         }
 
         $commitMessages = $process->getOutput();
@@ -56,7 +56,7 @@ commit range using Prism';
         if (empty($commitMessages)) {
             $this->error('No commit messages');
 
-            return;
+            return self::FAILURE;
         }
 
         $template = <<<'MARKDOWN'
@@ -83,41 +83,6 @@ commit range using Prism';
             ':commit_messages' => $commitMessages,
         ]);
 
-        if ($this->option('only-prompt')) {
-            $this->info('Generated Prompt:');
-            $this->line($prompt);
-
-            $this->openInEditor($prompt, 'prompt');
-
-            return;
-        }
-
-        /** @var string */
-        $usingProvider = config('prism.using.provider');
-        /** @var string */
-        $usingModel = config('prism.using.model');
-
-        $startTime = microtime(true);
-
-        $response = Prism::text()
-            ->using($usingProvider, $usingModel)
-            ->withPrompt($prompt)
-            ->asText();
-
-        $endTime = microtime(true);
-        $elapsedTime = $endTime - $startTime;
-
-        $proposedMessage = trim($response->text);
-
-        $this->newLine();
-        $this->info('Proposed pull request:');
-        $this->info('------------------------');
-        $this->line($proposedMessage);
-        $this->info('------------------------');
-        $this->info('Elapsed time: '.round($elapsedTime, 2).' seconds');
-        $this->info("Prompt tokens: {$response->usage->promptTokens}");
-        $this->info("Completion tokens: {$response->usage->completionTokens}");
-
-        $this->openInEditor($proposedMessage, 'pull request message');
+        return $this->generateLlmResponse($prompt, 'pull request message');
     }
 }
