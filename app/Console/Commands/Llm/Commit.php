@@ -28,21 +28,21 @@ class Commit extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle(): int
     {
         if (app()->environment('production')) {
             $this->error('This command can only be run in a development environment.');
 
-            return;
+            return self::FAILURE;
         }
 
-        $process = new Process(['git', 'diff', '--staged']);
+        $process = resolve(Process::class, ['command' => ['git', 'diff', '--staged']]);
         $process->run();
 
         if (! $process->isSuccessful()) {
             $this->error('Failed to get git diff: '.$process->getErrorOutput());
 
-            return;
+            return self::FAILURE;
         }
 
         $gitDiff = $process->getOutput();
@@ -50,7 +50,7 @@ class Commit extends Command
         if (empty($gitDiff)) {
             $this->error('No staged changes to commit');
 
-            return;
+            return self::FAILURE;
         }
 
         $template = <<<'MARKDOWN'
@@ -81,7 +81,7 @@ class Commit extends Command
 
             $this->openInEditor($prompt, 'prompt');
 
-            return;
+            return self::SUCCESS;
         }
 
         /** @var string */
@@ -112,5 +112,7 @@ class Commit extends Command
         $this->info("Completion tokens: {$response->usage->completionTokens}");
 
         $this->openInEditor($proposedMessage, 'commit message');
+
+        return self::SUCCESS;
     }
 }
