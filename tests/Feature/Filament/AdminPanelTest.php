@@ -44,4 +44,20 @@ class AdminPanelTest extends TestCase
 
         $response->assertRedirect('/email/verify'); // Unverified user should be redirected to email verification page
     }
+
+    public function test_verified_user_can_access_admin_panel(): void
+    {
+        $user = User::factory()->create(); // Verified by default
+
+        $response = $this->actingAs($user)->get('/admin');
+
+        $response->assertOk();
+    }
+
+    public function test_guest_user_is_redirected_to_login_page(): void
+    {
+        $response = $this->get('/admin');
+
+        $response->assertRedirect('/login');
+    }
 }
