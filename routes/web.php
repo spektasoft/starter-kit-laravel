@@ -6,7 +6,7 @@ use App\Models\Page;
 use Illuminate\Support\Facades\Route;
 use Laravel\Jetstream\Jetstream;
 
-Route::group(['middleware' => ['verified.fortify']], function () {
+Route::group(['middleware' => ['verified']], function () {
     Route::get('/', function () {
         return view('welcome');
     })->name('home');

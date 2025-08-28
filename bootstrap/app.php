@@ -32,7 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'json' => EnsureJsonRequest::class,
             'verify.api.artisan' => VerifyApiArtisan::class,
             'verify.api.key' => VerifyApiKey::class,
-            'verified.fortify' => EnsureEmailIsVerifiedWithFortify::class,
+            'verified' => EnsureEmailIsVerifiedWithFortify::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
