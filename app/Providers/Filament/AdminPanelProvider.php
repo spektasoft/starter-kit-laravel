@@ -9,6 +9,7 @@ use App\Filament\Resources\PageResource;
 use App\Filament\Resources\PermissionResource;
 use App\Filament\Resources\RoleResource;
 use App\Filament\Resources\UserResource;
+use App\Http\Middleware\EnsureEmailIsVerifiedWithFortify;
 use App\Http\Middleware\SetLocaleFromQueryAndSession;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -22,7 +23,6 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
-use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -32,7 +32,6 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\View\ComponentAttributeBag;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Laravel\Fortify\Features as FortifyFeatures;
 use Laravel\Jetstream\Features;
 
 class AdminPanelProvider extends PanelProvider
@@ -74,10 +73,10 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
                 SetLocaleFromQueryAndSession::class,
             ])
-            ->authMiddleware(array_filter([
-                FortifyFeatures::enabled(FortifyFeatures::emailVerification()) ? EnsureEmailIsVerified::class : null,
+            ->authMiddleware([
+                EnsureEmailIsVerifiedWithFortify::class,
                 Authenticate::class,
-            ]))
+            ])
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label(fn () => __('Administration')),

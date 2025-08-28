@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureEmailIsVerifiedWithFortify;
 use App\Http\Middleware\EnsureJsonRequest;
 use App\Http\Middleware\SetDeviceFromHeader;
 use App\Http\Middleware\SetLocaleFromHeader;
@@ -22,13 +23,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(ProtectAgainstSpam::class);
         $middleware->append(SetDeviceFromHeader::class);
         $middleware->append(SetLocaleFromHeader::class);
-        $middleware->web(append: [SetLocaleFromQueryAndSession::class]);
+        $middleware->web(append: [
+            SetLocaleFromQueryAndSession::class,
+        ]);
         $middleware->statefulApi();
 
         $middleware->alias([
             'json' => EnsureJsonRequest::class,
             'verify.api.artisan' => VerifyApiArtisan::class,
             'verify.api.key' => VerifyApiKey::class,
+            'verified' => EnsureEmailIsVerifiedWithFortify::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
