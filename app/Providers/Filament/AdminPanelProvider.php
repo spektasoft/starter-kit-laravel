@@ -32,6 +32,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\View\ComponentAttributeBag;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Laravel\Fortify\Features as FortifyFeatures;
 use Laravel\Jetstream\Features;
 
 class AdminPanelProvider extends PanelProvider
@@ -73,10 +74,10 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
                 SetLocaleFromQueryAndSession::class,
             ])
-            ->authMiddleware([
-                EnsureEmailIsVerified::class,
+            ->authMiddleware(array_filter([
+                FortifyFeatures::enabled(FortifyFeatures::emailVerification()) ? EnsureEmailIsVerified::class : null,
                 Authenticate::class,
-            ])
+            ]))
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label(fn () => __('Administration')),

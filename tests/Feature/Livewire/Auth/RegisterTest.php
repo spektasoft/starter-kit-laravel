@@ -3,7 +3,10 @@
 namespace Tests\Feature\Livewire\Auth;
 
 use App\Livewire\Auth\Register;
+use App\Models\User;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Laravel\Fortify\Features;
 use Laravel\Jetstream\Jetstream;
 use Livewire\Livewire;
@@ -120,5 +123,48 @@ class RegisterTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertGuest();
+    }
+
+    public function test_email_verification_notification_is_sent_when_enabled(): void
+    {
+        if (! Features::enabled(Features::registration()) || ! Features::enabled(Features::emailVerification())) {
+            $this->markTestSkipped('Registration or email verification support is not enabled.');
+        }
+
+        Notification::fake();
+
+        $response = $this->post('/register', [
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
+        ]);
+
+        $user = User::where('email', 'test@example.com')->first();
+        Notification::assertSentTo($user, VerifyEmail::class);
+    }
+
+    public function test_email_verification_notification_is_not_sent_when_disabled(): void
+    {
+        if (! Features::enabled(Features::registration())) {
+            $this->markTestSkipped('Registration support is not enabled.');
+        }
+
+        // Temporarily disable email verification for this test
+        $this->app['config']->set('fortify.features', [Features::registration()]);
+
+        Notification::fake();
+
+        $response = $this->post('/register', [
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
+        ]);
+
+        $user = User::where('email', 'test@example.com')->first();
+        Notification::assertNothingSentTo($user);
     }
 }
