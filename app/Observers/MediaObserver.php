@@ -27,13 +27,17 @@ class MediaObserver extends CuratorMediaObserver
      */
     public function creating(CuratorMedia $media): void
     {
-        if ($media instanceof Media && $media->creator === null) {
-            if (Auth::check()) {
-                $media->creator()->associate(Auth::user());
-            } else {
-                throw new AuthenticationException(
-                    'Cannot create Media without an authenticated user to assign as the creator.'
-                );
+        if ($media instanceof Media) {
+            /** @var \App\Models\User|null $creator */
+            $creator = $media->creator;
+            if (is_null($creator)) {
+                if (Auth::check()) {
+                    $media->creator()->associate(Auth::user());
+                } else {
+                    throw new AuthenticationException(
+                        'Cannot create Media without an authenticated user to assign as the creator.'
+                    );
+                }
             }
         }
         parent::creating($media);

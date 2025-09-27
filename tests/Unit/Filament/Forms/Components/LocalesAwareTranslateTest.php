@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Forms\Components;
+namespace Tests\Unit\Filament\Forms\Components;
 
 use App\Forms\Components\LocalesAwareTranslate;
 use Illuminate\Support\Collection;
@@ -18,10 +18,9 @@ class LocalesAwareTranslateTest extends TestCase
     use MockeryPHPUnitIntegration;
 
     /**
-     * @test
      * Test that the `locales` closure returns sorted locales when the record is `null`.
      */
-    public function locales_closure_returns_sorted_locales_when_record_is_null(): void
+    public function test_locales_closure_returns_sorted_locales_when_record_is_null(): void
     {
         // Arrange: Set up the application's locale and supported locales configuration.
         app()->setLocale('en');
@@ -43,10 +42,9 @@ class LocalesAwareTranslateTest extends TestCase
     }
 
     /**
-     * @test
      * Test that the closure returns sorted locales when the record does not have the method.
      */
-    public function locales_closure_returns_sorted_locales_when_record_lacks_method(): void
+    public function test_locales_closure_returns_sorted_locales_when_record_lacks_method(): void
     {
         // Arrange: Set up the application's locale and supported locales configuration.
         app()->setLocale('es');
@@ -68,10 +66,9 @@ class LocalesAwareTranslateTest extends TestCase
     }
 
     /**
-     * @test
      * Test that the closure returns the expected array from the record when the method exists.
      */
-    public function locales_closure_returns_prioritized_locales_when_method_exists(): void
+    public function test_locales_closure_returns_prioritized_locales_when_method_exists(): void
     {
         // Arrange: Create a mock record that has the getPrioritizedLocales method.
         // This test does not depend on the config or app locale, as the mock bypasses `getSortedLocales`.

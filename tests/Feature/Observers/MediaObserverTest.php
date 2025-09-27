@@ -49,9 +49,9 @@ class MediaObserverTest extends TestCase
 
         $expectedWebpPath = str_replace(pathinfo($media->path, PATHINFO_EXTENSION), 'webp', $media->path);
 
-        Storage::disk('public')->assertExists($expectedWebpPath);
+        $this->assertTrue(Storage::disk('public')->exists($expectedWebpPath));
         $this->assertEquals($expectedWebpPath, $media->path);
-        Storage::disk('public')->assertMissing($originalPath);
+        $this->assertFalse(Storage::disk('public')->exists($originalPath));
         $this->assertEquals('webp', $media->ext);
         $this->assertEquals('image/webp', $media->type);
     }
@@ -74,8 +74,8 @@ class MediaObserverTest extends TestCase
 
         $expectedWebpPath = str_replace(pathinfo($media->path, PATHINFO_EXTENSION), 'webp', $media->path);
 
-        Storage::disk('public')->assertMissing($expectedWebpPath);
-        Storage::disk('public')->assertExists('test.txt');
+        $this->assertFalse(Storage::disk('public')->exists($expectedWebpPath));
+        $this->assertTrue(Storage::disk('public')->exists('test.txt'));
         $this->assertEquals('txt', $media->ext);
         $this->assertEquals('text/plain', $media->type);
     }
