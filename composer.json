@@ -43,8 +43,7 @@
         "laravel/sail": "^1.46.0",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "^8.8.2",
-        "phpunit/phpunit": "^11.5.41",
-        "prism-php/prism": "^0.86.0"
+        "phpunit/phpunit": "^11.5.41"
     },
     "autoload": {
         "psr-4": {
