@@ -225,7 +225,6 @@ class HandlesTranslatableAttributesTest extends TestCase
         $this->assertEquals($systemLocales, $prioritizedLocales->toArray());
     }
 
-    /** @test */
     public function test_get_available_locales_identifies_locales_with_content(): void
     {
         // Arrange
@@ -270,7 +269,6 @@ class HandlesTranslatableAttributesTest extends TestCase
         );
     }
 
-    /** @test */
     public function test_get_available_locales_ignores_null_empty_and_whitespace_values(): void
     {
         // Arrange
@@ -303,7 +301,6 @@ class HandlesTranslatableAttributesTest extends TestCase
         );
     }
 
-    /** @test */
     public function test_get_available_locales_considers_zero_as_content(): void
     {
         // Arrange
@@ -336,7 +333,6 @@ class HandlesTranslatableAttributesTest extends TestCase
         );
     }
 
-    /** @test */
     public function test_get_available_locales_ignores_empty_tiptap_tags(): void
     {
         // Arrange

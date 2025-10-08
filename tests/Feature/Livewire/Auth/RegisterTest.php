@@ -112,13 +112,16 @@ class RegisterTest extends TestCase
             $this->markTestSkipped('Registration support is not enabled.');
         }
 
+        /** @var string $honeypotFieldName */
+        $honeypotFieldName = config('honeypot.name_field_name');
+
         $response = $this->post('/register', [
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
-            config('honeypot.name_field_name') => 'filled',
+            $honeypotFieldName => 'filled',
         ]);
 
         $response->assertStatus(200);

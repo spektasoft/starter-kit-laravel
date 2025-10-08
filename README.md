@@ -139,7 +139,7 @@ To apply changes from this repository to another Laravel project:
 
 ## Upstream
 
-Apply any changes available from the Laravel [12.x branch](https://github.com/laravel/laravel/compare/af512c59e810872e7098ac7a08865d35c7427eb9...12.x).
+Apply any changes available from the Laravel [12.x branch](https://github.com/laravel/laravel/compare/b45fe690bd673bab66a43c428ab4dabc2a25783a...12.x).
 
 ## License
 
