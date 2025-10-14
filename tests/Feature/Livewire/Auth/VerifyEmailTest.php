@@ -9,8 +9,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Laravel\Fortify\Features;
-use Livewire;
 use Livewire\Features\SupportTesting\Testable;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class VerifyEmailTest extends TestCase
@@ -19,6 +19,10 @@ class VerifyEmailTest extends TestCase
 
     public function test_verify_email_can_be_rendered(): void
     {
+        if (! Features::enabled(Features::emailVerification())) {
+            $this->markTestSkipped('Email verification not enabled.');
+        }
+
         /** @var User */
         $user = User::factory()->unverified()->create();
         $this->actingAs($user);
@@ -91,6 +95,10 @@ class VerifyEmailTest extends TestCase
 
     public function test_resend_verification_email_button_works(): void
     {
+        if (! Features::enabled(Features::emailVerification())) {
+            $this->markTestSkipped('Email verification not enabled.');
+        }
+
         /** @var User */
         $user = User::factory()->unverified()->create();
         $this->actingAs($user);

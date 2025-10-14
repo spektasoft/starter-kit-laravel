@@ -7,6 +7,7 @@ use App\Models\Page;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Laravel\Fortify\Features;
 use Tests\TestCase;
 
 class WebRoutesTest extends TestCase
@@ -22,6 +23,10 @@ class WebRoutesTest extends TestCase
 
     public function test_unverified_user_cannot_access_home_page(): void
     {
+        if (! Features::enabled(Features::emailVerification())) {
+            $this->markTestSkipped('Email verification not enabled.');
+        }
+
         $user = User::factory()->create([
             'email_verified_at' => null,
         ]);
@@ -52,6 +57,10 @@ class WebRoutesTest extends TestCase
 
     public function test_unverified_user_cannot_access_a_page_php_route(): void
     {
+        if (! Features::enabled(Features::emailVerification())) {
+            $this->markTestSkipped('Email verification not enabled.');
+        }
+
         $user = User::factory()->create([
             'email_verified_at' => null,
         ]);

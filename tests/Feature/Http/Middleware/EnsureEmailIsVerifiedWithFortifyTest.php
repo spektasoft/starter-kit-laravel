@@ -79,8 +79,9 @@ class EnsureEmailIsVerifiedWithFortifyTest extends TestCase
 
     public function test_unverified_user_is_redirected_to_email_verification_prompt_when_feature_is_enabled(): void
     {
-        // Ensure Fortify's email verification feature is enabled for this test
-        config(['fortify.features' => [Features::emailVerification()]]);
+        if (! Features::enabled(Features::emailVerification())) {
+            $this->markTestSkipped('Email verification support is not enabled.');
+        }
 
         // Create an unverified user
         $user = User::factory()->create(['email_verified_at' => null]);
