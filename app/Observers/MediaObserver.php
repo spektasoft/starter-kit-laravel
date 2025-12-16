@@ -19,7 +19,6 @@ class MediaObserver extends CuratorMediaObserver
     private $supportedImageToConvertTypes = [
         'image/jpeg',
         'image/png',
-        'image/webp',
     ];
 
     /**
