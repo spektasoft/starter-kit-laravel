@@ -9,6 +9,9 @@ export default defineConfig(({ mode }) => {
             hmr: {
                 host: process.env.VITE_HOST,
             },
+            watch: {
+                ignored: ["**/storage/framework/views/**"],
+            },
         },
         plugins: [
             laravel({
