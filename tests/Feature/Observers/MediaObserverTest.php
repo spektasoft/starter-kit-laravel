@@ -56,6 +56,38 @@ class MediaObserverTest extends TestCase
         $this->assertEquals('image/webp', $media->type);
     }
 
+    public function test_does_not_convert_webp_files_to_webp(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $webpPath = 'test.webp';
+        $image = Image::canvas(100, 100, 'ffffff');
+        Storage::disk('public')->put($webpPath, $image->stream('webp'));
+
+        // Get the original file hash to verify it remains unchanged
+        $originalHash = md5(Storage::disk('public')->get($webpPath));
+
+        $media = Media::create([
+            'name' => 'Test WebP Image',
+            'path' => $webpPath,
+            'disk' => 'public',
+            'size' => 1024,
+            'type' => 'image/webp',
+            'ext' => 'webp',
+        ]);
+
+        // Verify the file remains a WebP and no conversion occurred
+        $this->assertTrue(Storage::disk('public')->exists($webpPath));
+        $this->assertEquals($webpPath, $media->path);
+        $this->assertEquals('webp', $media->ext);
+        $this->assertEquals('image/webp', $media->type);
+
+        // Verify the file content is identical (no conversion happened)
+        $finalHash = md5(Storage::disk('public')->get($webpPath));
+        $this->assertEquals($originalHash, $finalHash, 'The WebP file should remain unchanged after Media creation');
+    }
+
     public function test_does_not_convert_non_image_files_to_webp(): void
     {
         $user = User::factory()->create();
