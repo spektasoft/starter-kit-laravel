@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Colors\Color;
 use App\Contracts\Jwt;
+use App\Filament\Components\Modals\CuratorPanel;
 use App\Models\Export;
 use App\Models\FailedImportRow;
 use App\Models\Import;
@@ -20,6 +21,7 @@ use Filament\Support\Facades\FilamentView;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 use SolutionForest\FilamentTranslateField\Facades\FilamentTranslateField;
 use Spatie\Translatable\Facades\Translatable;
 
@@ -56,6 +58,9 @@ class AppServiceProvider extends ServiceProvider
             'panels::pages.dashboard.navigation-item' => 'heroicon-o-building-library',
         ]);
         FilamentView::spa();
+
+        Livewire::component('curator-panel', CuratorPanel::class);
+
         Table::configureUsing(function (Table $table): void {
             $table->paginationPageOptions([12, 24]);
         });
