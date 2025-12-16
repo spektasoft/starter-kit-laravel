@@ -66,7 +66,7 @@ return [
     'directory' => 'media',
     'visibility' => 'public',
     'preserve_file_names' => false,
-    'max_file_size' => 5000,
+    'max_file_size' => 5120,
     'min_file_size' => 0,
     'image_resize_mode' => null,
     'image_crop_aspect_ratio' => null,
