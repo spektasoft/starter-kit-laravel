@@ -28,7 +28,7 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
     public static function getEloquentQuery(): Builder
     {
         /** @var Builder<Media> */
-        $query = parent::getEloquentQuery();
+        $query = parent::getEloquentQuery()->with(['creator']);
 
         if (! static::canViewAll()) {
             $query->whereCreatorId(User::auth()?->id);
