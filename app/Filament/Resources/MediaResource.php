@@ -93,6 +93,13 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
                     ReferenceAwareDeleteBulkAction::make(),
                 ]),
             ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('creator')
+                    ->relationship('creator', 'name')
+                    ->label(__('attributes.created_by'))
+                    ->searchable()
+                    ->visible(fn () => static::canViewAll()),
+            ])
             ->contentGrid(function () use ($livewire) {
                 if ($livewire->layoutView === 'grid') {
                     return [
