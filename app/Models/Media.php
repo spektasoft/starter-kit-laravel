@@ -6,6 +6,7 @@ use App\Observers\MediaObserver;
 use Awcodes\Curator\Models\Media as CuratorMedia;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -72,6 +73,25 @@ class Media extends CuratorMedia
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'creator_id');
+    }
+
+    protected function exif(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                // Respect the vendor's decoding logic but handle nulls safely
+                return $value ? json_decode($this->decodeExif($value), true) : null;
+            },
+            set: function ($value) {
+                // If the value is null, return null (SQL NULL).
+                // Only json_encode if there is actual data.
+                if (is_null($value)) {
+                    return null;
+                }
+
+                return json_encode($this->encodeExif($value));
+            },
+        );
     }
 
     /**
