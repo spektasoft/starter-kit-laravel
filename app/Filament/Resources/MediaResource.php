@@ -28,7 +28,7 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
     public static function getEloquentQuery(): Builder
     {
         /** @var Builder<Media> */
-        $query = parent::getEloquentQuery();
+        $query = parent::getEloquentQuery()->with(['creator']);
 
         if (! static::canViewAll()) {
             $query->whereCreatorId(User::auth()?->id);
@@ -92,6 +92,13 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
                 Tables\Actions\BulkActionGroup::make([
                     ReferenceAwareDeleteBulkAction::make(),
                 ]),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('creator')
+                    ->relationship('creator', 'name')
+                    ->label(__('attributes.created_by'))
+                    ->searchable()
+                    ->visible(fn () => static::canViewAll()),
             ])
             ->contentGrid(function () use ($livewire) {
                 if ($livewire->layoutView === 'grid') {

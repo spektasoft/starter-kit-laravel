@@ -83,4 +83,22 @@ class MediaResourceTest extends TestCase
         $livewire->call('create');
         $livewire->assertHasErrors(['data.creator_id']);
     }
+
+    public function test_can_filter_media_by_creator(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        Permission::firstOrCreate(['name' => 'view_all_media']);
+        $user->givePermissionTo('view_all_media');
+
+        $media = Media::factory()->create(['creator_id' => $user->id]);
+        $otherMedia = Media::factory()->create();
+
+        Livewire::test(\App\Filament\Resources\MediaResource\Pages\ListMedia::class)
+            ->assertCanSeeTableRecords([$media, $otherMedia])
+            ->filterTable('creator', $user->id)
+            ->assertCanSeeTableRecords([$media])
+            ->assertCanNotSeeTableRecords([$otherMedia]);
+    }
 }
