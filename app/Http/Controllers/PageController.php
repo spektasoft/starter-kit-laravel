@@ -22,8 +22,12 @@ class PageController extends Controller
      */
     public function terms(): View
     {
+        $pageId = config('page.terms');
+        if (! $pageId) {
+            abort(404);
+        }
         $record = Page::whereStatus(Status::Publish)
-            ->findOrFail(config('page.terms'));
+            ->findOrFail($pageId);
 
         return view('terms-of-service', ['record' => $record]);
     }
@@ -33,8 +37,12 @@ class PageController extends Controller
      */
     public function policy(): View
     {
+        $pageId = config('page.privacy');
+        if (! $pageId) {
+            abort(404);
+        }
         $record = Page::whereStatus(Status::Publish)
-            ->findOrFail(config('page.privacy'));
+            ->findOrFail($pageId);
 
         return view('privacy-policy', ['record' => $record]);
     }
