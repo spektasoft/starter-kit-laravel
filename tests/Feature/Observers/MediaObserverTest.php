@@ -65,8 +65,9 @@ class MediaObserverTest extends TestCase
         $image = Image::canvas(100, 100, 'ffffff');
         Storage::disk('public')->put($webpPath, $image->stream('webp'));
 
+        $this->assertNotNull($file = Storage::disk('public')->get($webpPath));
         // Get the original file hash to verify it remains unchanged
-        $originalHash = md5(Storage::disk('public')->get($webpPath));
+        $originalHash = md5($file);
 
         $media = Media::create([
             'name' => 'Test WebP Image',
@@ -84,8 +85,7 @@ class MediaObserverTest extends TestCase
         $this->assertEquals('image/webp', $media->type);
 
         // Verify the file content is identical (no conversion happened)
-        $finalHash = md5(Storage::disk('public')->get($webpPath));
-        $this->assertEquals($originalHash, $finalHash, 'The WebP file should remain unchanged after Media creation');
+        $this->assertEquals($originalHash, md5(Storage::disk('public')->get($webpPath)), 'The WebP file should remain unchanged after Media creation');
     }
 
     public function test_does_not_convert_non_image_files_to_webp(): void
