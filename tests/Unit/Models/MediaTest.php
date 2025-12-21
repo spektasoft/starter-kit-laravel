@@ -10,7 +10,7 @@ class MediaTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_handles_null_exif_data_safely()
+    public function test_it_handles_null_exif_data_safely(): void
     {
         $media = new Media;
 
@@ -23,7 +23,7 @@ class MediaTest extends TestCase
         $this->assertNull($media->exif);
     }
 
-    public function test_it_removes_exif_data_for_privacy()
+    public function test_it_removes_exif_data_for_privacy(): void
     {
         $media = Media::factory()->create(['exif' => ['iso' => 100]]);
 
