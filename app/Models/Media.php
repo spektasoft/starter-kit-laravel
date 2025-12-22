@@ -75,12 +75,21 @@ class Media extends CuratorMedia
         return $this->belongsTo(User::class, 'creator_id');
     }
 
+    /**
+     * @return Attribute<array<string, string>|null, array<string, string>|null>
+     */
     protected function exif(): Attribute
     {
         return Attribute::make(
             get: function ($value) {
+                if (is_null($value)) {
+                    return null;
+                }
+
                 // Respect the vendor's decoding logic but handle nulls safely
-                return $value ? json_decode($this->decodeExif($value), true) : null;
+                $decodedExif = parent::decodeExif($value);
+
+                return is_string($decodedExif) ? json_decode($decodedExif, true) : null;
             },
             set: function ($value) {
                 // If the value is null, return null (SQL NULL).
@@ -89,7 +98,7 @@ class Media extends CuratorMedia
                     return null;
                 }
 
-                return json_encode($this->encodeExif($value));
+                return json_encode(parent::encodeExif($value));
             },
         );
     }

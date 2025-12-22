@@ -28,9 +28,9 @@
         "porifa.laravel-intelephense",
         "recca0120.vscode-phpunit",
         "ronvanderheijden.phpdoc-generator",
+        "sanderronde.phpstan-vscode",
         "shufo.vscode-blade-formatter",
         "sperovita.alpinejs-syntax-highlight",
-        "swordev.phpstan",
         "timonwong.shellcheck"
     ]
 }
