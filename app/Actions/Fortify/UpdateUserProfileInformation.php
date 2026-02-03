@@ -34,7 +34,6 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 
         if (Jetstream::managesProfilePhotos()) {
             $user->profilePhotoMedia()->associate($input['profile_photo_media_id'] ?? null);
-            $user->save();
         }
 
         if ($input['email'] !== $user->email) {
