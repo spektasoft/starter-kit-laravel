@@ -12,7 +12,6 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
 use Laravel\Jetstream\Contracts\DeletesUsers;
@@ -92,20 +91,20 @@ class DeleteUserForm extends Component implements HasForms
     /**
      * Delete the current user.
      */
-    public function deleteUser(Request $request, DeletesUsers $deleter, StatefulGuard $auth, string $password): void
+    public function deleteUser(Request $request, DeletesUsers $deleter, StatefulGuard $auth): void
     {
         $this->resetErrorBag();
 
-        if (! Hash::check($password, $this->user->password)) {
-            throw ValidationException::withMessages([
-                'password' => [__('This password does not match our records.')],
-            ]);
-        }
-
         /** @var User */
-        $freshUser = $this->user->fresh();
+        $user = $this->user->fresh();
 
-        $deleter->delete($freshUser);
+        try {
+            $deleter->delete($user);
+        } catch (ValidationException $e) {
+            $this->addError('delete_account', $e->getMessage());
+
+            return;
+        }
 
         $auth->logout();
 
@@ -114,7 +113,6 @@ class DeleteUserForm extends Component implements HasForms
             $request->session()->regenerateToken();
         }
 
-        /** @var string */
         $to = config('fortify.redirects.logout') ?? '/';
 
         $this->redirect($to);
