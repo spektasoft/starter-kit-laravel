@@ -5,9 +5,11 @@ namespace App\Actions\Fortify;
 use App\Models\User;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 use Laravel\Fortify\Features;
+use Laravel\Fortify\Fortify;
 use Laravel\Jetstream\Jetstream;
 
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
@@ -19,6 +21,11 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     public function update(User $user, array $input): void
     {
+        // Normalize the username/email if configured to do so
+        if (config('fortify.lowercase_usernames') && isset($input[Fortify::username()])) {
+            $input[Fortify::username()] = Str::lower($input[Fortify::username()]);
+        }
+
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
