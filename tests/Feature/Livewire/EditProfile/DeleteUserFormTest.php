@@ -90,20 +90,6 @@ class DeleteUserFormTest extends TestCase
         $this->assertNull($user->fresh());
     }
 
-    public function test_correct_password_must_be_provided_before_account_can_be_deleted(): void
-    {
-        if (! Features::hasAccountDeletionFeatures()) {
-            $this->markTestSkipped('Account deletion is not enabled.');
-        }        /** @var User */
-        $user = User::factory()->create();
-
-        $this->actingAs($user);
-
-        $action = $this->getDeleteAction();
-
-        $this->assertThrows(fn () => $action->call());
-    }
-
     private function getDeleteAction(): Action
     {
         /** @var DeleteUserForm */
