@@ -21,9 +21,11 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     public function update(User $user, array $input): void
     {
-        // Normalize the username/email if configured to do so
-        if (config('fortify.lowercase_usernames') && isset($input[Fortify::username()])) {
-            $input[Fortify::username()] = Str::lower($input[Fortify::username()]);
+        $usernameField = Fortify::username();
+
+        // Normalize input according to configuration
+        if (config('fortify.lowercase_usernames') && isset($input[$usernameField])) {
+            $input[$usernameField] = Str::lower($input[$usernameField]);
         }
 
         Validator::make($input, [
@@ -51,9 +53,12 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         if ($input['email'] !== $user->email) {
             $this->updateVerifiedUser($user, $input);
         } else {
+            $usernameField = Fortify::username();
+
             $user->forceFill([
                 'name' => $input['name'],
                 'email' => $input['email'],
+                $usernameField => $input[$usernameField], // Ensure normalized username is saved
             ])->save();
         }
     }
