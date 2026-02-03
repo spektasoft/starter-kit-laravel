@@ -178,22 +178,42 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         return null;
     }
 
-    public function isReferenced(): bool
+    /**
+     * Get a list of resources preventing account deletion.
+     *
+     * @return array<int, array{label: string, count: int, route: string}>
+     */
+    public function getBlockingResources(): array
     {
-        if ($this->exports()->exists()) {
-            return true;
-        }
-        if ($this->imports()->exists()) {
-            return true;
-        }
-        if ($this->media()->exists()) {
-            return true;
-        }
-        if ($this->pages()->exists()) {
-            return true;
+        $blockers = [];
+
+        $checks = [
+            'pages' => ['label' => trans_choice('page.resource.model_label', 2), 'route' => 'filament.admin.resources.pages.index'],
+            'media' => ['label' => trans_choice('media.resource.model_label', 2), 'route' => 'filament.admin.resources.media.index'],
+            'exports' => ['label' => trans_choice('export.resource.model_label', 2), 'route' => 'filament.admin.resources.exports.index'],
+            'imports' => ['label' => trans_choice('import.resource.model_label', 2), 'route' => 'filament.admin.resources.imports.index'],
+        ];
+
+        foreach ($checks as $relation => $data) {
+            $count = $this->{$relation}()->count();
+            if ($count > 0) {
+                $blockers[] = [
+                    'label' => $data['label'],
+                    'count' => $count,
+                    'route' => route($data['route']),
+                ];
+            }
         }
 
-        return false;
+        return $blockers;
+    }
+
+    public function isReferenced(): bool
+    {
+        return $this->pages()->exists() ||
+            $this->media()->exists() ||
+            $this->exports()->exists() ||
+            $this->imports()->exists();
     }
 
     public function isSuperUser(): bool
