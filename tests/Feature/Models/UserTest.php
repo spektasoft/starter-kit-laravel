@@ -61,17 +61,17 @@ class UserTest extends TestCase
         // Check that all expected resources are present
         $resourceLabels = array_column($blockingResources, 'label');
         $this->assertContains('Pages', $resourceLabels);
-        $this->assertContains('Media Files', $resourceLabels);
-        $this->assertContains('Data Exports', $resourceLabels);
+        $this->assertContains('Media', $resourceLabels);
+        $this->assertContains('Exports', $resourceLabels);
 
         // Verify counts are correct
         $pageResource = array_filter($blockingResources, fn ($r) => $r['label'] === 'Pages');
         $this->assertEquals(2, reset($pageResource)['count']);
 
-        $mediaResource = array_filter($blockingResources, fn ($r) => $r['label'] === 'Media Files');
+        $mediaResource = array_filter($blockingResources, fn ($r) => $r['label'] === 'Media');
         $this->assertEquals(3, reset($mediaResource)['count']);
 
-        $exportResource = array_filter($blockingResources, fn ($r) => $r['label'] === 'Data Exports');
+        $exportResource = array_filter($blockingResources, fn ($r) => $r['label'] === 'Exports');
         $this->assertEquals(1, reset($exportResource)['count']);
     }
 

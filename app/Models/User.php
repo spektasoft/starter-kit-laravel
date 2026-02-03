@@ -189,7 +189,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
 
         $checks = [
             'pages' => ['label' => trans_choice('page.resource.model_label', 2), 'route' => 'filament.admin.resources.pages.index'],
-            'media' => ['label' => 'Media', 'route' => 'filament.admin.resources.media.index'],
+            'media' => ['label' => trans_choice('media.resource.model_label', 2), 'route' => 'filament.admin.resources.media.index'],
             'exports' => ['label' => trans_choice('export.resource.model_label', 2), 'route' => 'filament.admin.resources.exports.index'],
             'imports' => ['label' => trans_choice('import.resource.model_label', 2), 'route' => 'filament.admin.resources.imports.index'],
         ];
@@ -210,7 +210,10 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
 
     public function isReferenced(): bool
     {
-        return ! empty($this->getBlockingResources());
+        return $this->pages()->exists() ||
+            $this->media()->exists() ||
+            $this->exports()->exists() ||
+            $this->imports()->exists();
     }
 
     public function isSuperUser(): bool
