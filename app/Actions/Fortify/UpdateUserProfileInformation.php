@@ -65,9 +65,12 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     protected function updateVerifiedUser(User $user, array $input): void
     {
+        $usernameField = Fortify::username();
+
         $user->forceFill([
             'name' => $input['name'],
             'email' => $input['email'],
+            $usernameField => $input[$usernameField],
             'email_verified_at' => null,
         ])->save();
 
