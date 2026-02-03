@@ -188,10 +188,10 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         $blockers = [];
 
         $checks = [
-            'pages' => ['label' => 'Pages', 'route' => 'filament.admin.resources.pages.index'],
-            'media' => ['label' => 'Media Files', 'route' => 'filament.admin.resources.media.index'],
-            'exports' => ['label' => 'Data Exports', 'route' => 'filament.admin.resources.exports.index'],
-            'imports' => ['label' => 'Data Imports', 'route' => 'filament.admin.resources.imports.index'],
+            'pages' => ['label' => trans_choice('page.resource.model_label', 2), 'route' => 'filament.admin.resources.pages.index'],
+            'media' => ['label' => 'Media', 'route' => 'filament.admin.resources.media.index'],
+            'exports' => ['label' => trans_choice('export.resource.model_label', 2), 'route' => 'filament.admin.resources.exports.index'],
+            'imports' => ['label' => trans_choice('import.resource.model_label', 2), 'route' => 'filament.admin.resources.imports.index'],
         ];
 
         foreach ($checks as $relation => $data) {
