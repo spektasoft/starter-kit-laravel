@@ -76,12 +76,16 @@ class UpdatePasswordForm extends Component implements HasForms
     {
         $this->resetErrorBag();
 
+        // Call getState() outside the try-catch so Filament handles its own prefixed errors
+        $state = $this->form->getState();
+
         try {
-            $updater->update($this->user, $this->form->getState());
+            $updater->update($this->user, $state);
         } catch (\Illuminate\Validation\ValidationException $e) {
+            // Map Fortify Action errors (which lack the 'data.' prefix)
             throw \Illuminate\Validation\ValidationException::withMessages(
                 collect($e->errors())
-                    ->mapWithKeys(fn ($messages, $key) => [$key => $messages])
+                    ->mapWithKeys(fn ($messages, $key) => ["data.{$key}" => $messages])
                     ->all()
             );
         }
