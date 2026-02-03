@@ -7,4 +7,5 @@ return [
         'email_verified_at' => 'Email verified at',
         'model_label' => 'User|Users',
     ],
+    'account_cannot_be_deleted' => 'Account cannot be deleted while active resources exist.',
 ];
