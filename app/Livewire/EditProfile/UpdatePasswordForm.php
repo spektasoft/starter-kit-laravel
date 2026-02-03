@@ -76,14 +76,22 @@ class UpdatePasswordForm extends Component implements HasForms
     {
         $this->resetErrorBag();
 
-        $updater->update($this->user, $this->form->getState());
+        try {
+            $updater->update($this->user, $this->form->getState());
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw \Illuminate\Validation\ValidationException::withMessages(
+                collect($e->errors())
+                    ->mapWithKeys(fn ($messages, $key) => [$key => $messages])
+                    ->all()
+            );
+        }
 
         // Reset only the password fields in the form state
-        $this->data['current_password'] = '';
-        $this->data['password'] = '';
-        $this->data['password_confirmation'] = '';
-
-        $this->form->fill($this->data);
+        $this->form->fill([
+            'current_password' => '',
+            'password' => '',
+            'password_confirmation' => '',
+        ]);
 
         Notification::make()
             ->title(__('Saved.'))

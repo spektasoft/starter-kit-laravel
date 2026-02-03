@@ -110,10 +110,11 @@ class UpdateProfileInformationForm extends Component implements HasForms
                 $state
             );
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // Map Fortify's validation bag errors back to the component if necessary
-            // Though Filament usually handles validation via $this->form->getState()
-            // we keep this for compatibility with the Action's internal Validator.
-            throw $e;
+            throw \Illuminate\Validation\ValidationException::withMessages(
+                collect($e->errors())
+                    ->mapWithKeys(fn ($messages, $key) => ["data.{$key}" => $messages])
+                    ->all()
+            );
         }
 
         // Refresh data in form to reflect normalized values (e.g. lowercased email)
