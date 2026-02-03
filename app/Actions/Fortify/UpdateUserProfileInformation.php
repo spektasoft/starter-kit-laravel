@@ -3,7 +3,6 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -31,19 +30,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
         ])->validateWithBag('updateProfileInformation');
-
-        if (isset($input['photo'])) {
-            /** @var \Illuminate\Http\UploadedFile */
-            $photo = $input['photo'];
-            $user->updateProfilePhoto($photo);
-        }
-
-        $sessionKey = 'avatar-'.$user->id;
-        if (Session::has($sessionKey)) {
-            Session::remove($sessionKey);
-        }
 
         if (Jetstream::managesProfilePhotos()) {
             $user->profilePhotoMedia()->associate($input['profile_photo_media_id'] ?? null);
@@ -53,8 +40,6 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         if ($input['email'] !== $user->email) {
             $this->updateVerifiedUser($user, $input);
         } else {
-            $usernameField = Fortify::username();
-
             $user->forceFill([
                 'name' => $input['name'],
                 'email' => $input['email'],
