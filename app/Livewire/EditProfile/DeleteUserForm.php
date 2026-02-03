@@ -79,8 +79,7 @@ class DeleteUserForm extends Component implements HasForms
                                 $this->deleteUser(
                                     app(Request::class),
                                     app(DeletesUsers::class),
-                                    app(StatefulGuard::class),
-                                    $data['current_password']
+                                    app(StatefulGuard::class)
                                 );
                             }),
                     ])
