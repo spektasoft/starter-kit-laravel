@@ -96,7 +96,7 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
         $this->form->validate();
 
         try {
-            $confirm(Auth::user(), $this->code ?? '');
+            $confirm($this->user, $this->code ?? '');
 
             $this->showingQrCode = false;
             $this->showingConfirmation = false;
@@ -137,7 +137,7 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
 
         $this->confirmPassword($password);
 
-        $enable(Auth::user());
+        $enable($this->user);
 
         $this->showingQrCode = true;
 
@@ -257,7 +257,7 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
 
         $this->confirmPassword($password);
 
-        $generate(Auth::user());
+        $generate($this->user);
 
         $this->showingRecoveryCodes = true;
     }
@@ -277,21 +277,32 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
 
     private function confirmPassword(?string $password): void
     {
-        if (! Fortify::confirmsTwoFactorAuthentication()) {
+        /** @var int */
+        $confirmedAt = session('auth.password_confirmed_at', 0);
+        /** @var int */
+        $timeout = config('auth.password_timeout', 10800);
+
+        if (! Fortify::confirmsTwoFactorAuthentication() || (time() - $confirmedAt) < $timeout) {
             return;
         }
 
-        // Manual Hash::check removed as it is handled by the 'current_password' validation rule in the Action
         if (! $password) {
             throw ValidationException::withMessages([
-                'password' => [__('This password does not match our records.')],
+                'current_password' => [__('This password does not match our records.')],
             ]);
         }
+
+        session(['auth.password_confirmed_at' => time()]);
     }
 
     private function getProbablePasswordConfirmationAction(string $name): Action
     {
-        if (! Fortify::confirmsTwoFactorAuthentication()) {
+        /** @var int */
+        $confirmedAt = session('auth.password_confirmed_at', 0);
+        /** @var int */
+        $timeout = config('auth.password_timeout', 10800);
+
+        if (! Fortify::confirmsTwoFactorAuthentication() || (time() - $confirmedAt) < $timeout) {
             return Action::make($name);
         }
 
