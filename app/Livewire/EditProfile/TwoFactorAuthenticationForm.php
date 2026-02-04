@@ -12,8 +12,10 @@ use Filament\Forms\Components\View;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Actions\ConfirmTwoFactorAuthentication;
 use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
@@ -91,7 +93,6 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
     public function confirmTwoFactorAuthentication(ConfirmTwoFactorAuthentication $confirm): void
     {
         $this->resetErrorBag();
-
         $this->form->validate();
 
         try {
@@ -188,7 +189,6 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
         }
 
         try {
-            /** @var string|null */
             $two_factor_recovery_codes = $this->user->two_factor_recovery_codes;
 
             if ($two_factor_recovery_codes === null) {
@@ -202,9 +202,15 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
 
             return $codes;
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to decrypt 2FA recovery codes for user '.$this->user->id, [
+            Log::error('Failed to decrypt 2FA recovery codes for user '.$this->user->id, [
                 'exception' => $e->getMessage(),
             ]);
+
+            Notification::make()
+                ->title(__('user.two_factor.notifications.security_error_title'))
+                ->body(__('user.two_factor.notifications.security_error_body'))
+                ->danger()
+                ->send();
 
             return [];
         }
@@ -228,9 +234,15 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
 
             return $setupKey;
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to decrypt 2FA secret for user '.$this->user->id, [
+            Log::error('Failed to decrypt 2FA secret for user '.$this->user->id, [
                 'exception' => $e->getMessage(),
             ]);
+
+            Notification::make()
+                ->title(__('user.two_factor.notifications.configuration_error_title'))
+                ->body(__('user.two_factor.notifications.configuration_error_body'))
+                ->warning()
+                ->send();
 
             return '';
         }
@@ -315,7 +327,6 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
                         ->autocomplete('one-time-code')
                         ->model('code')
                         ->extraAttributes(['wire:keydown.enter' => 'confirmTwoFactorAuthentication'])
-                        ->extraInputAttributes(['name' => 'code'])
                 );
             }
         }
