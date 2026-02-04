@@ -10,14 +10,20 @@ use Illuminate\Support\Facades\Auth;
  */
 trait HasUser
 {
+    protected ?User $memoizedUser = null;
+
     public function getUserProperty(): User
     {
+        if ($this->memoizedUser) {
+            return $this->memoizedUser;
+        }
+
         $user = Auth::user();
 
         if (! ($user instanceof User)) {
             abort(403);
         }
 
-        return $user;
+        return $this->memoizedUser = $user;
     }
 }
