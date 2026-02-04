@@ -117,14 +117,20 @@ class TwoFactorAuthenticationFormTest extends TestCase
         }
 
         $user = User::factory()->create([
-            'two_factor_secret' => 'invalid-data',
+            'two_factor_secret' => 'invalid-data-that-cannot-be-decrypted',
         ]);
         $this->actingAs($user);
 
-        // Create component instance and call the method to ensure it doesn't throw an exception
-        // The method should handle decryption failure gracefully and return an empty string
-        Livewire::test(TwoFactorAuthenticationForm::class)
-            ->call('getSetupKey')  // This should not throw an exception
-            ->assertSuccessful();  // Ensures the component handled the call properly
+        $component = Livewire::test(TwoFactorAuthenticationForm::class);
+
+        // We execute the method and verify the return value directly from the component instance
+        /** @var TwoFactorAuthenticationForm */
+        $instance = $component->instance();
+        $returnValue = $instance->getSetupKey();
+
+        $this->assertEquals('', $returnValue);
+
+        // Verify that the security notification was dispatched
+        $component->assertNotified();
     }
 }
