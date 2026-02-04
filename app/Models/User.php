@@ -38,7 +38,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string $password
  * @property ?string $two_factor_secret
  * @property ?string $two_factor_recovery_codes
- * @property ?string $two_factor_confirmed_at
+ * @property ?Carbon $two_factor_confirmed_at
  * @property ?string $remember_token
  * @property ?string $current_team_id
  * @property ?string $profile_photo_path
