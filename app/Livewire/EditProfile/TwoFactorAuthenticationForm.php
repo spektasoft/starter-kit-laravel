@@ -92,19 +92,19 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
     {
         $this->resetErrorBag();
 
-        if ($this->code === null) {
-            throw ValidationException::withMessages([
-                'code' => [__('The provided two factor authentication code was invalid.')],
-            ])->errorBag('confirmTwoFactorAuthentication');
+        $this->form->validate();
+
+        try {
+            $confirm(Auth::user(), $this->code ?? '');
+
+            $this->showingQrCode = false;
+            $this->showingConfirmation = false;
+            $this->showingRecoveryCodes = true;
+
+            $this->dispatch('refresh-two-factor-authentication');
+        } catch (ValidationException $e) {
+            throw $e;
         }
-
-        $confirm(Auth::user(), $this->code);
-
-        $this->showingQrCode = false;
-        $this->showingConfirmation = false;
-        $this->showingRecoveryCodes = true;
-
-        $this->dispatch('refresh-two-factor-authentication');
     }
 
     /**
@@ -309,7 +309,9 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
                 $components->push(
                     TextInput::make('code')
                         ->label(__('Code'))
+                        ->required()
                         ->numeric()
+                        ->length(6)
                         ->autocomplete('one-time-code')
                         ->model('code')
                         ->extraAttributes(['wire:keydown.enter' => 'confirmTwoFactorAuthentication'])
