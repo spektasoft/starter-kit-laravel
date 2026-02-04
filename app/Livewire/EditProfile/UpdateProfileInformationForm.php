@@ -102,10 +102,23 @@ class UpdateProfileInformationForm extends Component implements HasForms
     {
         $this->resetErrorBag();
 
-        $updater->update(
-            $this->user,
-            $this->form->getState()
-        );
+        $state = $this->form->getState();
+
+        try {
+            $updater->update(
+                $this->user,
+                $state
+            );
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw \Illuminate\Validation\ValidationException::withMessages(
+                collect($e->errors())
+                    ->mapWithKeys(fn ($messages, $key) => ["data.{$key}" => $messages])
+                    ->all()
+            );
+        }
+
+        // Refresh data in form to reflect normalized values (e.g. lowercased email)
+        $this->form->fill($this->user->fresh()->toArray());
 
         $this->dispatch('refresh-navigation-menu');
 

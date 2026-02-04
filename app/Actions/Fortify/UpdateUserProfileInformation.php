@@ -3,11 +3,12 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 use Laravel\Fortify\Features;
+use Laravel\Fortify\Fortify;
 use Laravel\Jetstream\Jetstream;
 
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
@@ -19,26 +20,20 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     public function update(User $user, array $input): void
     {
+        $usernameField = Fortify::username();
+
+        // Normalize input according to configuration
+        if (config('fortify.lowercase_usernames') && isset($input[$usernameField])) {
+            $input[$usernameField] = Str::lower($input[$usernameField]);
+        }
+
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
         ])->validateWithBag('updateProfileInformation');
-
-        if (isset($input['photo'])) {
-            /** @var \Illuminate\Http\UploadedFile */
-            $photo = $input['photo'];
-            $user->updateProfilePhoto($photo);
-        }
-
-        $sessionKey = 'avatar-'.$user->id;
-        if (Session::has($sessionKey)) {
-            Session::remove($sessionKey);
-        }
 
         if (Jetstream::managesProfilePhotos()) {
             $user->profilePhotoMedia()->associate($input['profile_photo_media_id'] ?? null);
-            $user->save();
         }
 
         if ($input['email'] !== $user->email) {
@@ -47,6 +42,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             $user->forceFill([
                 'name' => $input['name'],
                 'email' => $input['email'],
+                $usernameField => $input[$usernameField], // Ensure normalized username is saved
             ])->save();
         }
     }
@@ -58,9 +54,12 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     protected function updateVerifiedUser(User $user, array $input): void
     {
+        $usernameField = Fortify::username();
+
         $user->forceFill([
             'name' => $input['name'],
             'email' => $input['email'],
+            $usernameField => $input[$usernameField],
             'email_verified_at' => null,
         ])->save();
 
