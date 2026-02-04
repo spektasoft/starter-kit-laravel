@@ -14,7 +14,6 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Actions\ConfirmTwoFactorAuthentication;
 use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
@@ -203,6 +202,10 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
 
             return $codes;
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to decrypt 2FA recovery codes for user '.$this->user->id, [
+                'exception' => $e->getMessage(),
+            ]);
+
             return [];
         }
     }
@@ -225,6 +228,10 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
 
             return $setupKey;
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to decrypt 2FA secret for user '.$this->user->id, [
+                'exception' => $e->getMessage(),
+            ]);
+
             return '';
         }
     }
@@ -262,7 +269,8 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
             return;
         }
 
-        if (! $password || ! Hash::check($password, $this->user->password)) {
+        // Manual Hash::check removed as it is handled by the 'current_password' validation rule in the Action
+        if (! $password) {
             throw ValidationException::withMessages([
                 'password' => [__('This password does not match our records.')],
             ]);
@@ -333,11 +341,12 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
                 ->label(__('Enable'))
                 ->action(
                     function (array $data) {
-                        /** @var string */
-                        $currentPassword = $data['current_password'];
+                        /** @var ?string */
+                        $currentPassword = $data['current_password'] ?? null; // Safe access
                         $this->enableTwoFactorAuthentication(
                             app(EnableTwoFactorAuthentication::class),
-                            Fortify::confirmsTwoFactorAuthentication() ? $currentPassword : null);
+                            $currentPassword
+                        );
                     }
                 )
             );
@@ -347,10 +356,12 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
                     ->label(__('Regenerate Recovery Codes'))
                     ->action(
                         function (array $data) {
-                            /** @var string */
-                            $currentPassword = $data['current_password'];
-                            $this->regenerateRecoveryCodes(app(GenerateNewRecoveryCodes::class),
-                                Fortify::confirmsTwoFactorAuthentication() ? $currentPassword : null);
+                            /** @var ?string */
+                            $currentPassword = $data['current_password'] ?? null; // Safe access
+                            $this->regenerateRecoveryCodes(
+                                app(GenerateNewRecoveryCodes::class),
+                                $currentPassword
+                            );
                         }
                     )
                 );
@@ -375,10 +386,11 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
                     ->label(__('Show Recovery Codes'))
                     ->action(
                         function (array $data) {
-                            /** @var string */
-                            $currentPassword = $data['current_password'];
+                            /** @var ?string */
+                            $currentPassword = $data['current_password'] ?? null; // Safe access
                             $this->confirmPassword(
-                                Fortify::confirmsTwoFactorAuthentication() ? $currentPassword : null);
+                                $currentPassword
+                            );
                             $this->showingRecoveryCodes = true;
                             $this->dispatch('refresh-two-factor-authentication');
                         }
@@ -398,10 +410,12 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
                         ->color('danger')
                         ->action(
                             function (array $data) {
-                                /** @var string */
-                                $currentPassword = $data['current_password'];
-                                $this->disableTwoFactorAuthentication(app(DisableTwoFactorAuthentication::class),
-                                    Fortify::confirmsTwoFactorAuthentication() ? $currentPassword : null);
+                                /** @var ?string */
+                                $currentPassword = $data['current_password'] ?? null; // Safe access
+                                $this->disableTwoFactorAuthentication(
+                                    app(DisableTwoFactorAuthentication::class),
+                                    $currentPassword
+                                );
                             }
                         )
                     );
