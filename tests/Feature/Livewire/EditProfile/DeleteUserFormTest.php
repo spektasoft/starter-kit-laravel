@@ -55,9 +55,9 @@ class DeleteUserFormTest extends TestCase
 
         $this->actingAs($user);
 
-        Livewire::test(DeleteUserForm::class)
-            ->assertSee('Your account cannot be deleted yet')
-            ->assertSee('Pages (1)');
+        $component = Livewire::test(DeleteUserForm::class);
+        $component->assertSee('Your account cannot be deleted yet');
+        $component->assertSee('Pages (1)');
     }
 
     public function test_blocking_resources_warning_hidden_when_not_blocked(): void
