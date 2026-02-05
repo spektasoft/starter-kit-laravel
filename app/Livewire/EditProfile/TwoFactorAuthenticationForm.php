@@ -15,6 +15,7 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Actions\ConfirmTwoFactorAuthentication;
@@ -286,7 +287,7 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
             return;
         }
 
-        if (! $password) {
+        if (! $password || ! Hash::check($password, $this->user->password)) {
             throw ValidationException::withMessages([
                 'current_password' => [__('This password does not match our records.')],
             ]);
