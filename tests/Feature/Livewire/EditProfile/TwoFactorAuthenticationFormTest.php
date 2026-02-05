@@ -94,4 +94,43 @@ class TwoFactorAuthenticationFormTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertNull($freshUser->two_factor_secret);
     }
+
+    public function test_confirmation_requires_six_digits(): void
+    {
+        if (! Features::canManageTwoFactorAuthentication()) {
+            $this->markTestSkipped();
+        }
+
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        Livewire::test(TwoFactorAuthenticationForm::class)
+            ->set('code', '123')
+            ->call('confirmTwoFactorAuthentication')
+            ->assertHasErrors(['code']);
+    }
+
+    public function test_decryption_failure_returns_empty_state(): void
+    {
+        if (! Features::canManageTwoFactorAuthentication()) {
+            $this->markTestSkipped();
+        }
+
+        $user = User::factory()->create([
+            'two_factor_secret' => 'invalid-data-that-cannot-be-decrypted',
+        ]);
+        $this->actingAs($user);
+
+        $component = Livewire::test(TwoFactorAuthenticationForm::class);
+
+        // We execute the method and verify the return value directly from the component instance
+        /** @var TwoFactorAuthenticationForm */
+        $instance = $component->instance();
+        $returnValue = $instance->getSetupKey();
+
+        $this->assertEquals('', $returnValue);
+
+        // Verify that the security notification was dispatched
+        $component->assertNotified();
+    }
 }
