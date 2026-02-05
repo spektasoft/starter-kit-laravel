@@ -18,7 +18,6 @@ class UserTest extends TestCase
 
         $blockingResources = $user->getBlockingResources();
 
-        $this->assertIsArray($blockingResources);
         $this->assertEmpty($blockingResources);
     }
 
@@ -30,7 +29,6 @@ class UserTest extends TestCase
 
         $blockingResources = $user->getBlockingResources();
 
-        $this->assertIsArray($blockingResources);
         $this->assertCount(1, $blockingResources);
 
         $pageResource = $blockingResources[0];
@@ -55,7 +53,6 @@ class UserTest extends TestCase
 
         $blockingResources = $user->getBlockingResources();
 
-        $this->assertIsArray($blockingResources);
         $this->assertCount(3, $blockingResources);
 
         // Check that all expected resources are present
@@ -65,14 +62,17 @@ class UserTest extends TestCase
         $this->assertContains('Exports', $resourceLabels);
 
         // Verify counts are correct
-        $pageResource = array_filter($blockingResources, fn ($r) => $r['label'] === 'Pages');
-        $this->assertEquals(2, reset($pageResource)['count']);
+        /** @var array{label: string, count: int, route: string} */
+        $pageResource = collect($blockingResources)->firstWhere('label', 'Pages');
+        $this->assertEquals(2, $pageResource['count']);
 
-        $mediaResource = array_filter($blockingResources, fn ($r) => $r['label'] === 'Media');
-        $this->assertEquals(3, reset($mediaResource)['count']);
+        /** @var array{label: string, count: int, route: string} */
+        $mediaResource = collect($blockingResources)->firstWhere('label', 'Media');
+        $this->assertEquals(3, $mediaResource['count']);
 
-        $exportResource = array_filter($blockingResources, fn ($r) => $r['label'] === 'Exports');
-        $this->assertEquals(1, reset($exportResource)['count']);
+        /** @var array{label: string, count: int, route: string} */
+        $exportResource = collect($blockingResources)->firstWhere('label', 'Exports');
+        $this->assertEquals(1, $exportResource['count']);
     }
 
     public function test_is_referenced_returns_true_when_resources_exist(): void
