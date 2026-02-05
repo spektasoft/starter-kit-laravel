@@ -11,7 +11,7 @@ class UpdateUserProfileInformationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_normalization_persists_when_email_is_not_changed()
+    public function test_normalization_persists_when_email_is_not_changed(): void
     {
         $this->app['config']->set('fortify.lowercase_usernames', true);
         $this->app['config']->set('fortify.username', 'email'); // Default configuration
@@ -41,7 +41,7 @@ class UpdateUserProfileInformationTest extends TestCase
         $this->assertEquals('original@example.com', $user->email);
     }
 
-    public function test_normalization_works_when_email_changes()
+    public function test_normalization_works_when_email_changes(): void
     {
         $this->app['config']->set('fortify.lowercase_usernames', true);
         $this->app['config']->set('fortify.username', 'email');

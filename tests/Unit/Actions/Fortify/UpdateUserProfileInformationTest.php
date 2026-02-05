@@ -13,7 +13,7 @@ class UpdateUserProfileInformationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_username_is_normalized_to_lowercase_when_configured()
+    public function test_username_is_normalized_to_lowercase_when_configured(): void
     {
         // Arrange
         Config::set('fortify.lowercase_usernames', true);
@@ -35,7 +35,7 @@ class UpdateUserProfileInformationTest extends TestCase
         $this->assertEquals('john@example.com', $user->fresh()->{Fortify::username()});
     }
 
-    public function test_username_is_not_normalized_when_config_not_set()
+    public function test_username_is_not_normalized_when_config_not_set(): void
     {
         // Arrange
         Config::set('fortify.lowercase_usernames', false);
