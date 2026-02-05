@@ -118,7 +118,9 @@ class UpdateProfileInformationForm extends Component implements HasForms
         }
 
         // Refresh data in form to reflect normalized values (e.g. lowercased email)
-        $this->form->fill($this->user->fresh()->toArray());
+        /** @var ?array<string, mixed> */
+        $freshUserArray = $this->user->fresh()?->toArray();
+        $this->form->fill($freshUserArray);
 
         $this->dispatch('refresh-navigation-menu');
 

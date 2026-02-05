@@ -13,7 +13,7 @@ class DeleteUserTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_user_with_active_resources_cannot_be_deleted()
+    public function test_user_with_active_resources_cannot_be_deleted(): void
     {
         // Create a user with an active Page resource
         $user = User::factory()->create();
@@ -29,10 +29,12 @@ class DeleteUserTest extends TestCase
             $deleteUserAction->delete($user);
             $this->fail('ValidationException was not thrown');
         } catch (ValidationException $e) {
+            /** @var array<string, string[]> */
+            $errors = $e->errors();
             // Verify the correct error message
             $this->assertEquals(
                 __('user.account_cannot_be_deleted'),
-                $e->errors()['delete_account'][0]
+                $errors['delete_account'][0]
             );
         }
 
@@ -48,7 +50,7 @@ class DeleteUserTest extends TestCase
         ]);
     }
 
-    public function test_user_without_active_resources_can_be_deleted()
+    public function test_user_without_active_resources_can_be_deleted(): void
     {
         // Create a user without any active resources
         $user = User::factory()->create();
