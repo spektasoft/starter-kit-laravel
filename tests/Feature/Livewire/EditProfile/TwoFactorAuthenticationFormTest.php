@@ -68,7 +68,7 @@ class TwoFactorAuthenticationFormTest extends TestCase
         $freshUser = $user->fresh();
 
         $this->assertCount(8, $user->recoveryCodes());
-        $this->assertCount(8, array_diff($user->recoveryCodes(), $freshUser->recoveryCodes()));
+        $this->assertCount(8, array_diff((array) $user->recoveryCodes(), (array) $freshUser->recoveryCodes()));
     }
 
     public function test_two_factor_authentication_can_be_disabled(): void

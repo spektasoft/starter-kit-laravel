@@ -81,11 +81,12 @@ class ExportResource extends Resource implements HasShieldPermissions
                     ->searchable()
                     ->sortable()
                     ->formatStateUsing(function (string $state): string {
-                        $exporterName = class_basename($state); // e.g., PageExporter
-                        $modelName = str_replace('Exporter', '', $exporterName); // e.g., Page
-                        $lowercasedModelName = strtolower($modelName); // e.g., page
+                        $exporterName = class_basename($state);
+                        $modelName = str_replace('Exporter', '', $exporterName);
 
-                        return trans_choice("{$lowercasedModelName}.resource.model_label", 1);
+                        $kebabCase = strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $modelName) ?? '');
+
+                        return trans_choice("{$kebabCase}.resource.model_label", 1);
                     }),
                 Tables\Columns\TextColumn::make('file_name')
                     ->label(__('export.resource.file_name'))

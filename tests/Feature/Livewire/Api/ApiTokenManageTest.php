@@ -170,12 +170,13 @@ class ApiTokenManageTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $permissions = collect(Jetstream::$permissions);
+        /** @var list<string> $permissions */
+        $permissions = array_values(Jetstream::$permissions);
 
         $testable = Livewire::test(ApiTokenManage::class);
 
         // Check create form
-        $testable->assertSeeInOrder($permissions->toArray());
+        $testable->assertSeeInOrder($permissions);
 
         // Create a token to test the edit form
         $token = $user->tokens()->create([
@@ -196,7 +197,7 @@ class ApiTokenManageTest extends TestCase
         $action->call(['record' => $token, 'data' => ['abilities' => ['create', 'read']]]);
 
         // Check edit form
-        $testable->assertSeeInOrder($permissions->toArray());
+        $testable->assertSeeInOrder($permissions);
     }
 
     public function test_can_close_token_display_modal(): void
