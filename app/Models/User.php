@@ -61,6 +61,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder|User permission($permissions)
  * @method static Builder|User query()
  * @method static Builder|User role($roles, $guard = null)
+ * @method array<int, string> recoveryCodes()
  */
 class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerifyEmail
 {
