@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Filament\Resources;
 
-use App\Filament\Resources\ExportResource;
-use App\Filament\Resources\ExportResource\Pages\ListExports;
+use App\Filament\Resources\Exports\ExportResource;
+use App\Filament\Resources\Exports\Pages\ListExports;
 use App\Models\Export;
 use App\Models\Permission;
 use App\Models\User;
@@ -172,7 +172,7 @@ class ExportResourceTest extends TestCase
                 ->where('creator_id', '!=', $userA->id);
         })->get();
 
-        $livewire = Livewire::test(ExportResource\Pages\ListExports::class);
+        $livewire = Livewire::test(Exports\Pages\ListExports::class);
         $livewire->assertCanSeeTableRecords($exportsUserA);
         $livewire->assertCanNotSeeTableRecords($exportsNotUserA);
     }

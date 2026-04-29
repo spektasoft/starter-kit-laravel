@@ -2,9 +2,9 @@
 
 namespace App\Filament\Components\Modals;
 
+use Filament\Schemas\Schema;
 use App\Models\Media;
 use Awcodes\Curator\Components\Modals\CuratorPanel as BaseCuratorPanel;
-use Filament\Forms\Form;
 
 class CuratorPanel extends BaseCuratorPanel
 {
@@ -16,9 +16,9 @@ class CuratorPanel extends BaseCuratorPanel
      * in a custom modal component, causing crashes when relation columns
      * are present in the custom Media model.
      */
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return parent::form($form)
+        return parent::form($schema)
             ->model(Media::class);
     }
 }

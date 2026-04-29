@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Filament\Resources\Pages\Pages;
+
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Pages\PageResource;
+use Filament\Actions;
+use Filament\Actions\Action;
+use Filament\Resources\Pages\EditRecord;
+
+class EditPage extends EditRecord
+{
+    protected static string $resource = PageResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('view')
+                ->color('gray')
+                ->label(__('page.action.view'))
+                ->url(fn (): string => route('pages.show', $this->record)),
+            DeleteAction::make(),
+        ];
+    }
+}

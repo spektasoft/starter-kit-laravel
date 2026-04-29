@@ -2,6 +2,9 @@
 
 namespace App\Observers;
 
+use Throwable;
+use Exception;
+use App\Models\User;
 use App\Models\Media;
 use Awcodes\Curator\Models\Media as CuratorMedia;
 use Awcodes\Curator\Observers\MediaObserver as CuratorMediaObserver;
@@ -27,7 +30,7 @@ class MediaObserver extends CuratorMediaObserver
     public function creating(CuratorMedia $media): void
     {
         if ($media instanceof Media) {
-            /** @var \App\Models\User|null $creator */
+            /** @var User|null $creator */
             $creator = $media->creator;
             if (is_null($creator)) {
                 if (Auth::check()) {
@@ -103,7 +106,7 @@ class MediaObserver extends CuratorMediaObserver
                     Log::warning("MediaObserver: Source file not found at old path: {$oldFullPath} for media ID: {$media->id}");
                 }
                 DB::commit();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 DB::rollBack();
                 Log::error("Failed to move media file for media ID {$media->id} and rolled back transaction: {$e->getMessage()}");
                 throw $e;
@@ -138,7 +141,7 @@ class MediaObserver extends CuratorMediaObserver
             if ($updated) {
                 Storage::disk($media->disk)->delete($oldImagePath);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error converting image to WebP: '.$e->getMessage(), ['media_id' => $media->id, 'path' => $media->path]);
         }
     }

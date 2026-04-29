@@ -2,14 +2,16 @@
 
 namespace App\Livewire\EditProfile;
 
+use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use App\Concerns\HasUser;
 use App\Filament\Actions\Forms\PasswordConfirmationAction;
 use App\Models\User;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\Request;
 use Illuminate\Support\HtmlString;
@@ -18,20 +20,21 @@ use Laravel\Jetstream\Contracts\DeletesUsers;
 use Livewire\Component;
 
 /**
- * @property Form $form
+ * @property \Filament\Schemas\Schema $form
  */
-class DeleteUserForm extends Component implements HasForms
+class DeleteUserForm extends Component implements HasForms, HasActions
 {
+    use InteractsWithActions;
     use HasUser;
     use InteractsWithForms;
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
         $blockingResources = $this->user->getBlockingResources();
         $isBlocked = ! empty($blockingResources);
 
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make()
                     ->heading(__('Delete Account'))
                     ->description(__('Permanently delete your account.'))

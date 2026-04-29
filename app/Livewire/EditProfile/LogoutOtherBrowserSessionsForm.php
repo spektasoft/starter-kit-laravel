@@ -2,17 +2,19 @@
 
 namespace App\Livewire\EditProfile;
 
+use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
 use App\Concerns\CanRestoreSession;
 use App\Concerns\HasUser;
 use App\Data\SessionData;
 use App\Filament\Actions\Forms\PasswordConfirmationAction;
 use App\Models\Session;
 use Carbon\Carbon;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\View as ComponentsView;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\StatefulGuard;
@@ -23,24 +25,25 @@ use Laravel\Jetstream\Agent;
 use Livewire\Component;
 
 /**
- * @property Form $form
+ * @property \Filament\Schemas\Schema $form
  */
-class LogoutOtherBrowserSessionsForm extends Component implements HasForms
+class LogoutOtherBrowserSessionsForm extends Component implements HasForms, HasActions
 {
+    use InteractsWithActions;
     use CanRestoreSession;
     use HasUser;
     use InteractsWithForms;
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make()
                     ->key('section')
                     ->heading(__('Browser Sessions'))
                     ->description(__('Manage and log out your active sessions on other browsers and devices.'))
                     ->schema([
-                        ComponentsView::make('browser-sessions') // @phpstan-ignore-line
+                        View::make('browser-sessions') // @phpstan-ignore-line
                             ->key('browser-sessions')
                             ->view('components.browser-sessions'),
                     ])

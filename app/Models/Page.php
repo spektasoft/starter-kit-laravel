@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Carbon;
+use Database\Factories\PageFactory;
 use App\Concerns\HandlesTranslatableAttributes;
 use App\Concerns\HasCreatorAttribute;
 use App\Enums\Page\Status;
@@ -16,10 +18,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $title
  * @property string $content
  * @property Status $status
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
- * @method static \Database\Factories\PageFactory factory(...$parameters)
+ * @method static PageFactory factory(...$parameters)
  */
 class Page extends Model
 {
@@ -27,7 +29,7 @@ class Page extends Model
 
     use HasCreatorAttribute;
 
-    /** @use HasFactory<\Database\Factories\PageFactory> */
+    /** @use HasFactory<PageFactory> */
     use HasFactory;
     use HasUlids;
 

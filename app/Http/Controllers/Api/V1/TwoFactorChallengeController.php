@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Exception;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Ahc\Jwt\JWTException;
 use App\Contracts\Jwt;
 use App\Models\User;
@@ -65,7 +67,7 @@ class TwoFactorChallengeController
             return response()->json([
                 'errors' => $e->getMessage(),
             ], JsonResponse::HTTP_UNAUTHORIZED);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error($e);
 
             return response()->json([
@@ -96,7 +98,7 @@ class TwoFactorChallengeController
             $secret = decrypt($twoFactorSecret);
 
             return app(TwoFactorAuthenticationProvider::class)->verify($secret, $code);
-        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+        } catch (DecryptException $e) {
             Log::error('Failed to decrypt two_factor_secret for user: '.$user->id, ['exception' => $e]);
 
             return false;

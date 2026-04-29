@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Filament\Resources;
 
-use App\Filament\Resources\MediaResource;
+use App\Filament\Resources\Media\MediaResource;
 use App\Models\Media;
 use App\Models\Permission;
 use App\Models\User;
@@ -95,7 +95,7 @@ class MediaResourceTest extends TestCase
         $media = Media::factory()->create(['creator_id' => $user->id]);
         $otherMedia = Media::factory()->create();
 
-        Livewire::test(\App\Filament\Resources\MediaResource\Pages\ListMedia::class)
+        Livewire::test(\App\Filament\Resources\Media\Pages\ListMedia::class)
             ->assertCanSeeTableRecords([$media, $otherMedia])
             ->filterTable('creator', $user->id)
             ->assertCanSeeTableRecords([$media])

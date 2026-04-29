@@ -33,7 +33,7 @@ trait AuthorizesRequestsWithTokens
      * Authorization passes if the user's token has the specified ability
      * OR if the user is authorized by the specified policy.
      *
-     * @throws \Illuminate\Auth\Access\AuthorizationException If neither check passes.
+     * @throws AuthorizationException If neither check passes.
      */
     protected function authorizeTokenOrPolicy(string $tokenPermission, string $policyAbility, mixed $policyArguments = []): void
     {

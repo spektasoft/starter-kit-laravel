@@ -3,7 +3,7 @@
 namespace App\Livewire\Page;
 
 use App\Enums\Page\Status;
-use App\Filament\Resources\PageResource;
+use App\Filament\Resources\Pages\PageResource;
 use App\Models\Page;
 use Artesaos\SEOTools\Facades\SEOTools;
 use Filament\Actions\Action;

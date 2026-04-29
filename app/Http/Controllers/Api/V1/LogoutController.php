@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Exception;
 use App\Http\Controllers\Controller;
 use App\Models\PersonalAccessToken;
 use App\Models\User;
@@ -30,7 +31,7 @@ class LogoutController extends Controller
             return response()->json([
                 'errors' => ['User or token not found.'],
             ], 404);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'errors' => ['An unexpected error occurred: '.$e->getMessage()],
             ], 500);

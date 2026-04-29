@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Filament\Resources;
 
-use App\Filament\Resources\UserResource;
-use App\Filament\Resources\UserResource\Pages\CreateUser;
-use App\Filament\Resources\UserResource\Pages\EditUser;
-use App\Filament\Resources\UserResource\Pages\ListUsers;
+use App\Filament\Resources\Users\UserResource;
+use App\Filament\Resources\Users\Pages\CreateUser;
+use App\Filament\Resources\Users\Pages\EditUser;
+use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Models\Page;
 use App\Models\Permission;
 use App\Models\Role;
@@ -158,7 +158,7 @@ class UserResourceTest extends TestCase
 
     public function test_user_table_has_expected_columns(): void
     {
-        $livewire = Livewire::test(UserResource\Pages\ListUsers::class);
+        $livewire = Livewire::test(Users\Pages\ListUsers::class);
         $livewire->assertCanRenderTableColumn('name');
         $livewire->assertCanRenderTableColumn('email');
         $livewire->assertCanRenderTableColumn('roles');
@@ -167,7 +167,7 @@ class UserResourceTest extends TestCase
         $livewire->assertCanRenderTableColumn('updated_at');
 
         if (Jetstream::managesProfilePhotos()) {
-            Livewire::test(UserResource\Pages\ListUsers::class)
+            Livewire::test(Users\Pages\ListUsers::class)
                 ->assertCanRenderTableColumn('profile_photo_media_id');
         }
     }
@@ -190,7 +190,7 @@ class UserResourceTest extends TestCase
         config(['auth.super_users' => ['super@example.com']]);
         $superUser = User::factory()->create(['email' => 'super@example.com']);
 
-        Livewire::test(UserResource\Pages\ListUsers::class)
+        Livewire::test(Users\Pages\ListUsers::class)
             ->assertCanNotSeeTableRecords([$superUser]);
     }
 
@@ -201,7 +201,7 @@ class UserResourceTest extends TestCase
         $otherSuperUser = User::factory()->create(['email' => 'super2@example.com']);
         $this->actingAs($superAdmin);
 
-        $livewire = Livewire::test(UserResource\Pages\ListUsers::class);
+        $livewire = Livewire::test(Users\Pages\ListUsers::class);
         $livewire->assertCanSeeTableRecords([$otherSuperUser]);
         $livewire->assertTableColumnStateSet('roles', '["Super User"]', $otherSuperUser);
     }
@@ -213,7 +213,7 @@ class UserResourceTest extends TestCase
         $role2 = Role::create(['name' => 'editor']);
         $user->assignRole($role1, $role2);
 
-        $livewire = Livewire::test(UserResource\Pages\ListUsers::class);
+        $livewire = Livewire::test(Users\Pages\ListUsers::class);
         $livewire->assertCanSeeTableRecords([$user]);
         $livewire->assertTableColumnStateSet('roles', '["Admin","Editor"]', $user);
     }
@@ -222,7 +222,7 @@ class UserResourceTest extends TestCase
     {
         $userToDelete = User::factory()->create();
 
-        $livewire = Livewire::test(UserResource\Pages\ListUsers::class);
+        $livewire = Livewire::test(Users\Pages\ListUsers::class);
         $livewire->callTableAction(
             'delete',
             $userToDelete
@@ -236,7 +236,7 @@ class UserResourceTest extends TestCase
     {
         $usersToDelete = User::factory()->count(3)->create();
 
-        $livewire = Livewire::test(UserResource\Pages\ListUsers::class);
+        $livewire = Livewire::test(Users\Pages\ListUsers::class);
         $livewire->callTableBulkAction(
             'delete',
             $usersToDelete
@@ -316,7 +316,7 @@ class UserResourceTest extends TestCase
         // Assuming a User has a relationship with another model, e.g., Page
         $userToDelete = User::factory()->has(Page::factory())->create();
 
-        Livewire::test(UserResource\Pages\ListUsers::class)
+        Livewire::test(Users\Pages\ListUsers::class)
             ->assertTableActionHidden('delete', $userToDelete);
 
         $this->assertModelExists($userToDelete);
@@ -346,7 +346,7 @@ class UserResourceTest extends TestCase
         $user->givePermissionTo('view_any_user');
         $userToDelete = User::factory()->create();
 
-        $listUsers = Livewire::test(UserResource\Pages\ListUsers::class);
+        $listUsers = Livewire::test(Users\Pages\ListUsers::class);
         $listUsers->assertTableActionHidden('delete', $userToDelete);
     }
 
@@ -358,7 +358,7 @@ class UserResourceTest extends TestCase
         $user->givePermissionTo('delete_any_user');
         $usersToDelete = User::factory(2)->create();
 
-        $listUsers = Livewire::test(UserResource\Pages\ListUsers::class);
+        $listUsers = Livewire::test(Users\Pages\ListUsers::class);
         $listUsers->callTableBulkAction('delete', $usersToDelete);
 
         $this->assertEquals(User::count(), 4); // 3 users + the initial user

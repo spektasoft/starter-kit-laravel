@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Filament\MediaResource\Pages;
 
-use App\Filament\Resources\MediaResource\Pages\EditMedia;
+use App\Filament\Resources\Media\Pages\EditMedia;
 use App\Models\Media; // Assuming Media model exists
 use App\Models\User;
 use Filament\Actions\Action;

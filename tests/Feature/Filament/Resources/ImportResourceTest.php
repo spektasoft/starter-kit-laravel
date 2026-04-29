@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Filament\Resources;
 
-use App\Filament\Resources\ImportResource;
-use App\Filament\Resources\ImportResource\Pages\ListImports;
+use App\Filament\Resources\Imports\ImportResource;
+use App\Filament\Resources\Imports\Pages\ListImports;
 use App\Models\Import;
 use App\Models\Permission;
 use App\Models\User;

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Filament\Resources;
 
-use App\Filament\Resources\PermissionResource;
+use App\Filament\Resources\Permissions\PermissionResource;
 use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

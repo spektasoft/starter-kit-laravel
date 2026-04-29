@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\ImportFactory;
 use App\Services\CreatorService;
 use Filament\Actions\Imports\Models\Import as FilamentImport;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -25,11 +26,11 @@ use Illuminate\Support\Carbon;
  * @property-read User $creator
  * @property-read User $user
  *
- * @method static \Database\Factories\ImportFactory factory(...$parameters)
+ * @method static ImportFactory factory(...$parameters)
  */
 class Import extends FilamentImport
 {
-    /** @use HasFactory<\Database\Factories\ImportFactory> */
+    /** @use HasFactory<ImportFactory> */
     use HasFactory;
 
     use HasUlids;

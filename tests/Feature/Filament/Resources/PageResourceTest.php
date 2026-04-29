@@ -3,10 +3,10 @@
 namespace Tests\Feature\Filament\Resources;
 
 use App\Enums\Page\Status;
-use App\Filament\Resources\PageResource;
-use App\Filament\Resources\PageResource\Pages\CreatePage;
-use App\Filament\Resources\PageResource\Pages\EditPage;
-use App\Filament\Resources\PageResource\Pages\ListPages;
+use App\Filament\Resources\Pages\PageResource;
+use App\Filament\Resources\Pages\Pages\CreatePage;
+use App\Filament\Resources\Pages\Pages\EditPage;
+use App\Filament\Resources\Pages\Pages\ListPages;
 use App\Models\Page;
 use App\Models\Permission;
 use App\Models\User;
@@ -62,7 +62,7 @@ class PageResourceTest extends TestCase
         $user->givePermissionTo('view_any_page');
         $page = Page::factory()->create();
 
-        $listPages = Livewire::test(PageResource\Pages\ListPages::class);
+        $listPages = Livewire::test(Pages\Pages\ListPages::class);
         $listPages->assertTableActionHidden('delete', $page);
     }
 
@@ -73,7 +73,7 @@ class PageResourceTest extends TestCase
         $user->givePermissionTo('view_any_page');
         $pages = Page::factory(3)->create();
 
-        $listPages = Livewire::test(PageResource\Pages\ListPages::class);
+        $listPages = Livewire::test(Pages\Pages\ListPages::class);
         $listPages->callTableBulkAction('delete', $pages->pluck('id')->toArray());
 
         $this->assertEquals(Page::count(), 3);
@@ -131,7 +131,7 @@ class PageResourceTest extends TestCase
         $page = Page::factory()->create();
         $newData = Page::factory()->make();
 
-        $livewire = Livewire::test(PageResource\Pages\EditPage::class, [
+        $livewire = Livewire::test(Pages\Pages\EditPage::class, [
             'record' => $page->id,
         ]);
         $livewire->fillForm([
@@ -161,7 +161,7 @@ class PageResourceTest extends TestCase
     {
         $page = Page::factory()->create();
 
-        $listPages = Livewire::test(PageResource\Pages\ListPages::class);
+        $listPages = Livewire::test(Pages\Pages\ListPages::class);
         $listPages->callTableAction('delete', $page);
         $listPages->assertSuccessful();
 
@@ -172,7 +172,7 @@ class PageResourceTest extends TestCase
     {
         $pages = Page::factory(3)->create();
 
-        $listPages = Livewire::test(PageResource\Pages\ListPages::class);
+        $listPages = Livewire::test(Pages\Pages\ListPages::class);
         $listPages->callTableBulkAction('delete', $pages->pluck('id')->toArray());
         $listPages->assertSuccessful();
 

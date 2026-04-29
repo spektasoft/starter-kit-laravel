@@ -2,6 +2,7 @@
 
 namespace App\Queue;
 
+use Illuminate\Queue\QueueManager;
 use App\Queue\Connectors\DatabaseConnector;
 use App\Queue\Failed\DatabaseUuidUlidFailedJobProvider;
 use Illuminate\Queue\QueueServiceProvider as IlluminateQueueServiceProvider;
@@ -11,7 +12,7 @@ class QueueServiceProvider extends IlluminateQueueServiceProvider
     /**
      * Register the database queue connector.
      *
-     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @param QueueManager $manager
      * @return void
      */
     protected function registerDatabaseConnector($manager)

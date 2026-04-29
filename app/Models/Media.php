@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Carbon;
+use Database\Factories\MediaFactory;
 use App\Observers\MediaObserver;
 use Awcodes\Curator\Models\Media as CuratorMedia;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -36,15 +38,15 @@ use Illuminate\Support\Facades\Gate;
  * @property array<string, mixed>|null $curations
  * @property string $size_for_humans
  * @property string $pretty_name
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
- * @method static \Database\Factories\MediaFactory factory(...$parameters)
+ * @method static MediaFactory factory(...$parameters)
  */
 #[ObservedBy([MediaObserver::class])]
 class Media extends CuratorMedia
 {
-    /** @use HasFactory<\Database\Factories\MediaFactory> */
+    /** @use HasFactory<MediaFactory> */
     use HasFactory;
 
     use HasUlids;

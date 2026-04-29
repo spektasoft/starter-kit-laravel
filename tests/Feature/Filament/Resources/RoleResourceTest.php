@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Filament\Resources;
 
-use App\Filament\Resources\RoleResource;
+use App\Filament\Resources\Roles\RoleResource;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;

@@ -2,23 +2,26 @@
 
 namespace App\Livewire\Auth;
 
-use Filament\Forms\Components\Actions\Action;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Support\Enums\Alignment;
 use Illuminate\Contracts\View\View;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
 
 /**
- * @property Form $form
+ * @property \Filament\Schemas\Schema $form
  */
-class ResetPassword extends Component implements HasForms
+class ResetPassword extends Component implements HasForms, HasActions
 {
+    use InteractsWithActions;
     use InteractsWithForms;
 
     /**
@@ -34,10 +37,10 @@ class ResetPassword extends Component implements HasForms
         ]);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make('request-password')
                     ->heading(__('filament-panels::pages/auth/password-reset/reset-password.heading'))
                     ->schema([

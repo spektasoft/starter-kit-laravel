@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Exception;
 use App\Concerns\AuthorizesRequestsWithTokens;
 use App\Data\UserData;
 use App\Http\Controllers\Controller;
@@ -113,7 +114,7 @@ class UserController extends Controller
         }
         try {
             $user->update($dataToUpdate);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['message' => 'Failed to update user.'], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
