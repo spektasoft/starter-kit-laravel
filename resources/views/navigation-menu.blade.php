@@ -11,7 +11,7 @@
                 <!-- Hamburger -->
                 <div class="flex items-center">
                     <div title="Menu" x-on:click="toggle()" x-on:click.outside="open = false"
-                        class="p-2.5 hover:bg-gray-500/10 rounded-2xl hover:dark:bg-gray-400/10">
+                        class="p-2.5 hover:bg-gray-500/10 rounded-2xl dark:hover:bg-gray-400/10">
                         <template x-if="!open">
                             <x-filament::icon-button icon="heroicon-m-bars-3" color="gray" size="xl" />
                         </template>

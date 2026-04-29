@@ -4,7 +4,7 @@
         @foreach ($data as $resource)
             <x-filament::grid.column>
                 <x-filament::section
-                    class="relative h-24 overflow-hidden overlook-card rounded-xl bg-gradient-to-tr from-gray-100 via-white to-white dark:from-gray-950 dark:to-gray-900">
+                    class="relative h-24 overflow-hidden overlook-card rounded-xl bg-linear-to-tr from-gray-100 via-white to-white dark:from-gray-950 dark:to-gray-900">
                     <a wire:navigate href="{{ $resource['url'] }}"
                         class="absolute inset-0 px-3 py-2 font-medium text-gray-600 overlook-link ring-primary-500 dark:text-gray-400 group hover:ring-2 focus:ring-2"
                         @if ($this->shouldShowTooltips($resource['raw_count'])) x-data x-tooltip="'{{ $resource['raw_count'] }}'" @endif>

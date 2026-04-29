@@ -17,7 +17,7 @@
             <x-curator::document-image :label="$record->name" icon-size="lg" :type="$record->type" :extension="$record->ext" />
         @endif
         <div
-            class="absolute inset-x-0 bottom-0 flex items-center justify-between px-1.5 pt-10 pb-1.5 text-xs text-white bg-gradient-to-t from-black/80 to-transparent gap-3">
+            class="absolute inset-x-0 bottom-0 flex items-center justify-between px-1.5 pt-10 pb-1.5 text-xs text-white bg-linear-to-t from-black/80 to-transparent gap-3">
             <div class="flex flex-col w-full gap-1">
                 @if ($canViewAll)
                     <div class="flex">
@@ -33,7 +33,7 @@
                 @endif
                 <div class="flex flex-row justify-between">
                     <p class="truncate">{{ $record->pretty_name }}</p>
-                    <p class="flex-shrink-0">{{ $record->size_for_humans }}</p>
+                    <p class="shrink-0">{{ $record->size_for_humans }}</p>
                 </div>
             </div>
         </div>

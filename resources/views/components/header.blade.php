@@ -5,7 +5,7 @@
 
 <div x-data="header" x-on:scroll.window.throttle.100ms="scroll"
     :class="{
-        '-translate-y-0 top-16': show,
+        'translate-y-0 top-16': show,
         '-translate-y-full top-0': !show
     }"
     class="sticky z-10 duration-500 bg-white transition-top dark:bg-gray-900">

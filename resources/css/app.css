@@ -1,10 +1,64 @@
-@import "/node_modules/cropperjs/dist/cropper.css";
 @import "/vendor/awcodes/filament-curator/resources/css/plugin.css";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@tailwind variants;
+@import "tailwindcss";
+
+@source '../../storage/framework/views/*.php';
+@source '../../vendor/awcodes/filament-curator/resources/**/*.blade.php';
+@source '../../vendor/awcodes/overlook/resources/**/*.blade.php';
+@source '../../vendor/filament/**/*.blade.php';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/laravel/jetstream/**/*.blade.php';
+
+@theme {
+    --color-primary-50: #fff4ed;
+    --color-primary-100: #ffe6d4;
+    --color-primary-200: #ffcaa8;
+    --color-primary-300: #ffa470;
+    --color-primary-400: #ff7237;
+    --color-primary-500: #ff4b0d;
+    --color-primary-600: #f03206;
+    --color-primary-700: #c72207;
+    --color-primary-800: #9e1c0e;
+    --color-primary-900: #7f1b0f;
+    --color-primary-950: #450905;
+
+    --color-secondary-50: #fffcea;
+    --color-secondary-100: #fff4c5;
+    --color-secondary-200: #ffe985;
+    --color-secondary-300: #ffd746;
+    --color-secondary-400: #ffc31b;
+    --color-secondary-500: #ffa40a;
+    --color-secondary-600: #e27800;
+    --color-secondary-700: #bb5202;
+    --color-secondary-800: #983f08;
+    --color-secondary-900: #7c340b;
+    --color-secondary-950: #481900;
+
+    --font-sans:
+        Figtree, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+        "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentcolor);
+    }
+}
+
+@layer utilities {
+}
 
 [x-cloak] {
     display: none;
@@ -17,7 +71,7 @@ dl.grid.md\:grid-cols-3.gap-6 {
 
 .fi-ta-record:has(.curator-grid-column-square) {
     label {
-        @apply aspect-square !important;
+        @apply aspect-square!;
     }
 
     .fi-ta-actions {

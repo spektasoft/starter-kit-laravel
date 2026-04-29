@@ -25,7 +25,7 @@
 
     <main class="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
         <x-banner />
-        <div class="flex-grow">{{ $slot }}</div>
+        <div class="grow">{{ $slot }}</div>
     </main>
 
     <x-curator::modals.modal />
