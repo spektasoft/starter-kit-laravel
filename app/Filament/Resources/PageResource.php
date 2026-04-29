@@ -19,7 +19,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Table;
-use FilamentTiptapEditor\TiptapEditor;
 use Illuminate\Database\Eloquent\Builder;
 
 class PageResource extends Resource implements HasShieldPermissions
@@ -53,8 +52,10 @@ class PageResource extends Resource implements HasShieldPermissions
                                         ->label(__('page.resource.title'))
                                         ->lazy()
                                         ->required($required),
-                                    TiptapEditor::make('content')
-                                        ->label(__('page.resource.content')),
+                                    Forms\Components\Textarea::make('content')
+                                        ->label(__('page.resource.content'))
+                                        ->rows(20)
+                                        ->columnSpanFull(),
                                 ];
                             })
                             ->columnSpanFull()
