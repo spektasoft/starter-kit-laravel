@@ -2,16 +2,16 @@
 
 namespace App\Filament\Resources\Users\Utils;
 
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Hidden;
 use App\Models\User;
-use Filament\Forms;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
 
 class Creator
 {
     /**
-     * @return \Filament\Schemas\Components\Component
+     * @return Component
      */
     public static function getComponent(bool $canSelect)
     {

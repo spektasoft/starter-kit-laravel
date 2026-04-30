@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Carbon;
-use Database\Factories\PageFactory;
 use App\Concerns\HandlesTranslatableAttributes;
-use App\Concerns\HasCreatorAttribute;
 use App\Enums\Page\Status;
+use Database\Factories\PageFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property string $id
@@ -27,10 +27,9 @@ class Page extends Model
 {
     use HandlesTranslatableAttributes;
 
-    use HasCreatorAttribute;
-
     /** @use HasFactory<PageFactory> */
     use HasFactory;
+
     use HasUlids;
 
     /**
@@ -49,6 +48,14 @@ class Page extends Model
      * @var list<string>
      */
     protected $fillable = ['creator_id', 'title', 'content', 'status'];
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'creator_id');
+    }
 
     public function isReferenced(): bool
     {
