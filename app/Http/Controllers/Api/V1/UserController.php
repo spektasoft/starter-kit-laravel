@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use Exception;
 use App\Concerns\AuthorizesRequestsWithTokens;
 use App\Data\UserData;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -31,12 +31,27 @@ class UserController extends Controller
     {
         $this->authorizeTokenOrPolicy('read', 'viewAny', User::class);
 
-        /** @var string */
-        $tableSortColumn = request()->input('tableSortColumn') ?? 'id';
-        /** @var string */
-        $tableSortDirection = request()->input('tableSortDirection') ?? 'asc';
+        // New format: sort=column:direction (e.g. "id:asc", "name:desc").
+        // Legacy format: tableSortColumn + tableSortDirection are still supported.
+        // The new `sort` parameter takes precedence when present.
+        /** @var string|null */
+        $sort = request()->input('sort');
 
-        $users = User::orderBy($tableSortColumn, $tableSortDirection)
+        if (filled($sort) && str_contains($sort, ':')) {
+            [$sortColumn, $sortDirection] = explode(':', $sort, 2);
+        } else {
+            /** @var string */
+            $sortColumn = filled($sort) ? $sort : (request()->input('tableSortColumn') ?? 'id');
+            /** @var string */
+            $sortDirection = request()->input('tableSortDirection') ?? 'asc';
+        }
+
+        /** @var string */
+        $sortColumn = $sortColumn;
+        /** @var string */
+        $sortDirection = $sortDirection;
+
+        $users = User::orderBy($sortColumn, $sortDirection)
             ->paginate();
 
         return UserData::collect($users);
@@ -113,7 +128,7 @@ class UserController extends Controller
             $dataToUpdate['password'] = Hash::make($password);
         }
         try {
-            $user->update($dataToUpdate);
+            $user->fill($dataToUpdate)->save();
         } catch (Exception $e) {
             return response()->json(['message' => 'Failed to update user.'], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -125,7 +140,11 @@ class UserController extends Controller
     {
         $this->authorizeTokenOrPolicy('delete', 'delete', $user);
 
-        $user->delete();
+        try {
+            $user->deleteOrFail();
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Failed to delete user.'], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
         return response()->json(
             ['message' => 'User deleted successfully!'],
