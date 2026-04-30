@@ -2,35 +2,34 @@
 
 namespace App\Filament\Resources\Pages;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Group;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Forms\Components\Textarea;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\Radio;
-use App\Filament\Resources\Pages\Pages\ListPages;
-use App\Filament\Resources\Pages\Pages\CreatePage;
-use App\Filament\Resources\Pages\Pages\EditPage;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\ExportBulkAction;
 use App\Enums\Page\Status;
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Exports\PageExporter;
-use App\Filament\Resources\PageResource\Pages;
+use App\Filament\Resources\Pages\Pages\CreatePage;
+use App\Filament\Resources\Pages\Pages\EditPage;
+use App\Filament\Resources\Pages\Pages\ListPages;
 use App\Filament\Resources\Users\Utils\Creator;
 use App\Filament\Tables\Columns\TranslatableTextColumn;
 use App\Forms\Components\LocalesAwareTranslate;
 use App\Models\Page;
 use App\Models\User;
+use BackedEnum;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
-use Filament\Forms;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ExportBulkAction;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -38,7 +37,7 @@ class PageResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Page::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document';
 
     public static function canViewAll(): bool
     {
@@ -65,9 +64,8 @@ class PageResource extends Resource implements HasShieldPermissions
                                         ->label(__('page.resource.title'))
                                         ->lazy()
                                         ->required($required),
-                                    Textarea::make('content')
+                                    RichEditor::make('content')
                                         ->label(__('page.resource.content'))
-                                        ->rows(20)
                                         ->columnSpanFull(),
                                 ];
                             })
@@ -89,7 +87,7 @@ class PageResource extends Resource implements HasShieldPermissions
                         'default' => 1,
                         'sm' => 2,
                     ]),
-                ]),
+                ])->columnSpanFull(),
             ]);
     }
 
