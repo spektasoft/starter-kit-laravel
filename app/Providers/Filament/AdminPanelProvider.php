@@ -2,13 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
-use Awcodes\Curator\CuratorPlugin;
-use Awcodes\Overlook\OverlookPlugin;
-use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-use ShuvroRoy\FilamentSpatieLaravelBackup\FilamentSpatieLaravelBackupPlugin;
-use Awcodes\Overlook\Widgets\OverlookWidget;
 use App\Colors\Color;
 use App\Filament\Pages\Backups;
 use App\Filament\Resources\Media\MediaResource;
@@ -18,28 +11,32 @@ use App\Filament\Resources\Roles\RoleResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Http\Middleware\EnsureEmailIsVerifiedWithFortify;
 use App\Http\Middleware\SetLocaleFromQueryAndSession;
+use Awcodes\Curator\CuratorPlugin;
+use Awcodes\Overlook\OverlookPlugin;
+use Awcodes\Overlook\Widgets\OverlookWidget;
+use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
+use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
-use Filament\Pages;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\View\PanelsRenderHook;
-use Filament\Widgets;
+use Filament\Widgets\AccountWidget;
+use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\View\ComponentAttributeBag;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Laravel\Jetstream\Features;
+use ShuvroRoy\FilamentSpatieLaravelBackup\FilamentSpatieLaravelBackupPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -58,15 +55,16 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Vermilion,
                 'secondary' => Color::WebOrange,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
+                OverlookWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -84,6 +82,7 @@ class AdminPanelProvider extends PanelProvider
                 EnsureEmailIsVerifiedWithFortify::class,
                 Authenticate::class,
             ])
+            ->databaseNotifications()
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label(fn () => __('Administration')),
@@ -116,24 +115,13 @@ class AdminPanelProvider extends PanelProvider
                         PermissionResource::class,
                         RoleResource::class,
                     ]),
-                FilamentShieldPlugin::make(),
                 FilamentSpatieLaravelBackupPlugin::make()
                     ->usingPage(Backups::class),
             ])
-            ->userMenuItems(array_filter([
-                MenuItem::make()
-                    ->label(fn () => __('navigation-menu.menu.profile'))
-                    ->icon('heroicon-o-user')
-                    ->url(fn () => route('profile.show')),
-                Features::hasApiFeatures() ? MenuItem::make()
-                    ->label(fn () => __('navigation-menu.menu.api_tokens'))
-                    ->icon('heroicon-o-key')
-                    ->url(fn () => route('api-tokens.index')) : null,
-            ]))
             // Hack to disable x-persist
             ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_BEFORE, fn () => Blade::render(<<<'BLADE'
             </div>
-            <div class="flex items-center gap-2 ms-auto">
+            <div class="fi-topbar-end">
             BLADE))
             ->renderHook(PanelsRenderHook::SCRIPTS_AFTER, fn () => Blade::render(<<<'BLADE'
             @vite('resources/ts/app.ts')
@@ -142,14 +130,20 @@ class AdminPanelProvider extends PanelProvider
             @googlefonts('sans')
             BLADE))
             ->renderHook(PanelsRenderHook::USER_MENU_BEFORE, fn () => Blade::render('<x-navigation-menu.language-switcher />'))
-            ->spa()
             ->sidebarFullyCollapsibleOnDesktop()
             ->sidebarWidth('14rem')
+            ->spa()
             ->unsavedChangesAlerts()
-            ->viteTheme('resources/css/app.css')
-            ->widgets([
-                OverlookWidget::class,
-            ])
-            ->databaseNotifications();
+            ->userMenuItems(array_filter([
+                Action::make('profile')
+                    ->label(fn () => __('navigation-menu.menu.profile'))
+                    ->icon('heroicon-o-user')
+                    ->url(fn () => route('profile.show')),
+                Features::hasApiFeatures() ? Action::make('api_token')
+                    ->label(fn () => __('navigation-menu.menu.api_tokens'))
+                    ->icon('heroicon-o-key')
+                    ->url(fn () => route('api-tokens.index')) : null,
+            ]))
+            ->viteTheme('resources/css/app.css');
     }
 }
