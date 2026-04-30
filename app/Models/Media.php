@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Carbon;
-use Database\Factories\MediaFactory;
 use App\Observers\MediaObserver;
 use Awcodes\Curator\Models\Media as CuratorMedia;
+use Database\Factories\MediaFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -13,6 +12,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 
@@ -50,6 +50,8 @@ class Media extends CuratorMedia
     use HasFactory;
 
     use HasUlids;
+
+    protected $table = 'media';
 
     protected static function booted()
     {
