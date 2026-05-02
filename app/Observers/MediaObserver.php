@@ -151,6 +151,6 @@ class MediaObserver extends CuratorMediaObserver
 
     private function removeExif(Media $media): void
     {
-        $media->setAttribute('exif', null);
+        $media->exif = null;
     }
 }
