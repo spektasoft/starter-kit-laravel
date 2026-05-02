@@ -4,15 +4,12 @@ namespace App\Filament\Resources\Media;
 
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\Media\Pages\EditMedia;
+use App\Filament\Resources\Media\Pages\ListMedia;
 use App\Models\Media;
 use App\Models\User;
 use Awcodes\Curator\Resources\Media\MediaResource as CuratorMediaResource;
-use Awcodes\Curator\Resources\Media\Pages\ListMedia;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Actions\BulkActionGroup;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Component;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -64,27 +61,6 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
         ];
     }
 
-    /**
-     * @return array<Component>
-     */
-    public static function getAdditionalInformationFormSchema(): array
-    {
-        /** @var array<Component> */
-        $parentComponents = parent::getAdditionalInformationFormSchema();
-
-        return [
-            ...$parentComponents,
-            static::canViewAll() ? Select::make('creator_id')
-                ->label(__('attributes.created_by'))
-                ->relationship('creator', titleAttribute: 'name')
-                ->default(User::auth()?->id)
-                ->native(false)
-                ->searchable()
-                ->required() : Hidden::make('creator_id')
-                ->dehydrateStateUsing(fn () => User::auth()?->id),
-        ];
-    }
-
     public static function table(Table $table): Table
     {
         /** @var ListMedia */
@@ -110,7 +86,6 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
                         'sm' => 3,
                         'md' => 3,
                         'lg' => 4,
-                        'xl' => 6,
                     ];
                 }
 

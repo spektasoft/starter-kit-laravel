@@ -85,41 +85,9 @@ class Media extends CuratorMedia
     protected function exif(): Attribute
     {
         return Attribute::make(
-            get: function ($value) {
-                if (is_null($value)) {
-                    return null;
-                }
-
-                // Respect the vendor's decoding logic but handle nulls safely
-                $decodedExif = parent::decodeExif($value);
-
-                return is_string($decodedExif) ? json_decode($decodedExif, true) : null;
-            },
-            set: function ($value) {
-                // If the value is null, return null (SQL NULL).
-                // Only json_encode if there is actual data.
-                if (is_null($value)) {
-                    return null;
-                }
-
-                return json_encode(parent::encodeExif($value));
-            },
+            get: fn ($value) => ! is_string($value) ? null : json_decode($value, true),
+            set: fn ($value) => is_null($value) ? null : json_encode($value),
         );
-    }
-
-    /**
-     * @return User
-     */
-    public function getCreatorAttribute()
-    {
-        if (! $this->relationLoaded('creator')) {
-            $this->load('creator');
-        }
-
-        /** @var User */
-        $creator = $this->getRelation('creator');
-
-        return $creator;
     }
 
     public function isReferenced(): bool

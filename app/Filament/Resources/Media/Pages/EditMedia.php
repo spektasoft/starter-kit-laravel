@@ -8,6 +8,7 @@ use Awcodes\Curator\Resources\Media\Pages\EditMedia as CuratorEditMedia;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
+use Filament\Actions\DeleteAction;
 
 class EditMedia extends CuratorEditMedia
 {
@@ -20,29 +21,28 @@ class EditMedia extends CuratorEditMedia
      */
     public function getHeaderActions(): array
     {
-        // Get the original header actions defined in the parent (Curator's) EditMedia page.
-        $actions = parent::getHeaderActions();
+        // We intentionally do NOT call parent::getHeaderActions() because
+        // Curator's implementation eagerly evaluates $this->record->url at
+        // registration time, before the record is resolved from the route,
+        // causing: "Argument #1 ($record) must be of type Model, null given".
+        //
+        // Instead, we rebuild all three actions here with lazy closures.
+        return [
+            Action::make('save')
+                ->action('save')
+                ->label(trans('curator::views.panel.edit_save')),
 
-        // Iterate through the actions to find and modify the 'preview' action.
-        /** @var array<Action|ActionGroup> */
-        $updatedActions = collect($actions)->map(function (Action|ActionGroup $action): Action|ActionGroup {
-            // Check if the current action is the 'preview' action.
-            if ($action instanceof Action && $action->getName() === 'preview') { // Check if it's an Action before getName()
-                // Override its URL definition.
-                // By providing a closure, the URL will be dynamically evaluated
-                // when the button is clicked, using the current state of $this->record.
-                return $action->url(function () {
-                    /** @var Media */
+            Action::make('preview')
+                ->color('gray')
+                ->url(function (): string {
+                    /** @var Media $record */
                     $record = $this->record;
 
                     return $record->url;
-                }, shouldOpenInNewTab: true);
-            }
+                }, shouldOpenInNewTab: true)
+                ->label(trans('curator::views.panel.view')),
 
-            // Return other actions as they are.
-            return $action;
-        })->toArray(); // Convert the collection back to an array.
-
-        return $updatedActions;
+            DeleteAction::make(),
+        ];
     }
 }
