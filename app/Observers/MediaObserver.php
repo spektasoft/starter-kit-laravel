@@ -2,19 +2,20 @@
 
 namespace App\Observers;
 
-use Throwable;
-use Exception;
-use App\Models\User;
 use App\Models\Media;
+use App\Models\User;
 use Awcodes\Curator\Models\Media as CuratorMedia;
 use Awcodes\Curator\Observers\MediaObserver as CuratorMediaObserver;
 use Awcodes\Curator\PathGenerators\UserPathGenerator;
+use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
+use Throwable;
 
 class MediaObserver extends CuratorMediaObserver
 {
@@ -129,9 +130,11 @@ class MediaObserver extends CuratorMediaObserver
 
         try {
             $originalPath = Storage::disk($media->disk)->path($media->path);
-            $image = Image::make($originalPath);
-            $webpPath = pathinfo($originalPath, PATHINFO_DIRNAME).'/'.pathinfo($originalPath, PATHINFO_FILENAME).'.webp';
-            $image->encode('webp', 90)->save($webpPath);
+            $manager = new ImageManager(new Driver);
+            $image = $manager->read($originalPath);
+            $webpPath = pathinfo($originalPath, PATHINFO_DIRNAME)
+                .'/'.pathinfo($originalPath, PATHINFO_FILENAME).'.webp';
+            $image->toWebp(90)->save($webpPath);
             $oldImagePath = $media->path;
             $media->setAttribute('path', str_replace(pathinfo($media->path, PATHINFO_EXTENSION), 'webp', $media->path));
             $media->setAttribute('ext', 'webp');
