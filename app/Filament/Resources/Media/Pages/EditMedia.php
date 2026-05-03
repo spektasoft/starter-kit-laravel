@@ -38,7 +38,7 @@ class EditMedia extends CuratorEditMedia
                     /** @var Media $record */
                     $record = $this->record;
 
-                    return $record->url;
+                    return $record->url ?? '';
                 }, shouldOpenInNewTab: true)
                 ->label(trans('curator::views.panel.view')),
 
