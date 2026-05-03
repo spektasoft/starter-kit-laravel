@@ -18,6 +18,10 @@ use Illuminate\Support\Facades\Gate;
 
 /**
  * @property string $id
+ * @property string|null $url
+ * @property string|null $thumbnail_url
+ * @property string|null $medium_url
+ * @property string|null $large_url
  * @property string $disk
  * @property string $path
  * @property string $creator_id
