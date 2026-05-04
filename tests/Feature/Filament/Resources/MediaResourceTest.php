@@ -3,10 +3,11 @@
 namespace Tests\Feature\Filament\Resources;
 
 use App\Filament\Resources\Media\MediaResource;
+use App\Filament\Resources\Media\Pages\ListMedia;
 use App\Models\Media;
 use App\Models\Permission;
 use App\Models\User;
-use Awcodes\Curator\Resources\MediaResource\CreateMedia;
+use Awcodes\Curator\Resources\Media\Pages\CreateMedia;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Livewire\Livewire;
@@ -95,7 +96,7 @@ class MediaResourceTest extends TestCase
         $media = Media::factory()->create(['creator_id' => $user->id]);
         $otherMedia = Media::factory()->create();
 
-        Livewire::test(\App\Filament\Resources\Media\Pages\ListMedia::class)
+        Livewire::test(ListMedia::class)
             ->assertCanSeeTableRecords([$media, $otherMedia])
             ->filterTable('creator', $user->id)
             ->assertCanSeeTableRecords([$media])
