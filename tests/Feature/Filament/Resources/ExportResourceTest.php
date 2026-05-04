@@ -162,17 +162,17 @@ class ExportResourceTest extends TestCase
         $this->actingAs($userA);
 
         // Act & Assert
-        $exportsUserA = Export::where(function ($query) use ($userA) {
+        $exportsUserA = Export::query()->where(function ($query) use ($userA) {
             $query->where('user_id', $userA->id)
                 ->orWhere('creator_id', $userA->id);
         })->get();
 
-        $exportsNotUserA = Export::where(function ($query) use ($userA) {
+        $exportsNotUserA = Export::query()->where(function ($query) use ($userA) {
             $query->where('user_id', '!=', $userA->id)
                 ->where('creator_id', '!=', $userA->id);
         })->get();
 
-        $livewire = Livewire::test(Exports\Pages\ListExports::class);
+        $livewire = Livewire::test(ListExports::class);
         $livewire->assertCanSeeTableRecords($exportsUserA);
         $livewire->assertCanNotSeeTableRecords($exportsNotUserA);
     }
