@@ -164,7 +164,7 @@ class PageResourceTest extends TestCase
         $page = Page::factory()->create();
 
         $listPages = Livewire::test(ListPages::class);
-        $listPages->callTableAction('delete', $page);
+        $listPages->callAction(TestAction::make('delete')->table($page));
         $listPages->assertSuccessful();
 
         $this->assertDatabaseMissing(Page::class, ['id' => $page->getKey()]);
@@ -175,7 +175,8 @@ class PageResourceTest extends TestCase
         $pages = Page::factory(3)->create();
 
         $listPages = Livewire::test(ListPages::class);
-        $listPages->callTableBulkAction('delete', $pages->pluck('id')->toArray());
+        $listPages->selectTableRecords($pages->pluck('id')->toArray())
+            ->callAction(TestAction::make('delete')->table()->bulk());
         $listPages->assertSuccessful();
 
         foreach ($pages as $page) {
