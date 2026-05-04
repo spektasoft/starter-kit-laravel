@@ -2,20 +2,20 @@
 
 namespace App\Livewire\EditProfile;
 
-use Filament\Actions\Contracts\HasActions;
-use Filament\Actions\Concerns\InteractsWithActions;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\View;
-use Exception;
-use Filament\Actions\Action;
 use App\Concerns\HasUser;
 use App\Filament\Actions\Forms\PasswordConfirmationAction;
 use App\Models\User;
+use Exception;
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -30,14 +30,14 @@ use Laravel\Fortify\Fortify;
 use Livewire\Component;
 
 /**
- * @property \Filament\Schemas\Schema $form
+ * @property Schema $form
  *
  * @method void refresh()
  */
-class TwoFactorAuthenticationForm extends Component implements HasForms, HasActions
+class TwoFactorAuthenticationForm extends Component implements HasActions, HasForms
 {
-    use InteractsWithActions;
     use HasUser;
+    use InteractsWithActions;
     use InteractsWithForms;
 
     /**
@@ -341,7 +341,6 @@ class TwoFactorAuthenticationForm extends Component implements HasForms, HasActi
                         ->numeric()
                         ->length(6)
                         ->autocomplete('one-time-code')
-                        ->model('code')
                         ->extraAttributes(['wire:keydown.enter' => 'confirmTwoFactorAuthentication'])
                 );
             }
