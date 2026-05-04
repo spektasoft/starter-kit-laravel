@@ -21,6 +21,8 @@ use Filament\Support\Facades\FilamentView;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 use Livewire\Livewire;
 use SolutionForest\FilamentTranslateField\Facades\FilamentTranslateField;
 use Spatie\Translatable\Facades\Translatable;
@@ -34,6 +36,9 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(DeviceService::class, function ($app) {
             return new DeviceService;
+        });
+        $this->app->singleton(ImageManager::class, function () {
+            return new ImageManager(new Driver);
         });
         $this->app->singleton(Jwt::class, function (Application $app) {
             return new AhcJwtService;

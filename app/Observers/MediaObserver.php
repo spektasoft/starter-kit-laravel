@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
 use Throwable;
 
@@ -113,8 +112,6 @@ class MediaObserver extends CuratorMediaObserver
                 throw $e;
             }
         }
-        // If the path generator is not UserPathGenerator, or creator_id is not dirty,
-        // this custom file moving logic is skipped.
     }
 
     private function convertToWebP(Media $media): void
@@ -130,7 +127,7 @@ class MediaObserver extends CuratorMediaObserver
 
         try {
             $originalPath = Storage::disk($media->disk)->path($media->path);
-            $manager = new ImageManager(new Driver);
+            $manager = app(ImageManager::class);
             $image = $manager->read($originalPath);
             $webpPath = pathinfo($originalPath, PATHINFO_DIRNAME)
                 .'/'.pathinfo($originalPath, PATHINFO_FILENAME).'.webp';
@@ -152,5 +149,6 @@ class MediaObserver extends CuratorMediaObserver
     private function removeExif(Media $media): void
     {
         $media->exif = null;
+        $media->saveQuietly();
     }
 }
