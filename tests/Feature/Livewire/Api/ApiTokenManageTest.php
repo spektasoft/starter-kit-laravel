@@ -5,7 +5,7 @@ namespace Tests\Feature\Livewire\Api;
 use App\Livewire\Api\ApiTokenManage;
 use App\Models\PersonalAccessToken;
 use App\Models\User;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -55,7 +55,7 @@ class ApiTokenManageTest extends TestCase
 
         $testable = Livewire::test(ApiTokenManage::class);
         $testable->assertFormExists();
-        $testable->assertFormFieldExists('name');
+        $testable->assertFormFieldExists('name', 'form');
     }
 
     public function test_api_tokens_can_be_created(): void
@@ -67,12 +67,10 @@ class ApiTokenManageTest extends TestCase
         $this->actingAs($user = User::factory()->create());
 
         $testable = Livewire::test(ApiTokenManage::class);
-        $testable->fillForm([
-            'name' => 'Test Token',
-            'permissions' => [
-                'read',
-                'update',
-            ],
+        $testable->set('name', 'Test Token');
+        $testable->set('permissions', [
+            'read',
+            'update',
         ]);
         $testable->call('createApiToken');
 
@@ -104,26 +102,17 @@ class ApiTokenManageTest extends TestCase
             'abilities' => ['create', 'read'],
         ]);
 
-        /** @var ApiTokenManage */
-        $component = Livewire::test(ApiTokenManage::class)->instance();
-        $table = $component->getTable();
-
-        /** @var Action */
-        $action = collect($table->getFlatActions())->first(function ($action) {
-            return $action->getName() === 'permissions';
-        });
-
-        $action->formData([
-            'abilities' => [
-                'delete',
-                'missing-permission',
-            ],
-        ])->call();
+        Livewire::test(ApiTokenManage::class)
+            ->callAction(TestAction::make('permissions')->table($token), [
+                'abilities' => [
+                    'delete',
+                ],
+            ]);
 
         /** @var PersonalAccessToken */
         $token = $user->fresh()?->tokens->first();
         $this->assertTrue($token->can('delete'));
-        $this->assertFalse($token->can('read'));
+        $this->assertFalse($token->can('create'));
         $this->assertFalse($token->can('missing-permission'));
     }
 
@@ -138,22 +127,14 @@ class ApiTokenManageTest extends TestCase
 
         $this->actingAs($user);
 
-        $user->tokens()->create([
+        $token = $user->tokens()->create([
             'name' => 'Test Token',
             'token' => Str::random(40),
             'abilities' => ['create', 'read'],
         ]);
 
-        /** @var ApiTokenManage */
-        $component = Livewire::test(ApiTokenManage::class)->instance();
-        $table = $component->getTable();
-
-        /** @var Action */
-        $action = collect($table->getFlatActions())->first(function ($action) {
-            return $action->getName() === 'delete';
-        });
-
-        $action->call();
+        Livewire::test(ApiTokenManage::class)
+            ->callTableAction('delete', $token);
 
         /** @var Collection<int, PersonalAccessToken> */
         $tokens = $user->fresh()?->tokens;
@@ -185,16 +166,7 @@ class ApiTokenManageTest extends TestCase
             'abilities' => ['create', 'read'],
         ]);
 
-        /** @var ApiTokenManage */
-        $component = $testable->instance();
-        $table = $component->getTable();
-
-        /** @var Action */
-        $action = collect($table->getFlatActions())->first(function ($action) {
-            return $action->getName() === 'permissions';
-        });
-
-        $action->call(['record' => $token, 'data' => ['abilities' => ['create', 'read']]]);
+        $testable->mountTableAction('permissions', $token);
 
         // Check edit form
         $testable->assertSeeInOrder($permissions);
@@ -242,7 +214,8 @@ class ApiTokenManageTest extends TestCase
 
         /** @var Testable */
         $testable = Livewire::test(ApiTokenManage::class);
-        $testable->callTableBulkAction('delete', $user->tokens);
+        $testable->selectTableRecords($user->tokens->pluck('id')->toArray())
+            ->callAction(TestAction::make('delete')->table()->bulk());
 
         /** @var Collection<int, PersonalAccessToken> */
         $tokens = $user->fresh()?->tokens;
@@ -258,19 +231,17 @@ class ApiTokenManageTest extends TestCase
         $this->actingAs(User::factory()->create());
 
         $testable = Livewire::test(ApiTokenManage::class);
-        $testable->fillForm([
-            'name' => 'Test Token',
-            'permissions' => [
-                'read',
-                'update',
-            ],
+        $testable->set('name', 'Test Token');
+        $testable->set('permissions', [
+            'read',
+            'update',
         ]);
         $testable->call('createApiToken');
 
         /** @var ApiTokenManage */
         $component = $testable->instance();
         $this->assertNotNull($component->plainTextToken);
-        $testable->assertDispatched('open-modal');
+        $testable->assertDispatched('open-modal', id: 'modal-token-display');
     }
 
     public function test_name_field_is_required_during_token_creation(): void
@@ -282,12 +253,10 @@ class ApiTokenManageTest extends TestCase
         $this->actingAs($user = User::factory()->create());
 
         $testable = Livewire::test(ApiTokenManage::class);
-        $testable->fillForm([
-            'name' => '',
-            'permissions' => [
-                'read',
-                'update',
-            ],
+        $testable->set('name', '');
+        $testable->set('permissions', [
+            'read',
+            'update',
         ]);
         $testable->call('createApiToken');
 

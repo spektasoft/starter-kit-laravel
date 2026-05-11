@@ -2,47 +2,46 @@
 
 namespace App\Livewire\Api;
 
-use Filament\Actions\Contracts\HasActions;
-use Filament\Actions\Concerns\InteractsWithActions;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\CheckboxList;
-use Filament\Actions\Action;
-use Filament\Schemas\Components\Actions;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use App\Concerns\CanUpdatePaginators;
 use App\Concerns\HasUser;
 use App\Models\PersonalAccessToken;
 use App\Models\User;
-use Filament\Forms;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
-use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\View\View;
 use Laravel\Jetstream\Jetstream;
 use Livewire\Component;
 
 /**
- * @property \Filament\Schemas\Schema $form
+ * @property Schema $form
  * @property Table $table
  */
-class ApiTokenManage extends Component implements HasForms, HasTable, HasActions
+class ApiTokenManage extends Component implements HasActions, HasSchemas, HasTable
 {
-    use InteractsWithActions;
     use CanUpdatePaginators;
     use HasUser;
-    use InteractsWithForms;
+    use InteractsWithActions;
+    use InteractsWithSchemas;
     use InteractsWithTable;
 
     /**
@@ -108,7 +107,7 @@ class ApiTokenManage extends Component implements HasForms, HasTable, HasActions
             'name' => $name,
         ], [
             'name' => ['required', 'string', 'max:255'],
-        ])->validateWithBag('createApiToken');
+        ])->validate();
 
         $token = $this->user->createToken(
             $name,
@@ -127,6 +126,7 @@ class ApiTokenManage extends Component implements HasForms, HasTable, HasActions
     public function form(Schema $schema): Schema
     {
         return $schema
+            ->statePath('')
             ->components([
                 Section::make('token_section')
                     ->heading(__('Create API Token'))
@@ -210,7 +210,7 @@ class ApiTokenManage extends Component implements HasForms, HasTable, HasActions
                         ->icon('heroicon-o-lock-closed')
                         ->action(function (Model $record, array $data) {
                             /** @var string[] */
-                            $abilities = $data['abilities'];
+                            $abilities = $data['abilities'] ?? [];
                             $record->forceFill([
                                 'abilities' => Jetstream::validPermissions($abilities),
                             ])->save();
@@ -244,6 +244,16 @@ class ApiTokenManage extends Component implements HasForms, HasTable, HasActions
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /**
+     * Render the component.
+     *
+     * @return View
+     */
+    public function render()
+    {
+        return view('livewire.api.api-token-manage');
     }
 
     /**
