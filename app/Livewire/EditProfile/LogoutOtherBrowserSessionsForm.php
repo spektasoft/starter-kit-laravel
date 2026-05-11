@@ -2,20 +2,20 @@
 
 namespace App\Livewire\EditProfile;
 
-use Filament\Actions\Contracts\HasActions;
-use Filament\Actions\Concerns\InteractsWithActions;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\View;
 use App\Concerns\CanRestoreSession;
 use App\Concerns\HasUser;
 use App\Data\SessionData;
 use App\Filament\Actions\Forms\PasswordConfirmationAction;
 use App\Models\Session;
 use Carbon\Carbon;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
+use Filament\Schemas\Schema;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Support\Collection;
@@ -25,13 +25,13 @@ use Laravel\Jetstream\Agent;
 use Livewire\Component;
 
 /**
- * @property \Filament\Schemas\Schema $form
+ * @property Schema $form
  */
-class LogoutOtherBrowserSessionsForm extends Component implements HasForms, HasActions
+class LogoutOtherBrowserSessionsForm extends Component implements HasActions, HasForms
 {
-    use InteractsWithActions;
     use CanRestoreSession;
     use HasUser;
+    use InteractsWithActions;
     use InteractsWithForms;
 
     public function form(Schema $schema): Schema
