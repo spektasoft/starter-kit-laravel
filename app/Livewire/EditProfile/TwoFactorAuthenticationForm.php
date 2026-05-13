@@ -162,14 +162,14 @@ class TwoFactorAuthenticationForm extends Component implements HasActions, HasFo
                 Section::make()
                     ->heading(__('Two Factor Authentication'))
                     ->description(__('Add additional security to your account using two factor authentication.'))
-                    ->schema([
+                    ->schema(fn () => [
                         View::make('heading') // @phpstan-ignore-line
                             ->view('components.two-factor-authentication-form.heading'),
                         View::make('instruction') // @phpstan-ignore-line
                             ->view('components.two-factor-authentication-form.instruction'),
-                        ...$this->getComponents(),
+                        ...$this->getFormComponents(),
                     ])
-                    ->footerActions($this->getFooterActions())
+                    ->footerActions($this->getActions())
                     ->aside(),
             ]);
     }
@@ -317,7 +317,7 @@ class TwoFactorAuthenticationForm extends Component implements HasActions, HasFo
     /**
      * @return \Filament\Schemas\Components\Component[]
      */
-    private function getComponents()
+    private function getFormComponents()
     {
         if (! $this->getEnabledProperty()) {
             return [];
@@ -351,15 +351,18 @@ class TwoFactorAuthenticationForm extends Component implements HasActions, HasFo
         }
 
         /** @var \Filament\Schemas\Components\Component[] */
-        $arr = $components->toArray();
+        $arr = $components->all();
 
         return $arr;
     }
 
     /**
+     * Register footer actions with Filament's action cache so they are
+     * resolvable by name via callAction() and the mounted action stack.
+     *
      * @return Action[]
      */
-    private function getFooterActions()
+    public function getActions(): array
     {
         /** @var Collection<int, Action> */
         $actions = collect();
@@ -452,7 +455,7 @@ class TwoFactorAuthenticationForm extends Component implements HasActions, HasFo
         }
 
         /** @var Action[] */
-        $arr = $actions->toArray();
+        $arr = $actions->all();
 
         return $arr;
     }
