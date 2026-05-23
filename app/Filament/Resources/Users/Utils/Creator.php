@@ -24,6 +24,7 @@ class Creator
                     ->relationship('creator', titleAttribute: 'name')
                     ->default(User::auth()?->id)
                     ->native(false)
+                    ->required()
                     ->searchable(),
             ]) :
         Hidden::make('creator_id')
