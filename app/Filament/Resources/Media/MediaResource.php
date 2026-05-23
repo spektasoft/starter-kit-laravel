@@ -8,14 +8,13 @@ use App\Filament\Resources\Media\Pages\ListMedia;
 use App\Models\Media;
 use App\Models\User;
 use Awcodes\Curator\Resources\Media\MediaResource as CuratorMediaResource;
-use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Actions\BulkActionGroup;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class MediaResource extends CuratorMediaResource implements HasShieldPermissions
+class MediaResource extends CuratorMediaResource
 {
     public static function canViewAll(): bool
     {
@@ -48,16 +47,6 @@ class MediaResource extends CuratorMediaResource implements HasShieldPermissions
             ...parent::getPages(),
             'index' => ListMedia::route('/'),
             'edit' => EditMedia::route('/{record}/edit'),
-        ];
-    }
-
-    /**
-     * @return string[]
-     */
-    public static function getPermissionPrefixes(): array
-    {
-        return [
-            'view_all',
         ];
     }
 

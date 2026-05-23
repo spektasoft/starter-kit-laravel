@@ -2,27 +2,24 @@
 
 namespace App\Filament\Resources\Permissions;
 
+use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
+use App\Filament\Resources\Permissions\Pages\ListPermissions;
+use App\Models\Permission;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use App\Filament\Resources\Permissions\Pages\ListPermissions;
-use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
-use App\Filament\Resources\PermissionResource\Pages;
-use App\Models\Permission;
-use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
-use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class PermissionResource extends Resource implements HasShieldPermissions
+class PermissionResource extends Resource
 {
     protected static ?string $model = Permission::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-lock-closed';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-lock-closed';
 
     public static function form(Schema $schema): Schema
     {
@@ -42,18 +39,6 @@ class PermissionResource extends Resource implements HasShieldPermissions
     public static function getPluralModelLabel(): string
     {
         return trans_choice('permission.resource.model_label', 2);
-    }
-
-    /**
-     * @return string[]
-     */
-    public static function getPermissionPrefixes(): array
-    {
-        return [
-            'view_any',
-            'delete',
-            'delete_any',
-        ];
     }
 
     public static function table(Table $table): Table

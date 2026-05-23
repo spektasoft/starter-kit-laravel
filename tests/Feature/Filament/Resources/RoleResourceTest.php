@@ -52,7 +52,6 @@ class RoleResourceTest extends TestCase
     {
         $options = RoleResource::getCustomPermissionOptions();
 
-        $this->assertIsArray($options);
         $this->assertArrayHasKey('delete-backup', $options);
         $this->assertArrayHasKey('download-backup', $options);
     }

@@ -2,27 +2,24 @@
 
 namespace App\Filament\Resources\Exports;
 
-use App\Filament\Resources\Exports\Pages\ListExports;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
-use App\Filament\Resources\ExportResource\Pages;
+use App\Filament\Resources\Exports\Pages\ListExports;
 use App\Models\Export;
-use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
-class ExportResource extends Resource implements HasShieldPermissions
+class ExportResource extends Resource
 {
     protected static ?string $model = Export::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-arrow-path-rounded-square';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-arrow-path-rounded-square';
 
     public static function canViewAll(): bool
     {
@@ -63,14 +60,6 @@ class ExportResource extends Resource implements HasShieldPermissions
         return [
             'index' => ListExports::route('/'),
         ];
-    }
-
-    /**
-     * @return string[]
-     */
-    public static function getPermissionPrefixes(): array
-    {
-        return ['view_all'];
     }
 
     public static function getPluralModelLabel(): string

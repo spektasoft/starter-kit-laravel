@@ -2,24 +2,22 @@
 
 namespace App\Filament\Resources\Imports;
 
-use App\Filament\Resources\Imports\Pages\ListImports;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
-use App\Filament\Resources\ImportResource\Pages;
+use App\Filament\Resources\Imports\Pages\ListImports;
 use App\Models\Import;
-use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
-class ImportResource extends Resource implements HasShieldPermissions
+class ImportResource extends Resource
 {
     protected static ?string $model = Import::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-arrow-down-tray';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-arrow-down-tray';
 
     public static function canViewAll(): bool
     {
@@ -60,12 +58,6 @@ class ImportResource extends Resource implements HasShieldPermissions
         return [
             'index' => ListImports::route('/'),
         ];
-    }
-
-    /** @return array<string> */
-    public static function getPermissionPrefixes(): array
-    {
-        return ['view_all'];
     }
 
     public static function getPluralModelLabel(): string

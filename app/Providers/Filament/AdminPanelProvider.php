@@ -7,13 +7,13 @@ use App\Filament\Pages\Backups;
 use App\Filament\Resources\Media\MediaResource;
 use App\Filament\Resources\Pages\PageResource;
 use App\Filament\Resources\Permissions\PermissionResource;
-use App\Filament\Resources\Roles\RoleResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Http\Middleware\EnsureEmailIsVerifiedWithFortify;
 use App\Http\Middleware\SetLocaleFromQueryAndSession;
 use Awcodes\Curator\CuratorPlugin;
 use Awcodes\Overlook\OverlookPlugin;
 use Awcodes\Overlook\Widgets\OverlookWidget;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -115,10 +115,10 @@ class AdminPanelProvider extends PanelProvider
                         PageResource::class,
                         UserResource::class,
                         PermissionResource::class,
-                        RoleResource::class,
                     ]),
                 FilamentSpatieLaravelBackupPlugin::make()
                     ->usingPage(Backups::class),
+                FilamentShieldPlugin::make(),
             ])
             // Hack to disable x-persist
             ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_BEFORE, fn () => Blade::render(<<<'BLADE'

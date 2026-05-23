@@ -14,7 +14,6 @@ use App\Forms\Components\LocalesAwareTranslate;
 use App\Models\Page;
 use App\Models\User;
 use BackedEnum;
-use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -33,7 +32,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class PageResource extends Resource implements HasShieldPermissions
+class PageResource extends Resource
 {
     protected static ?string $model = Page::class;
 
@@ -122,21 +121,6 @@ class PageResource extends Resource implements HasShieldPermissions
             'index' => ListPages::route('/'),
             'create' => CreatePage::route('/create'),
             'edit' => EditPage::route('/{record}/edit'),
-        ];
-    }
-
-    /**
-     * @return string[]
-     */
-    public static function getPermissionPrefixes(): array
-    {
-        return [
-            'view',
-            'view_all',
-            'view_any',
-            'create',
-            'update',
-            'delete',
         ];
     }
 
