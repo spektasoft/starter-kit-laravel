@@ -71,7 +71,7 @@ class UserControllerTest extends TestCase
 
         $response = $this->getJson(route('api.v1.users.index'));
         $response->assertStatus(JsonResponse::HTTP_OK);
-        $this->assertCount($count, (array) $response->json('data'));
+        $this->assertCount(User::count(), (array) $response->json('data'));
     }
 
     public function test_show_user(): void

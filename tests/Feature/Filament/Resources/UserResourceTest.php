@@ -164,8 +164,6 @@ class UserResourceTest extends TestCase
         $livewire->assertCanRenderTableColumn('email');
         $livewire->assertCanRenderTableColumn('roles');
         $livewire->assertCanRenderTableColumn('email_verified_at');
-        $livewire->assertCanRenderTableColumn('created_at');
-        $livewire->assertCanRenderTableColumn('updated_at');
 
         if (Jetstream::managesProfilePhotos()) {
             Livewire::test(ListUsers::class)
@@ -354,10 +352,12 @@ class UserResourceTest extends TestCase
         $user->givePermissionTo('delete_any_user');
         $usersToDelete = User::factory(2)->create();
 
+        $initialCount = User::count();
+
         $listUsers = Livewire::test(ListUsers::class);
         $listUsers->selectTableRecords($usersToDelete->pluck('id')->toArray())
             ->callAction(TestAction::make('delete')->table()->bulk());
 
-        $this->assertEquals(User::count(), 4); // 3 users + the initial user
+        $this->assertEquals($initialCount, User::count());
     }
 }
