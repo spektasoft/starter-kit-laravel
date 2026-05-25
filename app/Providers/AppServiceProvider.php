@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Colors\Color;
 use App\Contracts\Jwt;
 use App\Filament\Components\Modals\CuratorPanel;
+use App\Filament\Forms\Components\CuratorEnabledRichEditor;
 use App\Models\Export;
 use App\Models\FailedImportRow;
 use App\Models\Import;
@@ -14,6 +15,7 @@ use Exception;
 use Filament\Actions\Exports\Models\Export as FilamentExport;
 use Filament\Actions\Imports\Models\FailedImportRow as FilamentFailedImportRow;
 use Filament\Actions\Imports\Models\Import as FilamentImport;
+use Filament\Forms\Components\RichEditor;
 use Filament\Notifications\Livewire\DatabaseNotifications;
 use Filament\Support\Facades\FilamentColor;
 use Filament\Support\Facades\FilamentIcon;
@@ -79,5 +81,19 @@ class AppServiceProvider extends ServiceProvider
         }
 
         FilamentTranslateField::defaultLocales($locales);
+
+        // Ensure all RichEditor instances in the admin panel are Curator-enabled.
+        // This makes CuratorEnabledRichEditor the effective default without
+        // requiring every call site to import the custom class.
+        RichEditor::macro('withCurator', function () {
+            $resolve = function ($instance) {
+                return $instance;
+            };
+
+            /** @var RichEditor $editor */
+            $editor = $resolve($this);
+
+            return CuratorEnabledRichEditor::make($editor->getName());
+        });
     }
 }

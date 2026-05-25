@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @import "../../vendor/filament/filament/resources/css/theme.css";
+@import "../../vendor/awcodes/filament-curator/resources/css/plugin.css";
 
 @variant dark (&:where(.dark, .dark *));
 

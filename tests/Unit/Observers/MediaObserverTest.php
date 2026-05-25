@@ -4,13 +4,17 @@ namespace Tests\Unit\Observers;
 
 use App\Models\Media;
 use App\Models\User;
-use Awcodes\Curator\PathGenerators\UserPathGenerator;
+use App\PathGenerators\AuthenticatedUserPathGenerator;
+use Awcodes\Curator\PathGenerators\DatePathGenerator;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
+use Mockery\Expectation;
+use Mockery\ExpectationInterface;
 use Tests\TestCase;
 
 class MediaObserverTest extends TestCase
@@ -22,9 +26,9 @@ class MediaObserverTest extends TestCase
         parent::setUp();
         // Mock the file system
         Storage::fake('public');
-        // Set the config to use the UserPathGenerator for this test
-        config(['curator.path_generator' => UserPathGenerator::class]);
-        config(['curator.directory' => 'media']);
+        // Set the config to use the AuthenticatedUserPathGenerator for this test
+        config(['curator.path_generator' => AuthenticatedUserPathGenerator::class]);
+        config(['curator.default_directory' => 'media']);
     }
 
     public function test_moves_the_file_and_updates_db_when_creator_id_is_changed(): void
@@ -109,7 +113,7 @@ class MediaObserverTest extends TestCase
     {
         // 1. Arrange
         // Set a different path generator
-        config(['curator.path_generator' => \Awcodes\Curator\PathGenerators\DatePathGenerator::class]);
+        config(['curator.path_generator' => DatePathGenerator::class]);
 
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
@@ -214,24 +218,24 @@ class MediaObserverTest extends TestCase
             ->andReturn($mockDisk);
 
         // Allow makeDirectory to be called on the mock disk
-        /** @var \Mockery\ExpectationInterface $expectation */
+        /** @var ExpectationInterface $expectation */
         $expectation = $mockDisk->shouldReceive('makeDirectory');
         $expectation->andReturn(true);
 
         // On our mockDisk, expect 'move' to be called and throw an exception
-        /** @var \Mockery\Expectation $expectationMove */
+        /** @var Expectation $expectationMove */
         $expectationMove = $mockDisk->shouldReceive('move');
         $higherOrderMessage = $expectationMove->once();
         $higherOrderMessage->andThrow(new \Exception('Simulated file move failure'));
 
         // Also, on our mockDisk, expect 'exists' to be called and return true for the original path
         // and false for the new path (after rollback)
-        /** @var \Mockery\Expectation $expectationExists */
+        /** @var Expectation $expectationExists */
         $expectationExists = $mockDisk->shouldReceive('exists');
         $withExpectation = $expectationExists->with($originalPath);
         $withExpectation->andReturn(true);
 
-        /** @var \Mockery\Expectation $expectationExists2 */
+        /** @var Expectation $expectationExists2 */
         $expectationExists2 = $mockDisk->shouldReceive('exists');
         $withExpectation2 = $expectationExists2->with($newPath);
         $withExpectation2->andReturn(false);
@@ -307,7 +311,7 @@ class MediaObserverTest extends TestCase
         Auth::logout();
 
         // 2. Assert
-        $this->expectException(\Illuminate\Auth\AuthenticationException::class);
+        $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage(
             'Cannot create Media without an authenticated user to assign as the creator.'
         );
@@ -315,6 +319,41 @@ class MediaObserverTest extends TestCase
         // 3. Act
         Media::factory()->create([
             'creator_id' => null,
+        ]);
+    }
+
+    public function test_updating_aborts_gracefully_when_directory_config_missing(): void
+    {
+        // 1. Arrange
+        config(['curator.default_directory' => null]);
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with(
+                Mockery::pattern('/curator.default_directory config key is missing or invalid/'),
+                Mockery::type('array')
+            );
+
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $media = Media::factory()->create([
+            'creator_id' => $user->id,
+            'disk' => 'public',
+        ]);
+
+        $newUser = User::factory()->create();
+
+        // 2. Act
+        // Update creator_id, which triggers updating()
+        $media->creator_id = $newUser->id;
+        $media->save();
+
+        // 3. Assert
+        // The file should not have been moved (as it aborted), but the DB record for creator_id still updates
+        $this->assertDatabaseHas('media', [
+            'id' => $media->id,
+            'creator_id' => $newUser->id,
         ]);
     }
 }

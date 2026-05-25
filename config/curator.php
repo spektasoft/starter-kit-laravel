@@ -6,8 +6,8 @@ use App\Filament\Resources\Media\Pages\EditMedia;
 use App\Filament\Resources\Media\Pages\ListMedia;
 use App\Filament\Resources\Media\Schemas\MediaForm;
 use App\Models\Media;
+use App\PathGenerators\AuthenticatedUserPathGenerator;
 use Awcodes\Curator\Enums\PreviewableExtensions;
-use Awcodes\Curator\PathGenerators\UserPathGenerator;
 use Awcodes\Curator\Providers\GlideUrlProvider;
 use Awcodes\Curator\Resources\Media\Pages\CreateMedia;
 use Awcodes\Curator\Resources\Media\Tables\MediaTable;
@@ -15,12 +15,12 @@ use Awcodes\Curator\Resources\Media\Tables\MediaTable;
 return [
     'curation_formats' => PreviewableExtensions::toArray(),
     'default_disk' => env('CURATOR_DEFAULT_DISK', 'public'),
-    'default_directory' => null,
+    'default_directory' => 'media',
     'default_visibility' => 'public',
     'features' => [
-        'curations' => true,
-        'file_swap' => true,
-        'directory_restriction' => false,
+        'curations' => false,
+        'file_swap' => false,
+        'directory_restriction' => true,
         'preserve_file_names' => false,
         'tenancy' => [
             'enabled' => false,
@@ -29,7 +29,7 @@ return [
     ],
     'glide_token' => env('CURATOR_GLIDE_TOKEN'),
     'model' => Media::class,
-    'path_generator' => UserPathGenerator::class,
+    'path_generator' => AuthenticatedUserPathGenerator::class,
     'resource' => [
         'label' => 'Media',
         'plural_label' => 'Media',

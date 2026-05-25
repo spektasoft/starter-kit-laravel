@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Pages;
 use App\Enums\Page\Status;
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Exports\PageExporter;
+use App\Filament\Forms\Components\CuratorEnabledRichEditor;
 use App\Filament\Resources\Pages\Pages\CreatePage;
 use App\Filament\Resources\Pages\Pages\EditPage;
 use App\Filament\Resources\Pages\Pages\ListPages;
@@ -20,7 +21,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ExportBulkAction;
 use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -63,7 +63,7 @@ class PageResource extends Resource
                                         ->label(__('page.resource.title'))
                                         ->lazy()
                                         ->required($required),
-                                    RichEditor::make('content')
+                                    CuratorEnabledRichEditor::make('content')
                                         ->label(__('page.resource.content'))
                                         ->columnSpanFull(),
                                 ];

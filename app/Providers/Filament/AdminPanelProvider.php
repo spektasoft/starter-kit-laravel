@@ -101,9 +101,7 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(Dashboard::getNavigationSort() - 1),
             ])
             ->plugins([
-                CuratorPlugin::make()
-                    ->curations(false)
-                    ->fileSwap(false),
+                CuratorPlugin::make(),
                 OverlookPlugin::make()
                     ->columns([
                         'default' => 2,

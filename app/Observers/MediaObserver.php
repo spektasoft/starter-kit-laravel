@@ -4,9 +4,9 @@ namespace App\Observers;
 
 use App\Models\Media;
 use App\Models\User;
+use App\PathGenerators\AuthenticatedUserPathGenerator;
 use Awcodes\Curator\Models\Media as CuratorMedia;
 use Awcodes\Curator\Observers\MediaObserver as CuratorMediaObserver;
-use Awcodes\Curator\PathGenerators\UserPathGenerator;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
@@ -64,8 +64,8 @@ class MediaObserver extends CuratorMediaObserver
         // Get the configured path generator class
         $pathGeneratorClass = config('curator.path_generator');
 
-        // Only apply this file moving logic if creator_id is dirty AND UserPathGenerator is in use
-        if ($media->isDirty('creator_id') && $pathGeneratorClass === UserPathGenerator::class) {
+        // Only apply this file moving logic if creator_id is dirty AND AuthenticatedUserPathGenerator is in use
+        if ($media->isDirty('creator_id') && $pathGeneratorClass === AuthenticatedUserPathGenerator::class) {
             DB::beginTransaction();
             try {
                 $newCreatorId = $media->creator_id;
@@ -74,17 +74,18 @@ class MediaObserver extends CuratorMediaObserver
                 $oldFullPath = $media->getOriginal('path');
                 $filename = pathinfo($oldFullPath, PATHINFO_BASENAME);
 
-                // Get the base directory from Curator's config, defaulting to 'media'
-                $baseDirectoryConfig = config('curator.directory', 'media');
+                $defaultDirectoryConfig = config('curator.default_directory');
 
-                // Ensure $baseDirectoryConfig is a string
-                if (! is_string($baseDirectoryConfig)) {
-                    Log::warning('Curator directory config is not a string. Defaulting to "media".', ['config_value' => $baseDirectoryConfig]);
-                    $baseDirectoryConfig = 'media';
+                if (! is_string($defaultDirectoryConfig) || $defaultDirectoryConfig === '') {
+                    Log::error('curator.default_directory config key is missing or invalid. File move aborted.', [
+                        'media_id' => $media->id,
+                    ]);
+
+                    return;
                 }
 
                 // Construct the new base directory (e.g., 'media/1')
-                $newBaseDirectory = "{$baseDirectoryConfig}/{$newCreatorId}";
+                $newBaseDirectory = "{$defaultDirectoryConfig}/{$newCreatorId}";
 
                 // Construct the new full path (e.g., 'media/1/filename.ext')
                 $newFullPath = "{$newBaseDirectory}/{$filename}";

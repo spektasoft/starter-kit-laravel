@@ -11,3 +11,5 @@ parameters:
         - routes
     tmpDir: tmp
     level: max
+rules:
+    - App\Rules\PHPStan\NoDirectRichEditorMakeRule
