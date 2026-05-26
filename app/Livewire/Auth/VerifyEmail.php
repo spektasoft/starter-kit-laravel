@@ -2,28 +2,28 @@
 
 namespace App\Livewire\Auth;
 
-use Filament\Actions\Contracts\HasActions;
-use Filament\Actions\Concerns\InteractsWithActions;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Actions;
-use Filament\Actions\Action;
 use App\Concerns\HasUser;
 use App\Models\User;
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Route;
 use Livewire\Component;
 
 /**
- * @property \Filament\Schemas\Schema $form
+ * @property Schema $form
  * @property User $user
  */
-class VerifyEmail extends Component implements HasForms, HasActions
+class VerifyEmail extends Component implements HasActions, HasForms
 {
-    use InteractsWithActions;
     use HasUser;
+    use InteractsWithActions;
     use InteractsWithForms;
 
     public function mount(): void
@@ -43,7 +43,7 @@ class VerifyEmail extends Component implements HasForms, HasActions
             ->components([
                 Section::make()
                     ->key('actions')
-                    ->heading(__('filament-panels::pages/auth/email-verification/email-verification-prompt.heading'))
+                    ->heading(__('filament-panels::auth/pages/email-verification/email-verification-prompt.heading'))
                     ->description(__('Before continuing, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.'))
                     ->schema([
                         Actions::make(array_filter([
