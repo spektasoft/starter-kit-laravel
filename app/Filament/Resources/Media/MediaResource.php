@@ -13,9 +13,23 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class MediaResource extends CuratorMediaResource
 {
+    protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'title', 'alt'];
+    }
+
+    public static function getGlobalSearchResultTitle(Model $record): string
+    {
+        /** @var Media $record */
+        return $record->title ?? $record->name;
+    }
+
     public static function canViewAll(): bool
     {
         return static::can('viewAll');

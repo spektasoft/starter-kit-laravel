@@ -24,6 +24,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
@@ -34,6 +35,27 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user';
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'email'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        /** @var User $record */
+        return [
+            'Email' => $record->email,
+        ];
+    }
+
+    public static function getGlobalSearchResultTitle(Model $record): string
+    {
+        /** @var User $record */
+        return $record->name ?? $record->email;
+    }
 
     public static function form(Schema $schema): Schema
     {

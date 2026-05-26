@@ -11,7 +11,10 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
+use Filament\Facades\Filament;
+use Filament\GlobalSearch\GlobalSearchResult;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Jetstream\Jetstream;
 use Livewire\Livewire;
@@ -359,5 +362,25 @@ class UserResourceTest extends TestCase
             ->callAction(TestAction::make('delete')->table()->bulk());
 
         $this->assertEquals($initialCount, User::count());
+    }
+
+    public function test_user_global_search_is_configured_correctly(): void
+    {
+        User::factory()->create([
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+        ]);
+
+        /** @var Collection<string|int, mixed> */
+        $results = Filament::getGlobalSearchProvider()
+            ?->getResults('John Doe')
+            ?->getCategories()
+            ->get(UserResource::getPluralModelLabel(), collect());
+
+        $this->assertCount(1, $results);
+        /** @var GlobalSearchResult */
+        $first = $results->first();
+        $this->assertEquals('John Doe', $first->title);
+        $this->assertEquals('john@example.com', $first->details['Email']);
     }
 }

@@ -11,7 +11,10 @@ use App\Models\Page;
 use App\Models\Permission;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
+use Filament\Facades\Filament;
+use Filament\GlobalSearch\GlobalSearchResult;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -269,5 +272,24 @@ class PageResourceTest extends TestCase
         $livewire->assertSet('data.title.es', null);
         $livewire->assertSet('data.title.en', null);
         $livewire->assertSet('data.title.fr', null);
+    }
+
+    public function test_page_global_search_is_configured_correctly(): void
+    {
+        Page::factory()->create([
+            'title' => 'About Us',
+            'content' => 'Company content',
+        ]);
+
+        /** @var Collection<string|int, mixed> */
+        $results = Filament::getGlobalSearchProvider()
+            ?->getResults('About Us')
+            ?->getCategories()
+            ->get(PageResource::getPluralModelLabel(), collect());
+
+        $this->assertCount(1, $results);
+        /** @var GlobalSearchResult */
+        $first = $results->first();
+        $this->assertEquals('About Us', $first->title);
     }
 }

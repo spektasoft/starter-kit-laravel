@@ -31,12 +31,26 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class PageResource extends Resource
 {
     protected static ?string $model = Page::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document';
+
+    protected static ?string $recordTitleAttribute = 'title';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title'];
+    }
+
+    public static function getGlobalSearchResultTitle(Model $record): string
+    {
+        /** @var Page $record */
+        return $record->title;
+    }
 
     public static function canViewAll(): bool
     {

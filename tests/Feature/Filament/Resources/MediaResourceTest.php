@@ -8,8 +8,11 @@ use App\Models\Media;
 use App\Models\Permission;
 use App\Models\User;
 use Awcodes\Curator\Resources\Media\Pages\CreateMedia;
+use Filament\Facades\Filament;
+use Filament\GlobalSearch\GlobalSearchResult;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -101,5 +104,28 @@ class MediaResourceTest extends TestCase
             ->filterTable('creator', $user->id)
             ->assertCanSeeTableRecords([$media])
             ->assertCanNotSeeTableRecords([$otherMedia]);
+    }
+
+    public function test_media_global_search_is_configured_correctly(): void
+    {
+        $user = User::factory()->create();
+        Media::factory()->create([
+            'name' => 'test-image.jpg',
+            'title' => 'Stunning Landscape',
+            'creator_id' => $user->id,
+        ]);
+
+        $this->actingAs($user);
+
+        /** @var Collection<string|int, mixed> */
+        $results = Filament::getGlobalSearchProvider()
+            ?->getResults('Landscape')
+            ?->getCategories()
+            ->get(MediaResource::getPluralModelLabel(), collect());
+
+        $this->assertCount(1, $results);
+        /** @var GlobalSearchResult */
+        $first = $results->first();
+        $this->assertEquals('Stunning Landscape', $first->title);
     }
 }
