@@ -19,7 +19,7 @@ class TranslatableTextColumn extends TextColumn
      * translatable, case-insensitive search logic.
      */
     public function searchable(
-        bool|array|string $condition = true,
+        array|bool|Closure|string $condition = true,
         ?Closure $query = null,
         bool $isIndividual = false,
         bool $isGlobal = true

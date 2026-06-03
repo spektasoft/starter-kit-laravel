@@ -4,9 +4,8 @@ namespace Tests\Feature\Livewire\EditProfile;
 
 use App\Livewire\EditProfile\LogoutOtherBrowserSessionsForm;
 use App\Models\User;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Section;
+use Filament\Actions\Action;
+use Filament\Schemas\Components\Section;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithSession;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -25,7 +24,7 @@ class LogoutOtherBrowserSessionsTest extends TestCase
     {
         $testable = Livewire::test(LogoutOtherBrowserSessionsForm::class);
         $testable->assertFormExists();
-        $testable->assertFormComponentExists('browser-sessions');
+        $testable->assertFormComponentExists('section.browser-sessions');
     }
 
     public function test_can_be_logged_out(): void
@@ -39,17 +38,22 @@ class LogoutOtherBrowserSessionsTest extends TestCase
             ->instance();
         $form = $component->form;
 
-        /** @var Section */
-        $section = $form->getComponent(function (Component $component) {
-            return $component->getKey() === 'section';
-        });
+        /** @var Section $section */
+        $section = $form->getComponent('section');
 
-        /** @var Action */
-        $action = collect($section->getFooterActions())->first(function (Action $action) {
-            return $action->getName() === 'logout_other_browser_sessions';
-        });
+        $footerActions = $section->getFooterActions();
 
-        $result = $action->formData([
+        $action = null;
+        foreach ($footerActions as $candidate) {
+            if ($candidate instanceof Action && $candidate->getName() === 'logout_other_browser_sessions') {
+                $action = $candidate;
+                break;
+            }
+        }
+
+        $this->assertNotNull($action, 'Action logout_other_browser_sessions was not found.');
+
+        $result = $action->data([
             'current_password' => 'password',
         ])->call();
 

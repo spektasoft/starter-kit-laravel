@@ -6,7 +6,9 @@ use App\Models\Media;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
+use Mockery\Expectation;
 use Tests\TestCase;
 
 class MediaObserverTest extends TestCase
@@ -35,8 +37,10 @@ class MediaObserverTest extends TestCase
         $this->actingAs($user);
 
         $originalPath = 'test.png';
-        $image = Image::canvas(100, 100, 'ffffff');
-        Storage::disk('public')->put($originalPath, $image->stream('png'));
+        $manager = new ImageManager(new Driver);
+        $image = $manager->create(100, 100)->fill('ffffff');
+        $stream = (string) $image->toPng();
+        Storage::disk('public')->put($originalPath, $stream);
 
         $media = Media::create([
             'name' => 'Test Image',
@@ -47,7 +51,7 @@ class MediaObserverTest extends TestCase
             'ext' => 'png',
         ]);
 
-        $expectedWebpPath = str_replace(pathinfo($media->path, PATHINFO_EXTENSION), 'webp', $media->path);
+        $expectedWebpPath = str_replace(pathinfo($originalPath, PATHINFO_EXTENSION), 'webp', $originalPath);
 
         $this->assertTrue(Storage::disk('public')->exists($expectedWebpPath));
         $this->assertEquals($expectedWebpPath, $media->path);
@@ -62,11 +66,12 @@ class MediaObserverTest extends TestCase
         $this->actingAs($user);
 
         $webpPath = 'test.webp';
-        $image = Image::canvas(100, 100, 'ffffff');
-        Storage::disk('public')->put($webpPath, $image->stream('webp'));
+        $manager = new ImageManager(new Driver);
+        $image = $manager->create(100, 100)->fill('ffffff');
+        $stream = (string) $image->toWebp();
+        Storage::disk('public')->put($webpPath, $stream);
 
         $this->assertNotNull($file = Storage::disk('public')->get($webpPath));
-        // Get the original file hash to verify it remains unchanged
         $originalHash = md5($file);
 
         $media = Media::create([
@@ -78,13 +83,11 @@ class MediaObserverTest extends TestCase
             'ext' => 'webp',
         ]);
 
-        // Verify the file remains a WebP and no conversion occurred
         $this->assertTrue(Storage::disk('public')->exists($webpPath));
         $this->assertEquals($webpPath, $media->path);
         $this->assertEquals('webp', $media->ext);
         $this->assertEquals('image/webp', $media->type);
 
-        // Verify the file content is identical (no conversion happened)
         $this->assertEquals($originalHash, md5(Storage::disk('public')->get($webpPath)), 'The WebP file should remain unchanged after Media creation');
     }
 
@@ -118,8 +121,10 @@ class MediaObserverTest extends TestCase
         $this->actingAs($user);
 
         $originalPath = 'test.png';
-        $image = Image::canvas(100, 100, 'ffffff');
-        Storage::disk('public')->put($originalPath, $image->stream('png'));
+        $manager = new ImageManager(new Driver);
+        $image = $manager->create(100, 100)->fill('ffffff');
+        $stream = (string) $image->toPng();
+        Storage::disk('public')->put($originalPath, $stream);
 
         $media = Media::create([
             'name' => 'Test Image',
@@ -140,7 +145,15 @@ class MediaObserverTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        Image::shouldReceive('make')->andThrow(new \Exception('Conversion failed'));
+        // ImageManager is final — pass an instantiated object for a partial mock
+        $realManager = new ImageManager(new Driver);
+        $mockManager = \Mockery::mock($realManager);
+
+        /** @var Expectation $expectation */
+        $expectation = $mockManager->shouldReceive('read');
+        $expectation->andThrow(new \Exception('Conversion failed'));
+
+        $this->app->instance(ImageManager::class, $mockManager);
 
         Media::factory()->create([
             'name' => 'Test Image',

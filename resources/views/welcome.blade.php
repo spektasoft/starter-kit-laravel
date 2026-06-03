@@ -54,14 +54,14 @@
                 <ul class="flex gap-3 text-sm leading-normal">
                     <li>
                         <a href="https://cloud.laravel.com" target="_blank"
-                            class="inline-block dark:bg-[#eeeeec] dark:border-[#eeeeec] dark:text-[#1C1C1A] dark:hover:bg-white dark:hover:border-white hover:bg-black hover:border-black px-5 py-1.5 bg-[#1b1b18] rounded-sm border border-black text-white text-sm leading-normal">
+                            class="inline-block dark:bg-[#eeeeec] dark:border-[#eeeeec] dark:text-[#1C1C1A] dark:hover:bg-white dark:hover:border-white hover:bg-black hover:border-black px-5 py-1.5 bg-[#1b1b18] rounded-xs border border-black text-white text-sm leading-normal">
                             Deploy now
                         </a>
                     </li>
                 </ul>
             </div>
             <div
-                class="bg-[#fff2f2] dark:bg-[#1D0002] relative lg:-ml-px -mb-px lg:mb-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg aspect-[335/376] lg:aspect-auto w-full lg:w-[438px] shrink-0 overflow-hidden">
+                class="bg-[#fff2f2] dark:bg-[#1D0002] relative lg:-ml-px -mb-px lg:mb-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg aspect-335/376 lg:aspect-auto w-full lg:w-[438px] shrink-0 overflow-hidden">
                 {{-- Laravel Logo --}}
                 <svg class="w-full text-[#F53003] dark:text-[#F61500] transition-all translate-y-0 opacity-100 max-w-none duration-750 starting:opacity-0 starting:translate-y-6"
                     viewBox="0 0 438 104" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -83,7 +83,7 @@
                 </svg>
 
                 {{-- Light Mode 12 SVG --}}
-                <svg class="w-[448px] max-w-none relative -mt-[4.9rem] -ml-8 lg:ml-0 lg:-mt-[6.6rem] dark:hidden"
+                <svg class="w-[448px] max-w-none relative mt-[-4.9rem] -ml-8 lg:ml-0 lg:mt-[-6.6rem] dark:hidden"
                     viewBox="0 0 440 376" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g
                         class="transition-all delay-300 translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-4">
@@ -255,7 +255,7 @@
                 </svg>
 
                 {{-- Dark Mode 12 SVG --}}
-                <svg class="w-[448px] max-w-none relative -mt-[4.9rem] -ml-8 lg:ml-0 lg:-mt-[6.6rem] hidden dark:block"
+                <svg class="w-[448px] max-w-none relative mt-[-4.9rem] -ml-8 lg:ml-0 lg:mt-[-6.6rem] hidden dark:block"
                     viewBox="0 0 440 376" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g
                         class="transition-all delay-300 translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-4">

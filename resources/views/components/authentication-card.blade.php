@@ -3,7 +3,7 @@
         {{ $logo }}
     </div>
 
-    <div class="w-full max-w-screen-sm px-2 mt-6 sm:px-4">
+    <div class="w-full max-w-(--breakpoint-sm) px-2 mt-6 sm:px-4">
         {{ $slot }}
     </div>
 </div>

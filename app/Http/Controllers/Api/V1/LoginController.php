@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Exception;
 use App\Contracts\Jwt;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -67,7 +68,7 @@ class LoginController
             return response()->json([
                 'errors' => $e->errors(),
             ], 422);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'errors' => ['An unexpected error occurred.'],
             ], 500);

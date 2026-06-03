@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Filament\Components\Modals\CuratorPanel;
 use App\Models\Media;
+use Filament\Schemas\Schema;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -21,9 +22,9 @@ class CuratorPanelTest extends TestCase
         /** @var CuratorPanel $instance */
         $instance = $component->instance();
 
-        // Retrieve the form instance defined by the component
-        $form = $instance->getForm('form');
-        $this->assertNotNull($form, 'The curator panel form should not be null.');
+        // Retrieve the schema instance defined by the component
+        $form = $instance->getSchema('form');
+        $this->assertInstanceOf(Schema::class, $form, 'The curator panel schema should not be null.');
 
         // Verify the fix: The model should be the class string of App\Models\Media
         $this->assertEquals(Media::class, $form->getModel());

@@ -1,11 +1,21 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+use App\Providers\Filament\AdminPanelProvider;
+use App\Providers\FortifyServiceProvider;
+use App\Providers\JetstreamServiceProvider;
+use App\Providers\SanctumServiceProvider;
+use App\Providers\ShieldServiceProvider;
+use App\Queue\QueueServiceProvider;
+use Artesaos\SEOTools\Providers\SEOToolsServiceProvider;
+
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\Filament\AdminPanelProvider::class,
-    App\Providers\FortifyServiceProvider::class,
-    App\Providers\JetstreamServiceProvider::class,
-    App\Providers\SanctumServiceProvider::class,
-    App\Queue\QueueServiceProvider::class,
-    Artesaos\SEOTools\Providers\SEOToolsServiceProvider::class,
+    AppServiceProvider::class,
+    AdminPanelProvider::class,
+    FortifyServiceProvider::class,
+    JetstreamServiceProvider::class,
+    SanctumServiceProvider::class,
+    ShieldServiceProvider::class,
+    QueueServiceProvider::class,
+    SEOToolsServiceProvider::class,
 ];

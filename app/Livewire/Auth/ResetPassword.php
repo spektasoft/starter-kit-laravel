@@ -2,23 +2,26 @@
 
 namespace App\Livewire\Auth;
 
-use Filament\Forms\Components\Actions\Action;
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 use Illuminate\Contracts\View\View;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
 
 /**
- * @property Form $form
+ * @property Schema $form
  */
-class ResetPassword extends Component implements HasForms
+class ResetPassword extends Component implements HasActions, HasForms
 {
+    use InteractsWithActions;
     use InteractsWithForms;
 
     /**
@@ -34,32 +37,32 @@ class ResetPassword extends Component implements HasForms
         ]);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make('request-password')
-                    ->heading(__('filament-panels::pages/auth/password-reset/reset-password.heading'))
+                    ->heading(__('filament-panels::auth/pages/password-reset/reset-password.heading'))
                     ->schema([
                         Hidden::make('token')
                             ->extraAttributes(['name' => 'token']),
                         TextInput::make('email')
-                            ->label(__('filament-panels::pages/auth/password-reset/reset-password.form.email.label'))
+                            ->label(__('filament-panels::auth/pages/password-reset/reset-password.form.email.label'))
                             ->readOnly()
                             ->autofocus()
                             ->autocomplete('username')
                             ->extraInputAttributes(['name' => 'email']),
                         TextInput::make('password')
-                            ->label(__('filament-panels::pages/auth/password-reset/reset-password.form.password.label'))
+                            ->label(__('filament-panels::auth/pages/password-reset/reset-password.form.password.label'))
                             ->password()
                             ->revealable()
                             ->required()
                             ->rule(Password::default())
                             ->same('passwordConfirmation')
-                            ->validationAttribute(__('filament-panels::pages/auth/password-reset/reset-password.form.password.validation_attribute'))
+                            ->validationAttribute(__('filament-panels::auth/pages/password-reset/reset-password.form.password.validation_attribute'))
                             ->extraInputAttributes(['name' => 'password']),
                         TextInput::make('passwordConfirmation')
-                            ->label(__('filament-panels::pages/auth/password-reset/reset-password.form.password_confirmation.label'))
+                            ->label(__('filament-panels::auth/pages/password-reset/reset-password.form.password_confirmation.label'))
                             ->password()
                             ->revealable()
                             ->required()
@@ -68,7 +71,7 @@ class ResetPassword extends Component implements HasForms
                     ])
                     ->footerActions([
                         Action::make('resetPassword')
-                            ->label(__('filament-panels::pages/auth/password-reset/reset-password.form.actions.reset.label'))
+                            ->label(__('filament-panels::auth/pages/password-reset/reset-password.form.actions.reset.label'))
                             ->submit(route('password.update')),
                     ])
                     ->footerActionsAlignment(Alignment::Right),

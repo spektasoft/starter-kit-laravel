@@ -4,10 +4,22 @@ namespace App\Filament\Components\Modals;
 
 use App\Models\Media;
 use Awcodes\Curator\Components\Modals\CuratorPanel as BaseCuratorPanel;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 
 class CuratorPanel extends BaseCuratorPanel
 {
+    public function mount(): void
+    {
+        parent::mount();
+
+        // Breadcrumbs are suppressed application-wide: the directory restriction
+        // feature (UserPathGenerator) ensures users only see their own files, so
+        // directory navigation breadcrumbs add no value and are hidden.
+        // Uses null (the package's own sentinel) rather than [] for consistency
+        // with InteractsWithStorage::handleDirectoryChange().
+        $this->breadcrumbs = null;
+    }
+
     /**
      * Override the form method to explicitly set the model.
      *
@@ -16,9 +28,9 @@ class CuratorPanel extends BaseCuratorPanel
      * in a custom modal component, causing crashes when relation columns
      * are present in the custom Media model.
      */
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return parent::form($form)
+        return parent::form($schema)
             ->model(Media::class);
     }
 }

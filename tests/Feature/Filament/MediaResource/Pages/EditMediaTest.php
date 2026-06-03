@@ -2,13 +2,13 @@
 
 namespace Tests\Feature\Filament\MediaResource\Pages;
 
-use App\Filament\Resources\MediaResource\Pages\EditMedia;
-use App\Models\Media; // Assuming Media model exists
+use App\Filament\Resources\Media\Pages\EditMedia;
+use App\Models\Media;
 use App\Models\User;
 use Filament\Actions\Action;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Tests\TestCase; // Assuming a base TestCase
+use Tests\TestCase;
 
 class EditMediaTest extends TestCase
 {
@@ -34,11 +34,9 @@ class EditMediaTest extends TestCase
             'creator_id' => $this->user->id,
         ]);
 
-        // Test the Livewire component directly
         $component = Livewire::test(EditMedia::class, ['record' => $media->getRouteKey()]);
         $component->assertSuccessful();
 
-        // Retrieve the actions from the Livewire component instance
         /** @var EditMedia */
         $instance = $component->instance();
         $actions = $instance->getHeaderActions();
@@ -57,7 +55,6 @@ class EditMediaTest extends TestCase
 
     public function test_other_actions_are_unchanged(): void
     {
-        // Create a media record
         $media = Media::factory()->create([
             'name' => 'test',
             'disk' => 'public',
@@ -67,7 +64,6 @@ class EditMediaTest extends TestCase
             'creator_id' => $this->user->id,
         ]);
 
-        // Get the actions from the Livewire component
         $component = Livewire::test(EditMedia::class, ['record' => $media->getRouteKey()]);
         $component->assertSuccessful();
 
@@ -77,13 +73,12 @@ class EditMediaTest extends TestCase
 
         $foundOtherAction = false;
         foreach ($actions as $action) {
-            // Assuming there\'s a \'delete\' action by default in Filament\'s Edit page
             if ($action instanceof Action && $action->getName() === 'delete') {
                 $foundOtherAction = true;
                 break;
             }
         }
 
-        $this->assertTrue($foundOtherAction, 'Other actions (e.g., delete) were not found, indicating they might have been removed or altered.');
+        $this->assertTrue($foundOtherAction, 'Other actions were not found.');
     }
 }

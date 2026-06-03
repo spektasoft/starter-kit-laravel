@@ -3,13 +3,15 @@
 namespace App\Livewire\Auth;
 
 use App\Models\User;
-use Filament\Forms\Components\Actions\Action;
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Hash;
@@ -21,10 +23,11 @@ use Laravel\Jetstream\Features;
 use Livewire\Component;
 
 /**
- * @property Form $form
+ * @property Schema $form
  */
-class Register extends Component implements HasForms
+class Register extends Component implements HasActions, HasForms
 {
+    use InteractsWithActions;
     use InteractsWithForms;
 
     public function mount(): void
@@ -37,20 +40,20 @@ class Register extends Component implements HasForms
      */
     public ?array $data = [];
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
         if (Features::hasTermsAndPrivacyPolicyFeature()) {
             $termsOfService = Blade::render("<x-filament::link target=\"_blank\" href=\"{{ route('terms.show') }}\">{{ __('Terms of Service') }}</x-filament::link>");
             $privacyPolicy = Blade::render("<x-filament::link target=\"_blank\" href=\"{{ route('policy.show') }}\">{{ __('Privacy Policy') }}</x-filament::link>");
         }
 
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make()
-                    ->heading(__('filament-panels::pages/auth/register.heading'))
+                    ->heading(__('filament-panels::auth/pages/register.heading'))
                     ->schema(array_filter([
                         TextInput::make('name')
-                            ->label(__('filament-panels::pages/auth/register.form.name.label'))
+                            ->label(__('filament-panels::auth/pages/register.form.name.label'))
                             ->default(old('name'))
                             ->required()
                             ->maxLength(255)
@@ -58,7 +61,7 @@ class Register extends Component implements HasForms
                             ->autocomplete('name')
                             ->extraInputAttributes(['name' => 'name']),
                         TextInput::make('email')
-                            ->label(__('filament-panels::pages/auth/register.form.email.label'))
+                            ->label(__('filament-panels::auth/pages/register.form.email.label'))
                             ->default(old('email'))
                             ->email()
                             ->required()
@@ -67,7 +70,7 @@ class Register extends Component implements HasForms
                             ->autocomplete('email')
                             ->extraInputAttributes(['name' => 'email']),
                         TextInput::make('password')
-                            ->label(__('filament-panels::pages/auth/register.form.password.label'))
+                            ->label(__('filament-panels::auth/pages/register.form.password.label'))
                             ->password()
                             ->revealable()
                             ->required()
@@ -75,10 +78,10 @@ class Register extends Component implements HasForms
                             ->rule(Password::default())
                             ->dehydrateStateUsing(fn (string $state) => Hash::make($state))
                             ->same('passwordConfirmation')
-                            ->validationAttribute(__('filament-panels::pages/auth/register.form.password.validation_attribute'))
+                            ->validationAttribute(__('filament-panels::auth/pages/register.form.password.validation_attribute'))
                             ->extraInputAttributes(['name' => 'password']),
                         TextInput::make('passwordConfirmation')
-                            ->label(__('filament-panels::pages/auth/register.form.password_confirmation.label'))
+                            ->label(__('filament-panels::auth/pages/register.form.password_confirmation.label'))
                             ->password()
                             ->revealable()
                             ->required()
@@ -95,7 +98,7 @@ class Register extends Component implements HasForms
                     ]))
                     ->footerActions(array_filter([
                         Action::make('register')
-                            ->label(__('filament-panels::pages/auth/register.form.actions.register.label'))
+                            ->label(__('filament-panels::auth/pages/register.form.actions.register.label'))
                             ->submit(route('register')),
                         Route::has('login') ? Action::make('login')
                             ->link()

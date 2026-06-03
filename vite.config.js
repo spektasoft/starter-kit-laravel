@@ -1,3 +1,4 @@
+import tailwindcss from "@tailwindcss/vite";
 import laravel from "laravel-vite-plugin";
 import { defineConfig, loadEnv } from "vite";
 
@@ -18,6 +19,7 @@ export default defineConfig(({ mode }) => {
                 input: ["resources/css/app.css", "resources/ts/app.ts"],
                 refresh: true,
             }),
+            tailwindcss(),
         ],
     };
 });

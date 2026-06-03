@@ -3,14 +3,18 @@
 namespace Tests\Feature\Filament\Resources;
 
 use App\Enums\Page\Status;
-use App\Filament\Resources\PageResource;
-use App\Filament\Resources\PageResource\Pages\CreatePage;
-use App\Filament\Resources\PageResource\Pages\EditPage;
-use App\Filament\Resources\PageResource\Pages\ListPages;
+use App\Filament\Resources\Pages\PageResource;
+use App\Filament\Resources\Pages\Pages\CreatePage;
+use App\Filament\Resources\Pages\Pages\EditPage;
+use App\Filament\Resources\Pages\Pages\ListPages;
 use App\Models\Page;
 use App\Models\Permission;
 use App\Models\User;
+use Filament\Actions\Testing\TestAction;
+use Filament\Facades\Filament;
+use Filament\GlobalSearch\GlobalSearchResult;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -60,10 +64,10 @@ class PageResourceTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user); // User without 'delete_page' permission
         $user->givePermissionTo('view_any_page');
-        $page = Page::factory()->create();
+        $page = Page::factory()->create(['creator_id' => $user->id]);
 
-        $listPages = Livewire::test(PageResource\Pages\ListPages::class);
-        $listPages->assertTableActionHidden('delete', $page);
+        $listPages = Livewire::test(ListPages::class);
+        $listPages->assertActionHidden(TestAction::make('delete')->table($page));
     }
 
     public function test_cannot_bulk_delete_pages_without_permission(): void
@@ -71,12 +75,13 @@ class PageResourceTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user); // User without 'delete_page' permission
         $user->givePermissionTo('view_any_page');
-        $pages = Page::factory(3)->create();
+        $pages = Page::factory(3)->create(['creator_id' => $user->id]);
 
-        $listPages = Livewire::test(PageResource\Pages\ListPages::class);
-        $listPages->callTableBulkAction('delete', $pages->pluck('id')->toArray());
+        $listPages = Livewire::test(ListPages::class);
+        $listPages->selectTableRecords($pages->pluck('id')->toArray())
+            ->callAction(TestAction::make('delete')->table()->bulk());
 
-        $this->assertEquals(Page::count(), 3);
+        $this->assertEquals(3, Page::count('*'));
     }
 
     public function test_list_pages_page_can_be_rendered(): void
@@ -119,7 +124,7 @@ class PageResourceTest extends TestCase
         ]);
 
         // Retrieve the page from the database
-        $retrievedPage = Page::first();
+        $retrievedPage = Page::first(['*']);
 
         // Assert the JSON fields by comparing the PHP arrays
         $this->assertEquals($newData->title, $retrievedPage?->title);
@@ -131,7 +136,7 @@ class PageResourceTest extends TestCase
         $page = Page::factory()->create();
         $newData = Page::factory()->make();
 
-        $livewire = Livewire::test(PageResource\Pages\EditPage::class, [
+        $livewire = Livewire::test(EditPage::class, [
             'record' => $page->id,
         ]);
         $livewire->fillForm([
@@ -152,7 +157,7 @@ class PageResourceTest extends TestCase
         ]);
 
         /** @var ?Page */
-        $updatedPage = Page::find($page->getKey());
+        $updatedPage = Page::find($page->getKey(), ['*']);
         $this->assertEquals($newData->title, $updatedPage?->title);
         $this->assertEquals('<p>'.$newData->content.'</p>', $updatedPage?->content);
     }
@@ -161,8 +166,8 @@ class PageResourceTest extends TestCase
     {
         $page = Page::factory()->create();
 
-        $listPages = Livewire::test(PageResource\Pages\ListPages::class);
-        $listPages->callTableAction('delete', $page);
+        $listPages = Livewire::test(ListPages::class);
+        $listPages->callAction(TestAction::make('delete')->table($page));
         $listPages->assertSuccessful();
 
         $this->assertDatabaseMissing(Page::class, ['id' => $page->getKey()]);
@@ -172,8 +177,9 @@ class PageResourceTest extends TestCase
     {
         $pages = Page::factory(3)->create();
 
-        $listPages = Livewire::test(PageResource\Pages\ListPages::class);
-        $listPages->callTableBulkAction('delete', $pages->pluck('id')->toArray());
+        $listPages = Livewire::test(ListPages::class);
+        $listPages->selectTableRecords($pages->pluck('id')->toArray())
+            ->callAction(TestAction::make('delete')->table()->bulk());
         $listPages->assertSuccessful();
 
         foreach ($pages as $page) {
@@ -266,5 +272,24 @@ class PageResourceTest extends TestCase
         $livewire->assertSet('data.title.es', null);
         $livewire->assertSet('data.title.en', null);
         $livewire->assertSet('data.title.fr', null);
+    }
+
+    public function test_page_global_search_is_configured_correctly(): void
+    {
+        Page::factory()->create([
+            'title' => 'About Us',
+            'content' => 'Company content',
+        ]);
+
+        /** @var Collection<string|int, mixed> */
+        $results = Filament::getGlobalSearchProvider()
+            ?->getResults('About Us')
+            ?->getCategories()
+            ->get(PageResource::getPluralModelLabel(), collect());
+
+        $this->assertCount(1, $results);
+        /** @var GlobalSearchResult */
+        $first = $results->first();
+        $this->assertEquals('About Us', $first->title);
     }
 }

@@ -2,14 +2,17 @@
 
 namespace App\Livewire\EditProfile;
 
+use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Actions\Action;
+use Illuminate\Validation\ValidationException;
 use App\Concerns\HasUser;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 use Laravel\Fortify\Features;
@@ -17,10 +20,11 @@ use Laravel\Jetstream\Jetstream;
 use Livewire\Component;
 
 /**
- * @property Form $form
+ * @property \Filament\Schemas\Schema $form
  */
-class UpdateProfileInformationForm extends Component implements HasForms
+class UpdateProfileInformationForm extends Component implements HasForms, HasActions
 {
+    use InteractsWithActions;
     use HasUser;
     use InteractsWithForms;
 
@@ -29,10 +33,10 @@ class UpdateProfileInformationForm extends Component implements HasForms
      */
     public ?array $data = [];
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make()
                     ->heading(__('Profile Information'))
                     ->description(__('Update your account\'s profile information and email address.'))
@@ -109,8 +113,8 @@ class UpdateProfileInformationForm extends Component implements HasForms
                 $this->user,
                 $state
             );
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            throw \Illuminate\Validation\ValidationException::withMessages(
+        } catch (ValidationException $e) {
+            throw ValidationException::withMessages(
                 collect($e->errors())
                     ->mapWithKeys(fn ($messages, $key) => ["data.{$key}" => $messages])
                     ->all()

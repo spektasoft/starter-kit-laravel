@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Observers\MediaObserver;
 use Awcodes\Curator\Models\Media as CuratorMedia;
+use Database\Factories\MediaFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -11,11 +12,16 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 
 /**
  * @property string $id
+ * @property string|null $url
+ * @property string|null $thumbnail_url
+ * @property string|null $medium_url
+ * @property string|null $large_url
  * @property string $disk
  * @property string $path
  * @property string $creator_id
@@ -36,18 +42,20 @@ use Illuminate\Support\Facades\Gate;
  * @property array<string, mixed>|null $curations
  * @property string $size_for_humans
  * @property string $pretty_name
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
- * @method static \Database\Factories\MediaFactory factory(...$parameters)
+ * @method static MediaFactory factory(...$parameters)
  */
 #[ObservedBy([MediaObserver::class])]
 class Media extends CuratorMedia
 {
-    /** @use HasFactory<\Database\Factories\MediaFactory> */
+    /** @use HasFactory<MediaFactory> */
     use HasFactory;
 
     use HasUlids;
+
+    protected $table = 'media';
 
     protected static function booted()
     {
@@ -81,41 +89,9 @@ class Media extends CuratorMedia
     protected function exif(): Attribute
     {
         return Attribute::make(
-            get: function ($value) {
-                if (is_null($value)) {
-                    return null;
-                }
-
-                // Respect the vendor's decoding logic but handle nulls safely
-                $decodedExif = parent::decodeExif($value);
-
-                return is_string($decodedExif) ? json_decode($decodedExif, true) : null;
-            },
-            set: function ($value) {
-                // If the value is null, return null (SQL NULL).
-                // Only json_encode if there is actual data.
-                if (is_null($value)) {
-                    return null;
-                }
-
-                return json_encode(parent::encodeExif($value));
-            },
+            get: fn ($value) => ! is_string($value) ? null : json_decode($value, true),
+            set: fn ($value) => is_null($value) ? null : json_encode($value),
         );
-    }
-
-    /**
-     * @return User
-     */
-    public function getCreatorAttribute()
-    {
-        if (! $this->relationLoaded('creator')) {
-            $this->load('creator');
-        }
-
-        /** @var User */
-        $creator = $this->getRelation('creator');
-
-        return $creator;
     }
 
     public function isReferenced(): bool

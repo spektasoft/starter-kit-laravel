@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Media;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Media>
+ * @extends Factory<Media>
  */
 class MediaFactory extends Factory
 {
@@ -26,7 +27,7 @@ class MediaFactory extends Factory
             'path' => $this->faker->word,
             'width' => $this->faker->optional()->numberBetween(100, 1000),
             'height' => $this->faker->optional()->numberBetween(100, 1000),
-            'size' => $this->faker->optional()->numberBetween(100, 10000),
+            'size' => $this->faker->numberBetween(100, 10000),
             'type' => $this->faker->randomElement(['image', 'video', 'audio']),
             'ext' => $this->faker->fileExtension(),
             'alt' => $this->faker->optional()->sentence,

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
@@ -52,7 +53,7 @@ class ArtisanController
                 'command' => $command,
                 'output' => $output,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Artisan command '{$command}' failed via API. Error: {$e->getMessage()}. Output: " . Artisan::output());
             Log::critical("CRITICAL: Artisan command '{$command}' failed via API. Error: {$e->getMessage()}.");
 

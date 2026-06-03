@@ -2,6 +2,8 @@
 
 namespace App\Queue\Connectors;
 
+use Exception;
+use Illuminate\Contracts\Queue\Queue;
 use App\Queue\DatabaseQueue;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Connectors\DatabaseConnector as IlluminateDatabaseConnector;
@@ -12,7 +14,7 @@ class DatabaseConnector extends IlluminateDatabaseConnector
      * Establish a queue connection.
      *
      * @param  array<string, string|int|bool|null>  $config
-     * @return \Illuminate\Contracts\Queue\Queue
+     * @return Queue
      */
     public function connect(array $config)
     {
@@ -28,6 +30,6 @@ class DatabaseConnector extends IlluminateDatabaseConnector
             );
         }
 
-        throw new \Exception('DatabaseConnector: connection error');
+        throw new Exception('DatabaseConnector: connection error');
     }
 }

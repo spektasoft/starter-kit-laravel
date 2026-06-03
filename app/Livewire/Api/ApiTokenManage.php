@@ -6,31 +6,42 @@ use App\Concerns\CanUpdatePaginators;
 use App\Concerns\HasUser;
 use App\Models\PersonalAccessToken;
 use App\Models\User;
-use Filament\Forms;
-use Filament\Forms\ComponentContainer;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
-use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\View\View;
 use Laravel\Jetstream\Jetstream;
 use Livewire\Component;
 
 /**
- * @property Form $form
+ * @property Schema $form
  * @property Table $table
  */
-class ApiTokenManage extends Component implements HasForms, HasTable
+class ApiTokenManage extends Component implements HasActions, HasSchemas, HasTable
 {
     use CanUpdatePaginators;
     use HasUser;
-    use InteractsWithForms;
+    use InteractsWithActions;
+    use InteractsWithSchemas;
     use InteractsWithTable;
 
     /**
@@ -96,7 +107,7 @@ class ApiTokenManage extends Component implements HasForms, HasTable
             'name' => $name,
         ], [
             'name' => ['required', 'string', 'max:255'],
-        ])->validateWithBag('createApiToken');
+        ])->validate();
 
         $token = $this->user->createToken(
             $name,
@@ -112,17 +123,18 @@ class ApiTokenManage extends Component implements HasForms, HasTable
         $this->resetTable();
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('token_section')
+        return $schema
+            ->statePath('')
+            ->components([
+                Section::make('token_section')
                     ->heading(__('Create API Token'))
                     ->description(__('API tokens allow third-party services to authenticate with our application on your behalf.'))
                     ->schema(array_filter([
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->label(__('Token Name')),
-                        Jetstream::hasPermissions() ? Forms\Components\CheckboxList::make('permissions')
+                        Jetstream::hasPermissions() ? CheckboxList::make('permissions')
                             ->label(__('Permissions'))
                             ->options(
                                 collect($this->getPermissions())->mapWithKeys(function (string $permission) {
@@ -132,7 +144,7 @@ class ApiTokenManage extends Component implements HasForms, HasTable
                             ->columns(2) : null,
                     ]))
                     ->footerActions([
-                        Forms\Components\Actions\Action::make('create')
+                        Action::make('create')
                             ->action('createApiToken'),
                     ])
                     ->footerActionsAlignment(Alignment::End)
@@ -140,14 +152,14 @@ class ApiTokenManage extends Component implements HasForms, HasTable
             ]);
     }
 
-    public function getTokenDisplayForm(): Form
+    public function getTokenDisplayForm(): Schema
     {
-        return Form::make($this)
-            ->schema([
-                Forms\Components\TextInput::make('plainTextToken')
+        return Schema::make($this)
+            ->components([
+                TextInput::make('plainTextToken')
                     ->label(''),
-                Forms\Components\Actions::make([
-                    Forms\Components\Actions\Action::make('close')
+                Actions::make([
+                    Action::make('close')
                         ->label(__('Close'))
                         ->action('closeModalTokenDisplay'),
                 ])
@@ -169,36 +181,36 @@ class ApiTokenManage extends Component implements HasForms, HasTable
             ->heading(__('Manage API Tokens'))
             ->description(__('You may delete any of your existing tokens if they are no longer needed.'))
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('abilities')
+                TextColumn::make('abilities')
                     ->label(__('Permissions'))
                     ->badge(),
-                Tables\Columns\TextColumn::make('last_used_at')
+                TextColumn::make('last_used_at')
                     ->label(__('Last used'))
                     ->since()
                     ->dateTimeTooltip()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label(__('Created'))
                     ->since()
                     ->dateTimeTooltip()
                     ->sortable(),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
+            ->recordActions([
+                ActionGroup::make([
                     /**
                      * @source https://github.com/ArtMin96/filament-jet/blob/22c19af19b02a5e694b4edea6c05a424d0a924b3/src/Http/Livewire/ApiTokensTable.php#L80
                      *
                      * @license MIT
                      */
-                    Tables\Actions\Action::make('permissions')
+                    Action::make('permissions')
                         ->icon('heroicon-o-lock-closed')
                         ->action(function (Model $record, array $data) {
                             /** @var string[] */
-                            $abilities = $data['abilities'];
+                            $abilities = $data['abilities'] ?? [];
                             $record->forceFill([
                                 'abilities' => Jetstream::validPermissions($abilities),
                             ])->save();
@@ -212,11 +224,11 @@ class ApiTokenManage extends Component implements HasForms, HasTable
                         ->modalHeading(__('API Token Permissions'))
                         ->modalWidth('2xl')
                         ->mountUsing(
-                            function (ComponentContainer $form, PersonalAccessToken $record) {
-                                $form->fill(['abilities' => $record->abilities]);
+                            function (Schema $schema, PersonalAccessToken $record) {
+                                $schema->fill(['abilities' => $record->abilities]);
                             })
-                        ->form([
-                            Forms\Components\CheckboxList::make('abilities')
+                        ->schema([
+                            CheckboxList::make('abilities')
                                 ->label(__('Permissions'))
                                 ->options(collect($this->getPermissions())->mapWithKeys(function (string $permission) {
                                     return [$permission => $permission];
@@ -224,14 +236,24 @@ class ApiTokenManage extends Component implements HasForms, HasTable
                                 ->columns(2),
                         ])
                         ->modalFooterActionsAlignment(Alignment::End),
-                    Tables\Actions\DeleteAction::make(),
+                    DeleteAction::make(),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /**
+     * Render the component.
+     *
+     * @return View
+     */
+    public function render()
+    {
+        return view('livewire.api.api-token-manage');
     }
 
     /**

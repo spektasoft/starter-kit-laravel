@@ -2,6 +2,7 @@
 
 namespace App\Filament\Imports;
 
+use Exception;
 use App\Enums\Page\Status;
 use App\Models\Page;
 use App\Models\User;
@@ -154,7 +155,7 @@ class PageImporter extends Importer
             if (json_last_error() === JSON_ERROR_NONE) {
                 $data[$field] = $decoded;
             } else {
-                throw new \Exception("Failed to decode JSON for field: $field. Error: ".json_last_error_msg());
+                throw new Exception("Failed to decode JSON for field: $field. Error: ".json_last_error_msg());
             }
         }
 

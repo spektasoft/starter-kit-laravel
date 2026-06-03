@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Filament\Resources;
 
-use App\Filament\Resources\RoleResource;
+use App\Filament\Resources\Roles\RoleResource;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
@@ -52,7 +52,6 @@ class RoleResourceTest extends TestCase
     {
         $options = RoleResource::getCustomPermissionOptions();
 
-        $this->assertIsArray($options);
         $this->assertArrayHasKey('delete-backup', $options);
         $this->assertArrayHasKey('download-backup', $options);
     }

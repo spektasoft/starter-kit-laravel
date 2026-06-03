@@ -2,6 +2,7 @@
 
 namespace App\Concerns;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
@@ -30,7 +31,7 @@ trait HasTranslatableScopes
             $locales = static::getSortedLocales();
             $search = strtolower($search);
 
-            /** @var \Illuminate\Database\Connection $connection */
+            /** @var Connection $connection */
             $connection = $query->getConnection();
             $grammar = $connection->getQueryGrammar();
             $driver = $connection->getDriverName();

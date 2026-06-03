@@ -3,8 +3,8 @@
 @php
     $wrapperClass =
         $active ?? false
-            ? 'relative flex items-center gap-x-3 rounded-lg px-2 py-2 outline-none transition duration-75 hover:bg-gray-100 focus-visible:bg-gray-100 dark:hover:bg-white/5 dark:focus-visible:bg-white/5 bg-gray-100 dark:bg-white/5'
-            : 'relative flex items-center gap-x-3 rounded-lg px-2 py-2 outline-none transition duration-75 hover:bg-gray-100 focus-visible:bg-gray-100 dark:hover:bg-white/5 dark:focus-visible:bg-white/5';
+            ? 'relative flex items-center gap-x-3 rounded-lg px-2 py-2 outline-hidden transition duration-75 hover:bg-gray-100 focus-visible:bg-gray-100 dark:hover:bg-white/5 dark:focus-visible:bg-white/5 bg-gray-100 dark:bg-white/5'
+            : 'relative flex items-center gap-x-3 rounded-lg px-2 py-2 outline-hidden transition duration-75 hover:bg-gray-100 focus-visible:bg-gray-100 dark:hover:bg-white/5 dark:focus-visible:bg-white/5';
 
     $iconClass =
         $active ?? false

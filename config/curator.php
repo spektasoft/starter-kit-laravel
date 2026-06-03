@@ -1,66 +1,58 @@
 <?php
 
+declare(strict_types=1);
+use App\Filament\Resources\Media\MediaResource;
+use App\Filament\Resources\Media\Pages\EditMedia;
+use App\Filament\Resources\Media\Pages\ListMedia;
+use App\Filament\Resources\Media\Schemas\MediaForm;
+use App\Models\Media;
+use App\PathGenerators\AuthenticatedUserPathGenerator;
+use Awcodes\Curator\Enums\PreviewableExtensions;
+use Awcodes\Curator\Providers\GlideUrlProvider;
+use Awcodes\Curator\Resources\Media\Pages\CreateMedia;
+use Awcodes\Curator\Resources\Media\Tables\MediaTable;
+
 return [
-    'accepted_file_types' => [
-        'image/jpeg',
-        'image/png',
-        'image/webp',
-        'image/svg+xml',
+    'curation_formats' => PreviewableExtensions::toArray(),
+    'default_disk' => env('CURATOR_DEFAULT_DISK', 'public'),
+    'default_directory' => 'media',
+    'default_visibility' => 'public',
+    'features' => [
+        'curations' => false,
+        'file_swap' => false,
+        'directory_restriction' => true,
+        'preserve_file_names' => false,
+        'tenancy' => [
+            'enabled' => false,
+            'relationship_name' => null,
+        ],
     ],
-    'cloud_disks' => [
-        's3',
-        'cloudinary',
-        'imgix',
-    ],
-    'curation_formats' => [
-        'jpg',
-        'jpeg',
-        'webp',
-        'png',
-        'avif',
-    ],
-    'curation_presets' => [
-        \Awcodes\Curator\Curations\ThumbnailPreset::class,
-    ],
-    'directory' => 'media',
-    'disk' => env('FILAMENT_FILESYSTEM_DISK', 'public'),
-    'glide' => [
-        'server' => \Awcodes\Curator\Glide\DefaultServerFactory::class,
-        'fallbacks' => [],
-        'route_path' => 'curator',
-    ],
-    'image_crop_aspect_ratio' => null,
-    'image_resize_mode' => null,
-    'image_resize_target_height' => null,
-    'image_resize_target_width' => null,
-    'is_limited_to_directory' => false,
-    'is_tenant_aware' => true,
-    'tenant_ownership_relationship_name' => 'tenant',
-    'max_size' => 5120,
-    'model' => \App\Models\Media::class,
-    'min_size' => 0,
-    'path_generator' => Awcodes\Curator\PathGenerators\UserPathGenerator::class,
-    'resources' => [
+    'glide_token' => env('CURATOR_GLIDE_TOKEN'),
+    'model' => Media::class,
+    'path_generator' => AuthenticatedUserPathGenerator::class,
+    'resource' => [
         'label' => 'Media',
         'plural_label' => 'Media',
-        'navigation_group' => null,
-        'cluster' => null,
-        'navigation_label' => 'Media',
-        'navigation_icon' => 'heroicon-o-photo',
-        'navigation_sort' => null,
-        'navigation_count_badge' => false,
-        'resource' => \App\Filament\Resources\MediaResource::class,
+        'default_layout' => 'grid',
+        'navigation' => [
+            'group' => null,
+            'icon' => 'heroicon-o-photo',
+            'sort' => null,
+            'should_register' => true,
+            'should_show_badge' => false,
+        ],
+        'resource' => MediaResource::class,
+        'pages' => [
+            'create' => CreateMedia::class,
+            'edit' => EditMedia::class,
+            'index' => ListMedia::class,
+        ],
+        'schemas' => [
+            'form' => MediaForm::class,
+        ],
+        'tables' => [
+            'table' => MediaTable::class,
+        ],
     ],
-    'should_preserve_filenames' => false,
-    'should_register_navigation' => true,
-    'should_check_exists' => true,
-    'visibility' => 'public',
-    'tabs' => [
-        'display_curation' => false,
-        'display_upload_new' => false,
-    ],
-    'multi_select_key' => 'metaKey',
-    'table' => [
-        'layout' => 'grid',
-    ],
+    'url_provider' => GlideUrlProvider::class,
 ];

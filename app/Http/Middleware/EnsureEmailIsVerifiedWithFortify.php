@@ -2,6 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Http\RedirectResponse;
 use Closure;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Support\Facades\Auth;
@@ -12,9 +15,9 @@ class EnsureEmailIsVerifiedWithFortify extends EnsureEmailIsVerified
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @param  string|null  $redirectToRoute
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse|null
+     * @return Response|RedirectResponse|null
      */
     public function handle($request, Closure $next, $redirectToRoute = null)
     {
@@ -22,7 +25,7 @@ class EnsureEmailIsVerifiedWithFortify extends EnsureEmailIsVerified
         // simply pass the request to the next middleware without
         // enforcing email verification.
         if (! Auth::check() || ! FortifyFeatures::enabled(FortifyFeatures::emailVerification())) {
-            /** @var \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse|null */
+            /** @var Response|RedirectResponse|null */
             $response = $next($request);
 
             return $response;

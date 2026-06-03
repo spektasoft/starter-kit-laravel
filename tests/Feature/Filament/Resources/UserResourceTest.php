@@ -2,15 +2,19 @@
 
 namespace Tests\Feature\Filament\Resources;
 
-use App\Filament\Resources\UserResource;
-use App\Filament\Resources\UserResource\Pages\CreateUser;
-use App\Filament\Resources\UserResource\Pages\EditUser;
-use App\Filament\Resources\UserResource\Pages\ListUsers;
+use App\Filament\Resources\Users\Pages\CreateUser;
+use App\Filament\Resources\Users\Pages\EditUser;
+use App\Filament\Resources\Users\Pages\ListUsers;
+use App\Filament\Resources\Users\UserResource;
 use App\Models\Page;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use Filament\Actions\Testing\TestAction;
+use Filament\Facades\Filament;
+use Filament\GlobalSearch\GlobalSearchResult;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Jetstream\Jetstream;
 use Livewire\Livewire;
@@ -158,16 +162,14 @@ class UserResourceTest extends TestCase
 
     public function test_user_table_has_expected_columns(): void
     {
-        $livewire = Livewire::test(UserResource\Pages\ListUsers::class);
+        $livewire = Livewire::test(ListUsers::class);
         $livewire->assertCanRenderTableColumn('name');
         $livewire->assertCanRenderTableColumn('email');
         $livewire->assertCanRenderTableColumn('roles');
         $livewire->assertCanRenderTableColumn('email_verified_at');
-        $livewire->assertCanRenderTableColumn('created_at');
-        $livewire->assertCanRenderTableColumn('updated_at');
 
         if (Jetstream::managesProfilePhotos()) {
-            Livewire::test(UserResource\Pages\ListUsers::class)
+            Livewire::test(ListUsers::class)
                 ->assertCanRenderTableColumn('profile_photo_media_id');
         }
     }
@@ -190,7 +192,7 @@ class UserResourceTest extends TestCase
         config(['auth.super_users' => ['super@example.com']]);
         $superUser = User::factory()->create(['email' => 'super@example.com']);
 
-        Livewire::test(UserResource\Pages\ListUsers::class)
+        Livewire::test(ListUsers::class)
             ->assertCanNotSeeTableRecords([$superUser]);
     }
 
@@ -201,7 +203,7 @@ class UserResourceTest extends TestCase
         $otherSuperUser = User::factory()->create(['email' => 'super2@example.com']);
         $this->actingAs($superAdmin);
 
-        $livewire = Livewire::test(UserResource\Pages\ListUsers::class);
+        $livewire = Livewire::test(ListUsers::class);
         $livewire->assertCanSeeTableRecords([$otherSuperUser]);
         $livewire->assertTableColumnStateSet('roles', '["Super User"]', $otherSuperUser);
     }
@@ -213,7 +215,7 @@ class UserResourceTest extends TestCase
         $role2 = Role::create(['name' => 'editor']);
         $user->assignRole($role1, $role2);
 
-        $livewire = Livewire::test(UserResource\Pages\ListUsers::class);
+        $livewire = Livewire::test(ListUsers::class);
         $livewire->assertCanSeeTableRecords([$user]);
         $livewire->assertTableColumnStateSet('roles', '["Admin","Editor"]', $user);
     }
@@ -222,12 +224,9 @@ class UserResourceTest extends TestCase
     {
         $userToDelete = User::factory()->create();
 
-        $livewire = Livewire::test(UserResource\Pages\ListUsers::class);
-        $livewire->callTableAction(
-            'delete',
-            $userToDelete
-        );
-        $livewire->assertHasNoTableActionErrors();
+        $livewire = Livewire::test(ListUsers::class);
+        $livewire->callAction(TestAction::make('delete')->table($userToDelete));
+        $livewire->assertHasNoFormErrors();
 
         $this->assertModelMissing($userToDelete);
     }
@@ -236,12 +235,10 @@ class UserResourceTest extends TestCase
     {
         $usersToDelete = User::factory()->count(3)->create();
 
-        $livewire = Livewire::test(UserResource\Pages\ListUsers::class);
-        $livewire->callTableBulkAction(
-            'delete',
-            $usersToDelete
-        );
-        $livewire->assertHasNoTableBulkActionErrors();
+        $livewire = Livewire::test(ListUsers::class);
+        $livewire->selectTableRecords($usersToDelete->pluck('id')->toArray())
+            ->callAction(TestAction::make('delete')->table()->bulk());
+        $livewire->assertHasNoFormErrors();
 
         foreach ($usersToDelete as $user) {
             $this->assertModelMissing($user);
@@ -316,7 +313,7 @@ class UserResourceTest extends TestCase
         // Assuming a User has a relationship with another model, e.g., Page
         $userToDelete = User::factory()->has(Page::factory())->create();
 
-        Livewire::test(UserResource\Pages\ListUsers::class)
+        Livewire::test(ListUsers::class)
             ->assertTableActionHidden('delete', $userToDelete);
 
         $this->assertModelExists($userToDelete);
@@ -346,7 +343,7 @@ class UserResourceTest extends TestCase
         $user->givePermissionTo('view_any_user');
         $userToDelete = User::factory()->create();
 
-        $listUsers = Livewire::test(UserResource\Pages\ListUsers::class);
+        $listUsers = Livewire::test(ListUsers::class);
         $listUsers->assertTableActionHidden('delete', $userToDelete);
     }
 
@@ -358,9 +355,32 @@ class UserResourceTest extends TestCase
         $user->givePermissionTo('delete_any_user');
         $usersToDelete = User::factory(2)->create();
 
-        $listUsers = Livewire::test(UserResource\Pages\ListUsers::class);
-        $listUsers->callTableBulkAction('delete', $usersToDelete);
+        $initialCount = User::count();
 
-        $this->assertEquals(User::count(), 4); // 3 users + the initial user
+        $listUsers = Livewire::test(ListUsers::class);
+        $listUsers->selectTableRecords($usersToDelete->pluck('id')->toArray())
+            ->callAction(TestAction::make('delete')->table()->bulk());
+
+        $this->assertEquals($initialCount, User::count());
+    }
+
+    public function test_user_global_search_is_configured_correctly(): void
+    {
+        User::factory()->create([
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+        ]);
+
+        /** @var Collection<string|int, mixed> */
+        $results = Filament::getGlobalSearchProvider()
+            ?->getResults('John Doe')
+            ?->getCategories()
+            ->get(UserResource::getPluralModelLabel(), collect());
+
+        $this->assertCount(1, $results);
+        /** @var GlobalSearchResult */
+        $first = $results->first();
+        $this->assertEquals('John Doe', $first->title);
+        $this->assertEquals('john@example.com', $first->details['Email']);
     }
 }

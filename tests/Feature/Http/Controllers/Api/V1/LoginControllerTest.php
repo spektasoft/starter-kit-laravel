@@ -228,7 +228,7 @@ class LoginControllerTest extends TestCase
 
     public function test_device_name_is_trimmed(): void
     {
-        User::factory()->create([
+        $user = User::factory()->create([
             'email' => 'test@example.com',
             'password' => Hash::make('password'),
         ]);
@@ -246,7 +246,7 @@ class LoginControllerTest extends TestCase
             'token',
         ]);
 
-        $this->assertEquals(trim($deviceNameWithSpaces), User::first()?->tokens()?->first()?->name);
+        $this->assertEquals(trim($deviceNameWithSpaces), $user->tokens()->first()?->name);
     }
 
     public function test_device_name_is_not_empty(): void

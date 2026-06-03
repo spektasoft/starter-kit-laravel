@@ -1,6 +1,6 @@
 <x-filament::dropdown placement="bottom-end" teleport>
     <x-slot name="trigger">
-        <div class="p-2.5 hover:bg-gray-500/10 rounded-2xl hover:dark:bg-gray-400/10">
+        <div class="p-2.5 hover:bg-gray-500/10 rounded-2xl dark:hover:bg-gray-400/10">
             <x-filament::icon-button color="gray" icon="heroicon-m-ellipsis-vertical" :label="__('navigation-menu.menu.open_menu')" size="xl" />
         </div>
     </x-slot>

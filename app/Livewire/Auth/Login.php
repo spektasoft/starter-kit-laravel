@@ -2,13 +2,15 @@
 
 namespace App\Livewire\Auth;
 
-use Filament\Forms\Components\Actions\Action;
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Blade;
@@ -17,10 +19,11 @@ use Illuminate\Support\HtmlString;
 use Livewire\Component;
 
 /**
- * @property Form $form
+ * @property Schema $form
  */
-class Login extends Component implements HasForms
+class Login extends Component implements HasActions, HasForms
 {
+    use InteractsWithActions;
     use InteractsWithForms;
 
     /**
@@ -33,12 +36,12 @@ class Login extends Component implements HasForms
         $this->form->fill();
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make()
-                    ->heading(__('filament-panels::pages/auth/login.heading'))
+                    ->heading(__('filament-panels::auth/pages/login.heading'))
                     ->schema([
                         TextInput::make('email')
                             ->label(__('Email'))
@@ -54,7 +57,7 @@ class Login extends Component implements HasForms
                             ->required()
                             ->password()
                             ->revealable()
-                            ->hint(Route::has('password.request') ? new HtmlString(Blade::render('<x-filament::link wire:navigate href="{{ route(\'password.request\') }}" tabindex="3"> {{ __(\'filament-panels::pages/auth/login.actions.request_password_reset.label\') }}</x-filament::link>')) : null)
+                            ->hint(Route::has('password.request') ? new HtmlString(Blade::render('<x-filament::link wire:navigate href="{{ route(\'password.request\') }}" tabindex="3"> {{ __(\'filament-panels::auth/pages/login.actions.request_password_reset.label\') }}</x-filament::link>')) : null)
                             ->extraInputAttributes(['name' => 'password']),
                         Checkbox::make('remember')
                             ->label(__('Remember me'))
@@ -62,12 +65,12 @@ class Login extends Component implements HasForms
                     ])
                     ->footerActions(array_filter([
                         Action::make('login')
-                            ->label(__('filament-panels::pages/auth/login.form.actions.authenticate.label'))
+                            ->label(__('filament-panels::auth/pages/login.form.actions.authenticate.label'))
                             ->submit(route('login')),
                         Route::has('register') ?
                         Action::make('register')
                             ->link()
-                            ->label(ucfirst(__('filament-panels::pages/auth/login.actions.register.label')))
+                            ->label(ucfirst(__('filament-panels::auth/pages/login.actions.register.label')))
                             ->url(route('register'))
                             ->extraAttributes(['wire:navigate' => true]) : null,
                     ]))

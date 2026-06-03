@@ -3,15 +3,18 @@
 namespace App\Observers;
 
 use App\Models\Media;
+use App\Models\User;
+use App\PathGenerators\AuthenticatedUserPathGenerator;
 use Awcodes\Curator\Models\Media as CuratorMedia;
 use Awcodes\Curator\Observers\MediaObserver as CuratorMediaObserver;
-use Awcodes\Curator\PathGenerators\UserPathGenerator;
+use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
+use Throwable;
 
 class MediaObserver extends CuratorMediaObserver
 {
@@ -27,7 +30,7 @@ class MediaObserver extends CuratorMediaObserver
     public function creating(CuratorMedia $media): void
     {
         if ($media instanceof Media) {
-            /** @var \App\Models\User|null $creator */
+            /** @var User|null $creator */
             $creator = $media->creator;
             if (is_null($creator)) {
                 if (Auth::check()) {
@@ -61,8 +64,8 @@ class MediaObserver extends CuratorMediaObserver
         // Get the configured path generator class
         $pathGeneratorClass = config('curator.path_generator');
 
-        // Only apply this file moving logic if creator_id is dirty AND UserPathGenerator is in use
-        if ($media->isDirty('creator_id') && $pathGeneratorClass === UserPathGenerator::class) {
+        // Only apply this file moving logic if creator_id is dirty AND AuthenticatedUserPathGenerator is in use
+        if ($media->isDirty('creator_id') && $pathGeneratorClass === AuthenticatedUserPathGenerator::class) {
             DB::beginTransaction();
             try {
                 $newCreatorId = $media->creator_id;
@@ -71,17 +74,18 @@ class MediaObserver extends CuratorMediaObserver
                 $oldFullPath = $media->getOriginal('path');
                 $filename = pathinfo($oldFullPath, PATHINFO_BASENAME);
 
-                // Get the base directory from Curator's config, defaulting to 'media'
-                $baseDirectoryConfig = config('curator.directory', 'media');
+                $defaultDirectoryConfig = config('curator.default_directory');
 
-                // Ensure $baseDirectoryConfig is a string
-                if (! is_string($baseDirectoryConfig)) {
-                    Log::warning('Curator directory config is not a string. Defaulting to "media".', ['config_value' => $baseDirectoryConfig]);
-                    $baseDirectoryConfig = 'media';
+                if (! is_string($defaultDirectoryConfig) || $defaultDirectoryConfig === '') {
+                    Log::error('curator.default_directory config key is missing or invalid. File move aborted.', [
+                        'media_id' => $media->id,
+                    ]);
+
+                    return;
                 }
 
                 // Construct the new base directory (e.g., 'media/1')
-                $newBaseDirectory = "{$baseDirectoryConfig}/{$newCreatorId}";
+                $newBaseDirectory = "{$defaultDirectoryConfig}/{$newCreatorId}";
 
                 // Construct the new full path (e.g., 'media/1/filename.ext')
                 $newFullPath = "{$newBaseDirectory}/{$filename}";
@@ -103,14 +107,12 @@ class MediaObserver extends CuratorMediaObserver
                     Log::warning("MediaObserver: Source file not found at old path: {$oldFullPath} for media ID: {$media->id}");
                 }
                 DB::commit();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 DB::rollBack();
                 Log::error("Failed to move media file for media ID {$media->id} and rolled back transaction: {$e->getMessage()}");
                 throw $e;
             }
         }
-        // If the path generator is not UserPathGenerator, or creator_id is not dirty,
-        // this custom file moving logic is skipped.
     }
 
     private function convertToWebP(Media $media): void
@@ -126,9 +128,11 @@ class MediaObserver extends CuratorMediaObserver
 
         try {
             $originalPath = Storage::disk($media->disk)->path($media->path);
-            $image = Image::make($originalPath);
-            $webpPath = pathinfo($originalPath, PATHINFO_DIRNAME).'/'.pathinfo($originalPath, PATHINFO_FILENAME).'.webp';
-            $image->encode('webp', 90)->save($webpPath);
+            $manager = app(ImageManager::class);
+            $image = $manager->read($originalPath);
+            $webpPath = pathinfo($originalPath, PATHINFO_DIRNAME)
+                .'/'.pathinfo($originalPath, PATHINFO_FILENAME).'.webp';
+            $image->toWebp(90)->save($webpPath);
             $oldImagePath = $media->path;
             $media->setAttribute('path', str_replace(pathinfo($media->path, PATHINFO_EXTENSION), 'webp', $media->path));
             $media->setAttribute('ext', 'webp');
@@ -138,13 +142,14 @@ class MediaObserver extends CuratorMediaObserver
             if ($updated) {
                 Storage::disk($media->disk)->delete($oldImagePath);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error converting image to WebP: '.$e->getMessage(), ['media_id' => $media->id, 'path' => $media->path]);
         }
     }
 
     private function removeExif(Media $media): void
     {
-        $media->setAttribute('exif', null);
+        $media->exif = null;
+        $media->saveQuietly();
     }
 }

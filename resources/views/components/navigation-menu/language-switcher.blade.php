@@ -5,7 +5,7 @@
 <x-filament::dropdown placement="bottom-end" teleport>
     <x-slot name="trigger">
         <button aria-label="{{ __('navigation-menu.language_switcher.open_language_switcher') }}" type="button"
-            class="flex flex-row items-center justify-center gap-2 text-sm shrink-0 p-2.5 hover:bg-gray-500/10 rounded-2xl hover:dark:bg-gray-400/10">
+            class="flex flex-row items-center justify-center gap-2 text-sm shrink-0 p-2.5 hover:bg-gray-500/10 rounded-2xl dark:hover:bg-gray-400/10">
             <x-filament::icon icon="heroicon-m-language" color="gray" class="size-6" />
             <div class="hidden text-gray-500 sm:flex dark:text-gray-400">
                 {{ __('navigation-menu.language_switcher.language') }}

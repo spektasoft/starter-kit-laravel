@@ -170,7 +170,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     public function getFilamentAvatarUrl(): ?string
     {
         if (Jetstream::managesProfilePhotos() && $this->profilePhotoMedia !== null) {
-            return $this->profilePhotoMedia->getSignedUrl();
+            return $this->profilePhotoMedia->url;
         }
 
         if (! boolval(config('avatar.enabled', false))) {

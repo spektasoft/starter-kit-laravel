@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Page\Status;
 use App\Models\Page;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
@@ -22,7 +23,7 @@ class SitemapController extends Controller
             $sitemap->add(Url::create(route('policy.show'))->setPriority(0.8)->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY));
         }
 
-        $pages = Page::where('status', \App\Enums\Page\Status::Publish)->get();
+        $pages = Page::where('status', Status::Publish)->get();
         foreach ($pages as $page) {
             $sitemap->add(Url::create(route('pages.show', ['record' => $page]))
                 ->setLastModificationDate(Carbon::parse($page->updated_at))

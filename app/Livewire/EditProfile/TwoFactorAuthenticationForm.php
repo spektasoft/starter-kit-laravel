@@ -5,14 +5,17 @@ namespace App\Livewire\EditProfile;
 use App\Concerns\HasUser;
 use App\Filament\Actions\Forms\PasswordConfirmationAction;
 use App\Models\User;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Section;
+use Exception;
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\View;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -27,13 +30,14 @@ use Laravel\Fortify\Fortify;
 use Livewire\Component;
 
 /**
- * @property Form $form
+ * @property Schema $form
  *
  * @method void refresh()
  */
-class TwoFactorAuthenticationForm extends Component implements HasForms
+class TwoFactorAuthenticationForm extends Component implements HasActions, HasForms
 {
     use HasUser;
+    use InteractsWithActions;
     use InteractsWithForms;
 
     /**
@@ -151,21 +155,21 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
         $this->dispatch('refresh-two-factor-authentication');
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make()
                     ->heading(__('Two Factor Authentication'))
                     ->description(__('Add additional security to your account using two factor authentication.'))
-                    ->schema([
+                    ->schema(fn () => [
                         View::make('heading') // @phpstan-ignore-line
                             ->view('components.two-factor-authentication-form.heading'),
                         View::make('instruction') // @phpstan-ignore-line
                             ->view('components.two-factor-authentication-form.instruction'),
-                        ...$this->getComponents(),
+                        ...$this->getFormComponents(),
                     ])
-                    ->footerActions($this->getFooterActions())
+                    ->footerActions($this->getActions())
                     ->aside(),
             ]);
     }
@@ -202,7 +206,7 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
             $codes = json_decode($decryptedCodes, true);
 
             return $codes;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to decrypt 2FA recovery codes for user '.$this->user->id, [
                 'exception' => $e->getMessage(),
             ]);
@@ -234,7 +238,7 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
             $setupKey = decrypt($two_factor_secret);
 
             return $setupKey;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to decrypt 2FA secret for user '.$this->user->id, [
                 'exception' => $e->getMessage(),
             ]);
@@ -271,7 +275,7 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
 
         try {
             return $this->user->twoFactorQrCodeSvg();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return '';
         }
     }
@@ -311,15 +315,15 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
     }
 
     /**
-     * @return \Filament\Forms\Components\Component[]
+     * @return \Filament\Schemas\Components\Component[]
      */
-    private function getComponents()
+    private function getFormComponents()
     {
         if (! $this->getEnabledProperty()) {
             return [];
         }
 
-        /** @var Collection<int, \Filament\Forms\Components\Component> */
+        /** @var Collection<int, \Filament\Schemas\Components\Component> */
         $components = collect();
 
         if ($this->showingQrCode) {
@@ -337,7 +341,6 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
                         ->numeric()
                         ->length(6)
                         ->autocomplete('one-time-code')
-                        ->model('code')
                         ->extraAttributes(['wire:keydown.enter' => 'confirmTwoFactorAuthentication'])
                 );
             }
@@ -347,16 +350,19 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
             $components->push(View::make('components.two-factor-authentication-form.recovery-codes'));
         }
 
-        /** @var \Filament\Forms\Components\Component[] */
-        $arr = $components->toArray();
+        /** @var \Filament\Schemas\Components\Component[] */
+        $arr = $components->all();
 
         return $arr;
     }
 
     /**
+     * Register footer actions with Filament's action cache so they are
+     * resolvable by name via callAction() and the mounted action stack.
+     *
      * @return Action[]
      */
-    private function getFooterActions()
+    public function getActions(): array
     {
         /** @var Collection<int, Action> */
         $actions = collect();
@@ -449,7 +455,7 @@ class TwoFactorAuthenticationForm extends Component implements HasForms
         }
 
         /** @var Action[] */
-        $arr = $actions->toArray();
+        $arr = $actions->all();
 
         return $arr;
     }

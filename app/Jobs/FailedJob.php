@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -25,6 +26,6 @@ class FailedJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $this->fail(new \Exception('Intended error'));
+        $this->fail(new Exception('Intended error'));
     }
 }

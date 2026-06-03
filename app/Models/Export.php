@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\ExportFactory;
 use App\Services\CreatorService;
 use Filament\Actions\Exports\Models\Export as FilamentExport;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -24,11 +25,11 @@ use Illuminate\Support\Carbon;
  * @property string $creator_id
  * @property-read User $creator
  *
- * @method static \Database\Factories\ExportFactory factory(...$parameters)
+ * @method static ExportFactory factory(...$parameters)
  */
 class Export extends FilamentExport
 {
-    /** @use HasFactory<\Database\Factories\ExportFactory> */
+    /** @use HasFactory<ExportFactory> */
     use HasFactory;
 
     use HasUlids;
