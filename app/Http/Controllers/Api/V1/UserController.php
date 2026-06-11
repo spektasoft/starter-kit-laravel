@@ -19,6 +19,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Fortify\Fortify;
+use SortDirection;
 
 class UserController extends Controller
 {
@@ -48,7 +49,7 @@ class UserController extends Controller
 
         /** @var string */
         $sortColumn = $sortColumn;
-        /** @var string */
+        /** @var 'asc'|'desc'|SortDirection */
         $sortDirection = $sortDirection;
 
         $users = User::orderBy($sortColumn, $sortDirection)
