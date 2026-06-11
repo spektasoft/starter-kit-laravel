@@ -28,9 +28,9 @@
         "spatie/laravel-data": "^4.22.1",
         "spatie/laravel-google-fonts": "^1.6.0",
         "spatie/laravel-honeypot": "^4.7.1",
+        "spatie/laravel-robots-middleware": "^1.4",
         "spatie/laravel-sitemap": "^7.4.0",
-        "spatie/laravel-translatable": "^6.14.1",
-        "verschuur/laravel-robotstxt": "^5.2"
+        "spatie/laravel-translatable": "^6.14.1"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16.5",

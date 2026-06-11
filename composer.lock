@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eaf8830603fd401a39fbe364ef1ba5b5",
+    "content-hash": "6e9336eb4a8c55a80794510d096344f4",
     "packages": [
         {
             "name": "adhocore/jwt",
@@ -9477,6 +9477,66 @@
             "time": "2026-04-29T07:59:45+00:00"
         },
         {
+            "name": "spatie/laravel-robots-middleware",
+            "version": "1.4.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-robots-middleware.git",
+                "reference": "27fc3b80ceabfbf01ebee123094a72bfdce8f9b1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-robots-middleware/zipball/27fc3b80ceabfbf01ebee123094a72bfdce8f9b1",
+                "reference": "27fc3b80ceabfbf01ebee123094a72bfdce8f9b1",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/http": "^10|^11.0|^12.0|^13.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
+                "phpunit/phpunit": "^9.4|^10.5|^11.5.3|^12.5.12"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\RobotsMiddleware\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian De Deyne",
+                    "email": "sebastian@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Add an `all` or `none` robots header to your requests via a middleware in Laravel",
+            "homepage": "https://github.com/spatie/laravel-robots-middleware",
+            "keywords": [
+                "index",
+                "robots",
+                "seo",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/laravel-robots-middleware/issues",
+                "source": "https://github.com/spatie/laravel-robots-middleware/tree/1.4.2"
+            },
+            "funding": [
+                {
+                    "url": "https://spatie.be/open-source/support-us",
+                    "type": "custom"
+                }
+            ],
+            "time": "2026-02-21T21:26:46+00:00"
+        },
+        {
             "name": "spatie/laravel-signal-aware-command",
             "version": "2.1.2",
             "source": {
@@ -13281,64 +13341,6 @@
                 }
             ],
             "time": "2026-01-10T16:40:02+00:00"
-        },
-        {
-            "name": "verschuur/laravel-robotstxt",
-            "version": "5.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/verschuur/laravel-robotstxt.git",
-                "reference": "316b7d3cc5b76fc372aa2a8385a3202826a97204"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/verschuur/laravel-robotstxt/zipball/316b7d3cc5b76fc372aa2a8385a3202826a97204",
-                "reference": "316b7d3cc5b76fc372aa2a8385a3202826a97204",
-                "shasum": ""
-            },
-            "require": {
-                "laravel/framework": "^9.0|^10.0|^11.0|^12.0",
-                "php": "^8.0"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^7.0|^8.0|^9.0|^10.0",
-                "phpstan/phpstan": "^1.4",
-                "phpunit/phpunit": "^9.0|^10.0|^11.5"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Verschuur\\Laravel\\RobotsTxt\\Providers\\RobotsTxtProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Verschuur\\Laravel\\RobotsTxt\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Govert Verschuur",
-                    "email": "govert.verschuur@gmail.com"
-                }
-            ],
-            "description": "Set the robots.txt content dynamically based on the Laravel app environment.",
-            "keywords": [
-                "laravel",
-                "php",
-                "robots.txt"
-            ],
-            "support": {
-                "issues": "https://github.com/verschuur/laravel-robotstxt/issues",
-                "source": "https://github.com/verschuur/laravel-robotstxt/tree/5.2.0"
-            },
-            "time": "2025-02-25T17:01:46+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
