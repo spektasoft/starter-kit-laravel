@@ -22,4 +22,25 @@ if (Jetstream::hasTermsAndPrivacyPolicyFeature()) {
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 
+Route::get('/robots.txt', function () {
+    $isProduction = app()->environment('production');
+
+    if ($isProduction) {
+        $content = [
+            'User-agent: *',
+            'Disallow: /admin',
+            '',
+            'Sitemap: '.url('sitemap.xml'),
+        ];
+    } else {
+        $content = [
+            'User-agent: *',
+            'Disallow: /',
+        ];
+    }
+
+    return response(implode("\n", $content), 200)
+        ->header('Content-Type', 'text/plain; charset=UTF-8');
+});
+
 Route::fallback([PageController::class, 'fallback']);

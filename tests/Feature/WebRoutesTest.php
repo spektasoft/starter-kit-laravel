@@ -84,4 +84,34 @@ class WebRoutesTest extends TestCase
             ->get(route('pages.show', $page))
             ->assertOk();
     }
+
+    public function test_robots_txt_content_in_production(): void
+    {
+        $this->app['config']->set('app.env', 'production');
+        $this->app->detectEnvironment(fn () => 'production');
+
+        $response = $this->get('/robots.txt');
+
+        /** @var string */
+        $appUrl = config('app.url');
+
+        $response->assertOk()
+            ->assertHeader('Content-Type', 'text/plain; charset=UTF-8')
+            ->assertSee('User-agent: *')
+            ->assertSee('Disallow: /admin')
+            ->assertSee("Sitemap: $appUrl/sitemap.xml");
+    }
+
+    public function test_robots_txt_content_in_non_production(): void
+    {
+        $this->app['config']->set('app.env', 'staging');
+        $this->app->detectEnvironment(fn () => 'staging');
+
+        $response = $this->get('/robots.txt');
+
+        $response->assertOk()
+            ->assertHeader('Content-Type', 'text/plain; charset=UTF-8')
+            ->assertSee('User-agent: *')
+            ->assertSee('Disallow: /');
+    }
 }
