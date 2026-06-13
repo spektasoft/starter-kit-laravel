@@ -133,7 +133,7 @@ class UserControllerTest extends TestCase
         ]);
 
         // Test missing name
-        $response = $client->postJson('/users', [
+        $response = $client->postJson(route('api.v1.users.store'), [
             'email' => 'test@example.com',
             'password' => 'password',
         ]);
@@ -142,7 +142,7 @@ class UserControllerTest extends TestCase
         $response->assertJsonStructure(['errors' => ['name']]);
 
         // Test invalid email
-        $response = $client->postJson('/users', [
+        $response = $client->postJson(route('api.v1.users.store'), [
             'name' => 'Test User',
             'email' => 'invalid-email',
             'password' => 'password',
@@ -152,7 +152,7 @@ class UserControllerTest extends TestCase
         $response->assertJsonStructure(['errors' => ['email']]);
 
         // Test missing password
-        $response = $client->postJson('/users', [
+        $response = $client->postJson(route('api.v1.users.store'), [
             'name' => 'Test User',
             'email' => 'invalid-email',
         ]);
@@ -177,7 +177,7 @@ class UserControllerTest extends TestCase
             'Authorization' => 'Bearer '.$token,
         ]);
 
-        $response = $client->postJson('/users', [
+        $response = $client->postJson(route('api.v1.users.store'), [
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => 'password',

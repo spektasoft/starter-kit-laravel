@@ -38,6 +38,7 @@ trait HasTranslatableScopes
             $isPostgres = $driver === 'pgsql';
 
             foreach ($locales as $locale) {
+                /** @var literal-string */
                 $wrappedColumn = $grammar->wrap($column);
 
                 // IMPORTANT: The PostgreSQL query below is currently untested.
@@ -46,10 +47,12 @@ trait HasTranslatableScopes
                 // Until then, this functionality for PostgreSQL users is experimental and unverified.
                 if ($isPostgres) {
                     // PostgreSQL syntax: "LOWER(column->>'locale') LIKE ?"
+                    /** @var literal-string $locale */
                     $query->orWhereRaw("LOWER({$wrappedColumn}->>?) LIKE ?", [$locale, "%{$search}%"]);
                 } else {
                     // MySQL/MariaDB syntax: "LOWER(column->>'$."locale"') LIKE ?"
                     // Note the quotes around the JSON path key.
+                    /** @var literal-string $locale */
                     $query->orWhereRaw("LOWER({$wrappedColumn}->>\"$.{$locale}\") LIKE ?", ["%{$search}%"]);
                 }
             }

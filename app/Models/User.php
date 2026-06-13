@@ -9,6 +9,8 @@ use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -63,6 +65,19 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder|User role($roles, $guard = null)
  * @method array<int, string> recoveryCodes()
  */
+#[Fillable([
+    'name',
+    'email',
+    'password',
+    'profile_photo_media_id',
+    'email_verified_at',
+])]
+#[Hidden([
+    'password',
+    'remember_token',
+    'two_factor_recovery_codes',
+    'two_factor_secret',
+])]
 class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerifyEmail
 {
     use HasApiTokens;
@@ -76,31 +91,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     use Notifiable;
     use SuperUserAuthorizable;
     use TwoFactorAuthenticatable;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
-    protected $fillable = [
-        'profile_photo_media_id',
-        'name',
-        'email',
-        'password',
-        'email_verified_at',
-    ];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-        'two_factor_recovery_codes',
-        'two_factor_secret',
-    ];
 
     public static function auth(): ?User
     {
