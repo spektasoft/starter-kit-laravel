@@ -65,8 +65,19 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder|User role($roles, $guard = null)
  * @method array<int, string> recoveryCodes()
  */
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
+#[Fillable([
+    'name',
+    'email',
+    'password',
+    'profile_photo_media_id',
+    'email_verified_at',
+])]
+#[Hidden([
+    'password',
+    'remember_token',
+    'two_factor_recovery_codes',
+    'two_factor_secret',
+])]
 class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerifyEmail
 {
     use HasApiTokens;
