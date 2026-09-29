@@ -11,7 +11,7 @@
         "php": "^8.3",
         "adhocore/jwt": "^1.1.4",
         "artesaos/seotools": "^1.4.1",
-        "awcodes/filament-curator": "^4.0.1",
+        "awcodes/filament-curator": "^5.4",
         "awcodes/overlook": "^4.1.1",
         "bezhansalleh/filament-shield": "^4.3.1",
         "filament/filament": "^5.9",
@@ -35,7 +35,6 @@
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.7.0",
         "fakerphp/faker": "^1.24.1",
-        "filament/upgrade": "^5.9",
         "fruitcake/laravel-debugbar": "^4.4.4",
         "larastan/larastan": "^3.12.2",
         "laravel/pail": "^1.2.7",
