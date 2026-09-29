@@ -3,6 +3,7 @@
 namespace Tests\Feature\Livewire\EditProfile;
 
 use App\Livewire\EditProfile\LogoutOtherBrowserSessionsForm;
+use App\Models\Session;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Schemas\Components\Section;
@@ -25,6 +26,43 @@ class LogoutOtherBrowserSessionsTest extends TestCase
         $testable = Livewire::test(LogoutOtherBrowserSessionsForm::class);
         $testable->assertFormExists();
         $testable->assertFormComponentExists('section.browser-sessions');
+    }
+
+    public function test_lists_only_the_current_users_sessions_with_database_driver(): void
+    {
+        config(['session.driver' => 'database']);
+
+        /** @var User */
+        $user = User::factory()->create();
+        /** @var User */
+        $otherUser = User::factory()->create();
+        $this->actingAs($user);
+
+        $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+        Session::withoutTimestamps(function () use ($user, $otherUser, $userAgent): void {
+            Session::query()->forceCreate([
+                'user_id' => $user->getKey(),
+                'ip_address' => '203.0.113.7',
+                'user_agent' => $userAgent,
+                'payload' => '',
+                'last_activity' => now()->subMinutes(5)->getTimestamp(),
+            ]);
+
+            Session::query()->forceCreate([
+                'user_id' => $otherUser->getKey(),
+                'ip_address' => '198.51.100.9',
+                'user_agent' => $userAgent,
+                'payload' => '',
+                'last_activity' => now()->subMinutes(5)->getTimestamp(),
+            ]);
+        });
+
+        $this->get(route('profile.show'))
+            ->assertOk()
+            ->assertSee('203.0.113.7')
+            ->assertSee(__('Last active'))
+            ->assertDontSee('198.51.100.9');
     }
 
     public function test_can_be_logged_out(): void

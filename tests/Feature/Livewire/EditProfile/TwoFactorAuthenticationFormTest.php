@@ -26,6 +26,40 @@ class TwoFactorAuthenticationFormTest extends TestCase
             ->assertStatus(200);
     }
 
+    public function test_form_renders_disabled_state_when_two_factor_is_not_enabled(): void
+    {
+        if (! Features::canManageTwoFactorAuthentication()) {
+            $this->markTestSkipped('Two factor authentication is not enabled.');
+        }
+
+        /** @var User */
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        Livewire::test(TwoFactorAuthenticationForm::class)
+            ->assertSee(__('You have not enabled two factor authentication.'))
+            ->assertDontSee(__('You have enabled two factor authentication.'));
+    }
+
+    public function test_form_renders_enabled_state_when_two_factor_is_confirmed(): void
+    {
+        if (! Features::canManageTwoFactorAuthentication()) {
+            $this->markTestSkipped('Two factor authentication is not enabled.');
+        }
+
+        /** @var User */
+        $user = User::factory()->create([
+            'two_factor_secret' => encrypt('SECRETKEYSECRETKEY'),
+            'two_factor_recovery_codes' => encrypt(json_encode(['code-one', 'code-two'])),
+            'two_factor_confirmed_at' => now(),
+        ]);
+        $this->actingAs($user);
+
+        Livewire::test(TwoFactorAuthenticationForm::class)
+            ->assertSee(__('You have enabled two factor authentication.'))
+            ->assertDontSee(__('You have not enabled two factor authentication.'));
+    }
+
     public function test_two_factor_authentication_can_be_enabled(): void
     {
         if (! Features::canManageTwoFactorAuthentication()) {

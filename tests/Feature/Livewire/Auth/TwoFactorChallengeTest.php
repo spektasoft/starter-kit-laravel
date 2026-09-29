@@ -117,4 +117,30 @@ class TwoFactorChallengeTest extends TestCase
             ->assertHasNoFormErrors()
             ->assertFormSet(['code' => $otp]);
     }
+
+    public function test_recovery_code_completes_two_factor_login(): void
+    {
+        $provider = app(TwoFactorAuthenticationProvider::class);
+        $recoveryCodes = Collection::times(8, function () {
+            return RecoveryCode::generate();
+        })->all();
+
+        $user = User::factory()->create([
+            'two_factor_secret' => encrypt($provider->generateSecretKey()),
+            'two_factor_recovery_codes' => encrypt(json_encode($recoveryCodes)),
+        ] + (Fortify::confirmsTwoFactorAuthentication() ? ['two_factor_confirmed_at' => now()] : []));
+
+        $this->withSession(['login.id' => $user->getKey(), 'login.remember' => false])
+            ->post(route('two-factor.login.store'), ['recovery_code' => $recoveryCodes[0]])
+            ->assertRedirect();
+
+        $this->assertAuthenticatedAs($user);
+
+        /** @var User $freshUser */
+        $freshUser = $user->fresh();
+        $remainingCodes = $freshUser->recoveryCodes();
+
+        $this->assertNotContains($recoveryCodes[0], $remainingCodes);
+        $this->assertCount(8, $remainingCodes);
+    }
 }
