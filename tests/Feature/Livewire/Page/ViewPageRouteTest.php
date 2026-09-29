@@ -61,4 +61,17 @@ class ViewPageRouteTest extends TestCase
 
         $this->assertSeesLivewire($response, 'page.view-page', 'navigation-menu');
     }
+
+    public function test_pages_show_route_is_registered_once_with_expected_url(): void
+    {
+        $this->assertSame(
+            url('/pages/sample-slug'),
+            route('pages.show', ['record' => 'sample-slug'])
+        );
+
+        $matchingRoutes = collect(app('router')->getRoutes()->getRoutes())
+            ->filter(fn ($route) => $route->getName() === 'pages.show');
+
+        $this->assertCount(1, $matchingRoutes);
+    }
 }
