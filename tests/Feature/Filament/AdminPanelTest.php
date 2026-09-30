@@ -10,6 +10,7 @@ use Filament\Support\Colors\Color as FilamentPalette;
 use Filament\Support\Facades\FilamentColor;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features as FortifyFeatures;
 use Tests\TestCase;
 
@@ -76,6 +77,28 @@ class AdminPanelTest extends TestCase
         }
 
         $this->assertSame(Heroicon::OutlinedBuildingLibrary, Dashboard::getNavigationIcon());
+    }
+
+    public function test_filament_authentication_advisory_surfaces_are_disabled(): void
+    {
+        $panel = Filament::getPanel('admin');
+
+        $this->assertFalse($panel->hasLogin());
+        $this->assertFalse($panel->hasRegistration());
+        $this->assertFalse($panel->hasProfile());
+        $this->assertFalse($panel->hasMultiFactorAuthentication());
+
+        $authRoutes = collect(
+            Route::getRoutes()->getRoutes()
+        )
+            ->map(fn ($route) => $route->getName())
+            ->filter(fn ($name) => str_starts_with($name ?? '', 'filament.admin.auth.'))
+            ->values()
+            ->all();
+
+        $this->assertSame(['filament.admin.auth.logout'], $authRoutes);
+
+        $this->get('/admin')->assertRedirect('/login');
     }
 
     public function test_guest_user_is_redirected_to_login_page(): void

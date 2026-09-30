@@ -32,6 +32,26 @@ class ViewPageTest extends TestCase
             ->assertSee($pageContent);
     }
 
+    public function test_published_page_content_removes_scripts_and_event_handlers(): void
+    {
+        $this->withoutVite();
+        app()->setLocale('en');
+
+        $page = Page::factory()->create([
+            'status' => Status::Publish,
+            'title' => ['en' => 'Security regression'],
+            'content' => [
+                'en' => '<p onclick="alert(\'ticket17\')">Safe content</p><script>alert(\'ticket17\')</script>',
+            ],
+        ]);
+
+        Livewire::test(ViewPage::class, ['record' => $page])
+            ->assertStatus(200)
+            ->assertSeeHtml('<p>Safe content</p>')
+            ->assertDontSeeHtml('onclick="alert(\'ticket17\')"')
+            ->assertDontSeeHtml('<script>alert(\'ticket17\')</script>');
+    }
+
     public function test_guest_views_draft_page(): void
     {
         $page = Page::factory()->create(['status' => Status::Draft]);

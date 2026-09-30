@@ -8,10 +8,13 @@ use App\Models\User;
 use Awcodes\Curator\Components\Forms\RichEditor\AttachCuratorMediaPlugin;
 use Filament\Forms\Components\RichEditor;
 use Filament\Schemas\Schema;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class CuratorEnabledRichEditorTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_uses_restricted_plugin_not_base_plugin(): void
     {
         $component = CuratorEnabledRichEditor::make('content')
