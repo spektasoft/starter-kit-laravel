@@ -5,26 +5,10 @@ namespace Tests\Support;
 use App\Models\Permission;
 use App\Models\User;
 use Filament\Facades\Filament;
-use Illuminate\Foundation\Application;
 use Tests\TestCase;
 
 abstract class FilamentPanelTestCase extends TestCase
 {
-    public function createApplication(): Application
-    {
-        $application = parent::createApplication();
-
-        $application['config']->set([
-            'database.default' => 'sqlite',
-            'database.connections.sqlite.database' => ':memory:',
-            'database.connections.sqlite.url' => null,
-        ]);
-
-        $application['db']->purge('sqlite');
-
-        return $application;
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -36,7 +20,7 @@ abstract class FilamentPanelTestCase extends TestCase
     }
 
     /**
-     * @param list<string> $names
+     * @param  list<string>  $names
      */
     protected function grantPermissions(User $user, array $names): void
     {
