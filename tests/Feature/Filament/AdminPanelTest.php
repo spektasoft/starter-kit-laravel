@@ -2,7 +2,13 @@
 
 namespace Tests\Feature\Filament;
 
+use App\Colors\Color;
 use App\Models\User;
+use Filament\Facades\Filament;
+use Filament\Pages\Dashboard;
+use Filament\Support\Colors\Color as FilamentPalette;
+use Filament\Support\Facades\FilamentColor;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Fortify\Features as FortifyFeatures;
 use Tests\TestCase;
@@ -52,6 +58,24 @@ class AdminPanelTest extends TestCase
         $response = $this->actingAs($user)->get('/admin');
 
         $response->assertOk();
+    }
+
+    public function test_admin_branding_uses_the_configured_palettes_and_dashboard_icon(): void
+    {
+        $this->actingAs(User::factory()->create())->get('/admin')->assertOk();
+
+        $panel = Filament::getPanel('admin');
+        $this->assertSame(Color::Vermilion, $panel->getColors()['primary']);
+        $this->assertSame(Color::WebOrange, $panel->getColors()['secondary']);
+
+        $colors = FilamentColor::getColors();
+        foreach (['primary' => Color::Vermilion, 'secondary' => Color::WebOrange] as $name => $palette) {
+            foreach ($palette as $shade => $hex) {
+                $this->assertSame(FilamentPalette::convertToOklch($hex), $colors[$name][$shade]);
+            }
+        }
+
+        $this->assertSame(Heroicon::OutlinedBuildingLibrary, Dashboard::getNavigationIcon());
     }
 
     public function test_guest_user_is_redirected_to_login_page(): void

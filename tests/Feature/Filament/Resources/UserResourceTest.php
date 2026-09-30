@@ -6,6 +6,7 @@ use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\UserResource;
+use App\Models\Media;
 use App\Models\Page;
 use App\Models\Permission;
 use App\Models\Role;
@@ -16,6 +17,7 @@ use Filament\GlobalSearch\GlobalSearchResult;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Jetstream\Features;
 use Laravel\Jetstream\Jetstream;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -42,6 +44,67 @@ class UserResourceTest extends TestCase
         $user->givePermissionTo('delete_user');
         Permission::firstOrCreate(['name' => 'delete_any_user']);
         $user->givePermissionTo('delete_any_user');
+    }
+
+    public function test_profile_photo_field_and_column_follow_jetstream_features(): void
+    {
+        $user = User::factory()->create();
+
+        config(['jetstream.features' => [Features::profilePhotos()]]);
+        Livewire::test(CreateUser::class)->assertFormFieldExists('profile_photo_media_id');
+        Livewire::test(EditUser::class, ['record' => $user->id])
+            ->assertFormFieldExists('profile_photo_media_id');
+        Livewire::test(ListUsers::class)->assertTableColumnExists('profile_photo_media_id');
+
+        config(['jetstream.features' => []]);
+        Livewire::test(CreateUser::class)->assertFormFieldDoesNotExist('profile_photo_media_id');
+        Livewire::test(EditUser::class, ['record' => $user->id])
+            ->assertFormFieldDoesNotExist('profile_photo_media_id');
+        Livewire::test(ListUsers::class)->assertTableColumnDoesNotExist('profile_photo_media_id');
+    }
+
+    public function test_editing_with_blank_password_preserves_the_existing_password(): void
+    {
+        $user = User::factory()->create();
+        $hash = $user->password;
+
+        Livewire::test(EditUser::class, ['record' => $user->id])
+            ->fillForm(['name' => 'Updated name', 'password' => ''])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('Updated name', $user->refresh()->name);
+        $this->assertSame($hash, $user->password);
+    }
+
+    public function test_editing_with_a_new_password_persists_a_hash(): void
+    {
+        $user = User::factory()->create();
+        $hash = $user->password;
+
+        Livewire::test(EditUser::class, ['record' => $user->id])
+            ->fillForm(['password' => 'new-password-123'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertNotSame($hash, $user->refresh()->password);
+        $this->assertTrue(Hash::check('new-password-123', $user->password));
+    }
+
+    public function test_profile_photo_media_attribute_is_saved_when_enabled(): void
+    {
+        config(['jetstream.features' => [Features::profilePhotos()]]);
+        $user = User::factory()->create();
+        $authenticatedUser = User::auth();
+        $this->assertInstanceOf(User::class, $authenticatedUser);
+        $media = Media::factory()->create(['creator_id' => $authenticatedUser->id]);
+
+        Livewire::test(EditUser::class, ['record' => $user->id])
+            ->set('data.profile_photo_media_id', [$media->toArray()])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame($media->id, $user->refresh()->profile_photo_media_id);
     }
 
     public function test_user_list_page_can_be_rendered(): void

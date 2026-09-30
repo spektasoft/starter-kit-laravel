@@ -20,6 +20,8 @@ use Filament\Notifications\Livewire\DatabaseNotifications;
 use Filament\Support\Facades\FilamentColor;
 use Filament\Support\Facades\FilamentIcon;
 use Filament\Support\Facades\FilamentView;
+use Filament\Support\Icons\Heroicon;
+use Filament\View\PanelsIconAlias;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
@@ -62,7 +64,7 @@ class AppServiceProvider extends ServiceProvider
             'secondary' => Color::WebOrange,
         ]);
         FilamentIcon::register([
-            'panels::pages.dashboard.navigation-item' => 'heroicon-o-building-library',
+            PanelsIconAlias::PAGES_DASHBOARD_NAVIGATION_ITEM => Heroicon::OutlinedBuildingLibrary,
         ]);
         FilamentView::spa();
 
