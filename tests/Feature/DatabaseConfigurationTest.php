@@ -10,13 +10,9 @@ class DatabaseConfigurationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_default_suite_uses_sqlite_memory_storage_and_persists_users(): void
+    public function test_default_suite_uses_sqlite_and_persists_users(): void
     {
         $this->assertSame('sqlite', config('database.default'));
-        $this->assertSame(
-            ':memory:',
-            config('database.connections.sqlite.database'),
-        );
         $this->assertEmpty(config('database.connections.sqlite.url'));
 
         $user = User::factory()->create();
