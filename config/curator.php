@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 use App\Filament\Resources\Media\MediaResource;
+use App\Filament\Resources\Media\Pages\CreateMedia;
 use App\Filament\Resources\Media\Pages\EditMedia;
 use App\Filament\Resources\Media\Pages\ListMedia;
 use App\Filament\Resources\Media\Schemas\MediaForm;
@@ -9,7 +10,6 @@ use App\Models\Media;
 use App\PathGenerators\AuthenticatedUserPathGenerator;
 use Awcodes\Curator\Enums\PreviewableExtensions;
 use Awcodes\Curator\Providers\GlideUrlProvider;
-use Awcodes\Curator\Resources\Media\Pages\CreateMedia;
 use Awcodes\Curator\Resources\Media\Tables\MediaTable;
 
 return [
