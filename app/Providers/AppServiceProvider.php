@@ -86,14 +86,11 @@ class AppServiceProvider extends ServiceProvider
         // This makes CuratorEnabledRichEditor the effective default without
         // requiring every call site to import the custom class.
         RichEditor::macro('withCurator', function () {
-            $resolve = function ($instance) {
-                return $instance;
-            };
-
+            // The closure is bound to a RichEditor instance by Macroable at call time.
             /** @var RichEditor $editor */
-            $editor = $resolve($this);
+            $editor = $this; // @phpstan-ignore varTag.nativeType
 
-            return CuratorEnabledRichEditor::make($editor->getName());
+            return CuratorEnabledRichEditor::applyCuratorConfiguration($editor);
         });
     }
 }

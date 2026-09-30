@@ -6,6 +6,7 @@ use App\Filament\Forms\Components\CuratorEnabledRichEditor;
 use App\Filament\Forms\Components\RichEditor\RestrictedAttachCuratorMediaPlugin;
 use App\Models\User;
 use Awcodes\Curator\Components\Forms\RichEditor\AttachCuratorMediaPlugin;
+use Filament\Forms\Components\RichEditor;
 use Filament\Schemas\Schema;
 use Tests\TestCase;
 
@@ -38,5 +39,38 @@ class CuratorEnabledRichEditorTest extends TestCase
         $authIdentifier = $user->getAuthIdentifier();
 
         $this->assertSame('media/'.$authIdentifier, $directory);
+    }
+
+    public function test_file_attachments_disk_and_visibility_follow_curator_config(): void
+    {
+        config([
+            'curator.default_disk' => 'curator-disk',
+            'curator.default_visibility' => 'private',
+            'filament.default_filesystem_disk' => 'other-disk',
+        ]);
+
+        $component = CuratorEnabledRichEditor::make('content')
+            ->container(Schema::make()->operation('test'));
+
+        $this->assertSame('curator-disk', $component->getFileAttachmentsDiskName());
+        $this->assertSame('private', $component->getFileAttachmentsVisibility());
+    }
+
+    public function test_with_curator_macro_configures_the_same_editor_and_keeps_prior_settings(): void
+    {
+        // Intentional direct use: the macro is defined on the base RichEditor.
+        // @phpstan-ignore-next-line
+        $editor = RichEditor::make('content')
+            ->required()
+            ->container(Schema::make()->operation('test'));
+
+        // @phpstan-ignore-next-line
+        $result = $editor->withCurator();
+
+        $this->assertSame($editor, $result);
+        $this->assertTrue($result->isRequired());
+
+        $pluginClasses = array_map(fn ($p) => get_class($p), $result->getPlugins());
+        $this->assertContains(RestrictedAttachCuratorMediaPlugin::class, $pluginClasses);
     }
 }
