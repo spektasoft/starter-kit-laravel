@@ -23,9 +23,10 @@ class ShieldServiceProvider extends ServiceProvider
     public function boot(): void
     {
         FilamentShield::buildPermissionKeyUsing(
-            function (string $entity, string $affix, string $subject, string $case, string $separator) {
+            function (string $entity, ?string $affix, string $subject, string $case, string $separator): string {
                 return match (true) {
-                    is_subclass_of($entity, Resource::class) => Str::of($affix)
+                    $entity === 'custom' => $subject,
+                    is_subclass_of($entity, Resource::class) => Str::of($affix ?? '')
                         ->snake()
                         ->append('_')
                         ->append(
@@ -43,7 +44,7 @@ class ShieldServiceProvider extends ServiceProvider
                     is_subclass_of($entity, Widget::class) => Str::of('widget_')
                         ->append(class_basename($entity))
                         ->toString(),
-                    default => Str::of($affix)
+                    default => Str::of($affix ?? '')
                         ->append('_')
                         ->append(Str::of(class_basename($entity))->snake())
                         ->toString(),
