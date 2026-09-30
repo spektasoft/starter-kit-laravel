@@ -37,7 +37,7 @@ class LoginTest extends TestCase
     {
         $user = User::factory()->create(['password' => bcrypt('password')]);
 
-        /** @var Testable $testable */
+        /** @var Testable<Login> $testable */
         $testable = Livewire::test(Login::class);
         $testable->set('data.email', $user->email);
         $testable->set('data.password', 'password');
@@ -54,7 +54,7 @@ class LoginTest extends TestCase
     {
         User::factory()->create(['password' => bcrypt('password')]);
 
-        /** @var Testable $testable */
+        /** @var Testable<Login> $testable */
         $testable = Livewire::test(Login::class);
         $testable->set('data.email', 'invalid@example.com');
         $testable->set('data.password', 'wrong-password');
@@ -69,7 +69,7 @@ class LoginTest extends TestCase
 
     public function test_email_field_is_required(): void
     {
-        /** @var Testable $testable */
+        /** @var Testable<Login> $testable */
         $testable = Livewire::test(Login::class);
         $testable->set('data.password', 'password'); // Include password to avoid password error first
 
@@ -83,7 +83,7 @@ class LoginTest extends TestCase
 
     public function test_email_field_has_valid_email_format(): void
     {
-        /** @var Testable $testable */
+        /** @var Testable<Login> $testable */
         $testable = Livewire::test(Login::class);
         $testable->set('data.email', 'invalid-email');
         $testable->set('data.password', 'password'); // Include password to avoid password error first
@@ -98,7 +98,7 @@ class LoginTest extends TestCase
 
     public function test_password_field_is_required(): void
     {
-        /** @var Testable $testable */
+        /** @var Testable<Login> $testable */
         $testable = Livewire::test(Login::class);
         $testable->set('data.email', 'test@example.com'); // Include email to avoid email error first
 
@@ -112,7 +112,7 @@ class LoginTest extends TestCase
 
     public function test_form_validation_fails_when_email_field_is_missing(): void
     {
-        /** @var Testable $testable */
+        /** @var Testable<Login> $testable */
         $testable = Livewire::test(Login::class);
         $testable->set('data.password', 'password'); // Include password to avoid password error first
         /** @var array<string, string> $formData */
@@ -124,7 +124,7 @@ class LoginTest extends TestCase
 
     public function test_form_validation_fails_when_password_field_is_missing(): void
     {
-        /** @var Testable $testable */
+        /** @var Testable<Login> $testable */
         $testable = Livewire::test(Login::class);
         $testable->set('data.email', 'test@example.com'); // Include email to avoid email error first
         /** @var array<string, string> $formData */

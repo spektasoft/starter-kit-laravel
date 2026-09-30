@@ -43,7 +43,7 @@ class LogoutOtherBrowserSessionsForm extends Component implements HasActions, Ha
                     ->heading(__('Browser Sessions'))
                     ->description(__('Manage and log out your active sessions on other browsers and devices.'))
                     ->schema([
-                        View::make('browser-sessions') // @phpstan-ignore-line
+                        View::make('browser-sessions')
                             ->key('browser-sessions')
                             ->view('components.browser-sessions'),
                     ])

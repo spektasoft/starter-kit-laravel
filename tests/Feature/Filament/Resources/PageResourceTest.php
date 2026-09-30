@@ -104,7 +104,7 @@ class PageResourceTest extends TestCase
     {
         $newData = Page::factory()->make();
 
-        /** @var Testable */
+        /** @var Testable<CreatePage> */
         $livewire = Livewire::test(CreatePage::class)
             ->fillForm([
                 'title' => [
@@ -193,7 +193,7 @@ class PageResourceTest extends TestCase
         $sanitizedContent = '<p>Test</p>';
 
         // Create the page with malicious content
-        /** @var Testable */
+        /** @var Testable<CreatePage> */
         $livewire = Livewire::test(CreatePage::class)
             ->fillForm([
                 'title' => ['en' => 'XSS Test'],

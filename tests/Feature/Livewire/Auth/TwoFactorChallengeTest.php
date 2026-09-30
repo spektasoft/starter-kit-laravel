@@ -27,7 +27,7 @@ class TwoFactorChallengeTest extends TestCase
 
     public function test_two_factor_challenge_form_has_proper_attributes(): void
     {
-        /** @var Testable $testable */
+        /** @var Testable<TwoFactorChallenge> $testable */
         $testable = Livewire::test(TwoFactorChallenge::class);
 
         $testable->assertFormExists();
@@ -39,7 +39,7 @@ class TwoFactorChallengeTest extends TestCase
 
     public function test_component_renders_authentication_code_form_by_default(): void
     {
-        /** @var Testable $testable */
+        /** @var Testable<TwoFactorChallenge> $testable */
         $testable = Livewire::test(TwoFactorChallenge::class);
 
         $testable->assertSee(__('Please confirm access to your account by entering the authentication code provided by your authenticator application.'));
@@ -49,7 +49,7 @@ class TwoFactorChallengeTest extends TestCase
 
     public function test_component_renders_recovery_code_form_when_show_recovery_is_true(): void
     {
-        /** @var Testable $testable */
+        /** @var Testable<TwoFactorChallenge> $testable */
         $testable = Livewire::test(TwoFactorChallenge::class);
 
         $testable->set('showRecovery', true);
@@ -68,7 +68,7 @@ class TwoFactorChallengeTest extends TestCase
 
     public function test_switch_to_authentication_code_link_toggles_show_recovery_and_refreshes_component(): void
     {
-        /** @var Testable $testable */
+        /** @var Testable<TwoFactorChallenge> $testable */
         $testable = Livewire::test(TwoFactorChallenge::class);
 
         $testable->set('showRecovery', true)
@@ -78,7 +78,7 @@ class TwoFactorChallengeTest extends TestCase
 
     public function test_form_submission_binds_data(): void
     {
-        /** @var Testable $testable */
+        /** @var Testable<TwoFactorChallenge> $testable */
         $testable = Livewire::test(TwoFactorChallenge::class);
 
         $testable->set('data.code', '123456')
