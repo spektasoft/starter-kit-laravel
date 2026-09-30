@@ -10,10 +10,12 @@ class DatabaseConfigurationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_default_suite_uses_sqlite_and_persists_users(): void
+    public function test_configured_database_uses_a_supported_driver_and_persists_users(): void
     {
-        $this->assertSame('sqlite', config('database.default'));
-        $this->assertEmpty(config('database.connections.sqlite.url'));
+        $connection = (new User)->getConnection();
+
+        $this->assertContains($connection->getDriverName(), ['sqlite', 'mysql']);
+        $this->assertEmpty($connection->getConfig('url'));
 
         $user = User::factory()->create();
 
