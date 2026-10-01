@@ -7,9 +7,10 @@
         "dev": "vite",
         "dev:host": "vite --host",
         "update": "npx npm-check-updates --interactive --format group",
-        "lint": "eslint . --ext ts && tsc --noEmit --strict"
+        "lint": "eslint \"**/*.ts\" && tsc --noEmit --strict"
     },
     "devDependencies": {
+        "@eslint/js": "^10.0.0",
         "@tailwindcss/postcss": "^4.3.3",
         "@tailwindcss/vite": "^4.3.3",
         "@types/alpinejs": "^3.17.0",
@@ -20,6 +21,7 @@
         "concurrently": "^10.0.5",
         "dotenv": "^17.4.2",
         "eslint": "^10.11.0",
+        "globals": "^16.0.0",
         "laravel-vite-plugin": "^3.2",
         "postcss": "^8.5.28",
         "tailwindcss": "^4.3.3",
