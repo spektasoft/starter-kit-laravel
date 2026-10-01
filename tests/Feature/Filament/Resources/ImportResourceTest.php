@@ -8,6 +8,7 @@ use App\Models\Import;
 use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Lang;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -42,7 +43,7 @@ class ImportResourceTest extends TestCase
         // Mock the trans_choice function for the importer column
         // This is necessary because the resource uses trans_choice which might not be available
         // or correctly configured in a feature test without a full application context.
-        \Illuminate\Support\Facades\Lang::shouldReceive('trans_choice')
+        Lang::shouldReceive('trans_choice')
             ->with('page.resource.model_label', 1)
             ->andReturn('Page');
 
@@ -130,7 +131,7 @@ class ImportResourceTest extends TestCase
         ]);
 
         // Mock the trans_choice function for the importer column
-        \Illuminate\Support\Facades\Lang::shouldReceive('trans_choice')
+        Lang::shouldReceive('trans_choice')
             ->with('product.resource.model_label', 1)
             ->andReturn('Product');
 

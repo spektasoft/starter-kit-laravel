@@ -190,8 +190,9 @@ class PageTranslationsTest extends FilamentPanelTestCase
 
     /**
      * @template TComponent of CreatePage|EditPage
-     * @param Testable<TComponent> $component
-     * @param array{title: array<string, string>, content: array<string, string>} $payload
+     *
+     * @param  Testable<TComponent>  $component
+     * @param  array{title: array<string, string>, content: array<string, string>}  $payload
      */
     private function assertHydratedTranslations(
         Testable $component,
@@ -222,7 +223,7 @@ class PageTranslationsTest extends FilamentPanelTestCase
     }
 
     /**
-     * @param array{title: array<string, string>, content: array<string, string>} $payload
+     * @param  array{title: array<string, string>, content: array<string, string>}  $payload
      */
     private function assertTranslations(Page $page, array $payload): void
     {

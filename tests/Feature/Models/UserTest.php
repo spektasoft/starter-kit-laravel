@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Models;
 
+use App\Models\Export;
+use App\Models\Media;
 use App\Models\Page;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -46,10 +48,10 @@ class UserTest extends TestCase
         Page::factory()->count(2)->create(['creator_id' => $user->id]);
 
         // Create media files
-        \App\Models\Media::factory()->count(3)->create(['creator_id' => $user->id]);
+        Media::factory()->count(3)->create(['creator_id' => $user->id]);
 
         // Create exports
-        \App\Models\Export::factory()->count(1)->create(['creator_id' => $user->id]);
+        Export::factory()->count(1)->create(['creator_id' => $user->id]);
 
         $blockingResources = $user->getBlockingResources();
 

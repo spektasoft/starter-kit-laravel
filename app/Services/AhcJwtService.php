@@ -21,7 +21,7 @@ class AhcJwtService implements Jwt
         if (Str::startsWith($key, 'base64:')) {
             $key = substr($key, 7);
             $secret = base64_decode($key);
-            $this->jwt = new AhcJWT($secret);
+            $this->jwt = new AhcJwt($secret);
         } else {
             throw new Exception('JWT creation failed, invalid APP_KEY.');
         }

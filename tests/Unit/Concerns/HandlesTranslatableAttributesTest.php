@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Mockery;
+use Mockery\Expectation;
 use Tests\TestCase;
 
 class TestModel extends Model
@@ -140,10 +141,10 @@ class HandlesTranslatableAttributesTest extends TestCase
         $currentLocale = 'es';
 
         $appMock = Mockery::mock(Application::class);
-        /** @var \Mockery\Expectation */
+        /** @var Expectation */
         $expectation = $appMock->shouldReceive('getLocale');
         $expectation->andReturn($currentLocale);
-        /** @var \Illuminate\Contracts\Foundation\Application $appMock */
+        /** @var Application $appMock */
         Facade::setFacadeApplication($appMock);
 
         $model = $this->createTestModel(
@@ -173,10 +174,10 @@ class HandlesTranslatableAttributesTest extends TestCase
         $contentLocales = ['en', 'es']; // These locales have content
 
         $appMock = Mockery::mock(Application::class);
-        /** @var \Mockery\Expectation */
+        /** @var Expectation */
         $expectation = $appMock->shouldReceive('getLocale');
         $expectation->andReturn($currentLocale);
-        /** @var \Illuminate\Contracts\Foundation\Application $appMock */
+        /** @var Application $appMock */
         Facade::setFacadeApplication($appMock);
 
         $model = $this->createTestModel(

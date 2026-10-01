@@ -2,9 +2,9 @@
 
 namespace App\Queue\Connectors;
 
+use App\Queue\DatabaseQueue;
 use Exception;
 use Illuminate\Contracts\Queue\Queue;
-use App\Queue\DatabaseQueue;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Connectors\DatabaseConnector as IlluminateDatabaseConnector;
 

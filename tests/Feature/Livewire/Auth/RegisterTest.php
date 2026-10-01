@@ -87,14 +87,14 @@ class RegisterTest extends TestCase
             'email' => 'john@example.com',
             'password' => 'password',
             'password_confirmation' => 'not-matching-password',
-            'terms' => \Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature(),
+            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
         ]);
 
         $response->assertSessionHasErrors(['password']);
         $response->assertSessionHas('_old_input', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'terms' => \Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature(),
+            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
         ]);
     }
 

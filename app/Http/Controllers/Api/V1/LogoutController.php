@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use Exception;
 use App\Http\Controllers\Controller;
 use App\Models\PersonalAccessToken;
 use App\Models\User;
+use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

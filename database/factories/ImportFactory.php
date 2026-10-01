@@ -2,11 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\User; // Assuming User model exists and is needed for user_id
+use App\Models\Import; // Assuming User model exists and is needed for user_id
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Import>
+ * @extends Factory<Import>
  */
 class ImportFactory extends Factory
 {
@@ -19,8 +21,8 @@ class ImportFactory extends Factory
     {
         return [
             'completed_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
-            'file_name' => 'imports/'.\Illuminate\Support\Str::ulid().'.csv',
-            'file_path' => 'imports/'.\Illuminate\Support\Str::ulid().'.csv',
+            'file_name' => 'imports/'.Str::ulid().'.csv',
+            'file_path' => 'imports/'.Str::ulid().'.csv',
             'importer' => $this->faker->randomElement(['UserImporter', 'ProductImporter', 'OrderImporter']),
             'processed_rows' => $processed = $this->faker->numberBetween(10, 1000),
             'total_rows' => $total = $this->faker->numberBetween($processed, $processed + 500),

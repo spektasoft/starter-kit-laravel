@@ -2,30 +2,30 @@
 
 namespace App\Livewire\EditProfile;
 
-use Filament\Actions\Contracts\HasActions;
-use Filament\Actions\Concerns\InteractsWithActions;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Actions\Action;
-use Illuminate\Validation\ValidationException;
 use App\Concerns\HasUser;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 use Laravel\Fortify\Features;
 use Laravel\Jetstream\Jetstream;
 use Livewire\Component;
 
 /**
- * @property \Filament\Schemas\Schema $form
+ * @property Schema $form
  */
-class UpdateProfileInformationForm extends Component implements HasForms, HasActions
+class UpdateProfileInformationForm extends Component implements HasActions, HasForms
 {
-    use InteractsWithActions;
     use HasUser;
+    use InteractsWithActions;
     use InteractsWithForms;
 
     /**

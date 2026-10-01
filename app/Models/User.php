@@ -142,7 +142,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         ])->save();
     }
 
-
     public function getFilamentAvatarUrl(): ?string
     {
         if (Jetstream::managesProfilePhotos() && $this->profilePhotoMedia !== null) {
@@ -156,7 +155,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         return null;
     }
 
-
     public function isSuperUser(): bool
     {
         /** @var string[] */
@@ -168,7 +166,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
 
         return in_array($this->{Fortify::username()}, $superUsers);
     }
-
 
     /**
      * Get the profilePhotoMedia that owns the User

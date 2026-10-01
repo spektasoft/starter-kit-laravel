@@ -2,10 +2,10 @@
 
 namespace App\Queue\Failed;
 
-use Throwable;
 use Illuminate\Queue\Failed\DatabaseUuidFailedJobProvider;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
+use Throwable;
 
 class DatabaseUuidUlidFailedJobProvider extends DatabaseUuidFailedJobProvider
 {
@@ -15,7 +15,7 @@ class DatabaseUuidUlidFailedJobProvider extends DatabaseUuidFailedJobProvider
      * @param  string  $connection
      * @param  string  $queue
      * @param  string  $payload
-     * @param Throwable $exception
+     * @param  Throwable  $exception
      * @return string|null
      */
     public function log($connection, $queue, $payload, $exception)

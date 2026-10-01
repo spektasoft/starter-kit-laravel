@@ -2,11 +2,11 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Http\RedirectResponse;
 use Closure;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Features as FortifyFeatures;
 
@@ -15,7 +15,7 @@ class EnsureEmailIsVerifiedWithFortify extends EnsureEmailIsVerified
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @param  string|null  $redirectToRoute
      * @return Response|RedirectResponse|null
      */
