@@ -21,6 +21,16 @@ class CuratorPanel extends BaseCuratorPanel
     }
 
     /**
+     * The base panel rebuilds breadcrumbs on every getFiles() call (directory
+     * change, load more, search reset). Suppression must hold for all of them,
+     * not only after mount().
+     */
+    public function getBreadcrumbs(): void
+    {
+        $this->breadcrumbs = null;
+    }
+
+    /**
      * Override the form method to explicitly set the model.
      *
      * Fixes issue where form model is not inferred correctly in modal context.

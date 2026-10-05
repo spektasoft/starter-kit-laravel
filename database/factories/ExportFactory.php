@@ -2,10 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Models\Export;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Export>
+ * @extends Factory<Export>
  */
 class ExportFactory extends Factory
 {
@@ -17,10 +20,10 @@ class ExportFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => \App\Models\User::factory(),
+            'user_id' => User::factory(),
             'completed_at' => $this->faker->boolean(50) ? $this->faker->dateTimeBetween('-1 month', 'now') : null,
             'file_disk' => 'public', // As used in the test
-            'file_name' => $this->faker->boolean(80) ? 'exports/'.\Illuminate\Support\Str::ulid().'.csv' : null,
+            'file_name' => $this->faker->boolean(80) ? 'exports/'.Str::ulid().'.csv' : null,
             'exporter' => $this->faker->word().'Exporter',
             'processed_rows' => $this->faker->numberBetween(0, 1000),
             'total_rows' => $this->faker->numberBetween(1000, 2000),

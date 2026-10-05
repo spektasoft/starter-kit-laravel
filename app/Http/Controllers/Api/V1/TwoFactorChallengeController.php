@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use Exception;
-use Illuminate\Contracts\Encryption\DecryptException;
 use Ahc\Jwt\JWTException;
 use App\Contracts\Jwt;
 use App\Models\User;
+use Exception;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;

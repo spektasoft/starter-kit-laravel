@@ -27,7 +27,7 @@ class TwoFactorChallengeTest extends TestCase
 
     public function test_two_factor_challenge_form_has_proper_attributes(): void
     {
-        /** @var Testable $testable */
+        /** @var Testable<TwoFactorChallenge> $testable */
         $testable = Livewire::test(TwoFactorChallenge::class);
 
         $testable->assertFormExists();
@@ -39,7 +39,7 @@ class TwoFactorChallengeTest extends TestCase
 
     public function test_component_renders_authentication_code_form_by_default(): void
     {
-        /** @var Testable $testable */
+        /** @var Testable<TwoFactorChallenge> $testable */
         $testable = Livewire::test(TwoFactorChallenge::class);
 
         $testable->assertSee(__('Please confirm access to your account by entering the authentication code provided by your authenticator application.'));
@@ -49,7 +49,7 @@ class TwoFactorChallengeTest extends TestCase
 
     public function test_component_renders_recovery_code_form_when_show_recovery_is_true(): void
     {
-        /** @var Testable $testable */
+        /** @var Testable<TwoFactorChallenge> $testable */
         $testable = Livewire::test(TwoFactorChallenge::class);
 
         $testable->set('showRecovery', true);
@@ -68,7 +68,7 @@ class TwoFactorChallengeTest extends TestCase
 
     public function test_switch_to_authentication_code_link_toggles_show_recovery_and_refreshes_component(): void
     {
-        /** @var Testable $testable */
+        /** @var Testable<TwoFactorChallenge> $testable */
         $testable = Livewire::test(TwoFactorChallenge::class);
 
         $testable->set('showRecovery', true)
@@ -78,7 +78,7 @@ class TwoFactorChallengeTest extends TestCase
 
     public function test_form_submission_binds_data(): void
     {
-        /** @var Testable $testable */
+        /** @var Testable<TwoFactorChallenge> $testable */
         $testable = Livewire::test(TwoFactorChallenge::class);
 
         $testable->set('data.code', '123456')
@@ -116,5 +116,31 @@ class TwoFactorChallengeTest extends TestCase
             ->callFormComponentAction('two-factor-authentication', 'log-in')
             ->assertHasNoFormErrors()
             ->assertFormSet(['code' => $otp]);
+    }
+
+    public function test_recovery_code_completes_two_factor_login(): void
+    {
+        $provider = app(TwoFactorAuthenticationProvider::class);
+        $recoveryCodes = Collection::times(8, function () {
+            return RecoveryCode::generate();
+        })->all();
+
+        $user = User::factory()->create([
+            'two_factor_secret' => encrypt($provider->generateSecretKey()),
+            'two_factor_recovery_codes' => encrypt(json_encode($recoveryCodes)),
+        ] + (Fortify::confirmsTwoFactorAuthentication() ? ['two_factor_confirmed_at' => now()] : []));
+
+        $this->withSession(['login.id' => $user->getKey(), 'login.remember' => false])
+            ->post(route('two-factor.login.store'), ['recovery_code' => $recoveryCodes[0]])
+            ->assertRedirect();
+
+        $this->assertAuthenticatedAs($user);
+
+        /** @var User $freshUser */
+        $freshUser = $user->fresh();
+        $remainingCodes = $freshUser->recoveryCodes();
+
+        $this->assertNotContains($recoveryCodes[0], $remainingCodes);
+        $this->assertCount(8, $remainingCodes);
     }
 }

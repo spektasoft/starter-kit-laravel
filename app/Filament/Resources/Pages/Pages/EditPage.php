@@ -2,10 +2,9 @@
 
 namespace App\Filament\Resources\Pages\Pages;
 
-use Filament\Actions\DeleteAction;
 use App\Filament\Resources\Pages\PageResource;
-use Filament\Actions;
 use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditPage extends EditRecord

@@ -19,7 +19,7 @@
 
 <a {{ $attributes->merge(['class' => $wrapperClass]) }}>
     <span class="{{ $iconClass }}">
-        @svg($icon)
+        <x-filament::icon :icon="$icon" :size="\Filament\Support\Enums\IconSize::Large" class="h-6 w-6" />
     </span>
     <span class="{{ $textClass }}">{{ $slot }}</span>
 </a>

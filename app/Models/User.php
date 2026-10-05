@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Concerns\HasUserResources;
 use App\Concerns\SuperUserAuthorizable;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
@@ -16,7 +17,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\Notifiable;
@@ -88,6 +88,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     use HasProfilePhoto;
     use HasRoles;
     use HasUlids;
+    use HasUserResources;
     use Notifiable;
     use SuperUserAuthorizable;
     use TwoFactorAuthenticatable;
@@ -141,22 +142,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         ])->save();
     }
 
-    /**
-     * @return HasMany<Import, $this>
-     */
-    public function imports(): HasMany
-    {
-        return $this->hasMany(Import::class, 'creator_id');
-    }
-
-    /**
-     * @return HasMany<Export, $this>
-     */
-    public function exports(): HasMany
-    {
-        return $this->hasMany(Export::class, 'creator_id');
-    }
-
     public function getFilamentAvatarUrl(): ?string
     {
         if (Jetstream::managesProfilePhotos() && $this->profilePhotoMedia !== null) {
@@ -170,44 +155,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         return null;
     }
 
-    /**
-     * Get a list of resources preventing account deletion.
-     *
-     * @return array<int, array{label: string, count: int, route: string}>
-     */
-    public function getBlockingResources(): array
-    {
-        $blockers = [];
-
-        $checks = [
-            'pages' => ['label' => trans_choice('page.resource.model_label', 2), 'route' => 'filament.admin.resources.pages.index'],
-            'media' => ['label' => trans_choice('media.resource.model_label', 2), 'route' => 'filament.admin.resources.media.index'],
-            'exports' => ['label' => trans_choice('export.resource.model_label', 2), 'route' => 'filament.admin.resources.exports.index'],
-            'imports' => ['label' => trans_choice('import.resource.model_label', 2), 'route' => 'filament.admin.resources.imports.index'],
-        ];
-
-        foreach ($checks as $relation => $data) {
-            $count = $this->{$relation}()->count();
-            if ($count > 0) {
-                $blockers[] = [
-                    'label' => $data['label'],
-                    'count' => $count,
-                    'route' => route($data['route']),
-                ];
-            }
-        }
-
-        return $blockers;
-    }
-
-    public function isReferenced(): bool
-    {
-        return $this->pages()->exists() ||
-            $this->media()->exists() ||
-            $this->exports()->exists() ||
-            $this->imports()->exists();
-    }
-
     public function isSuperUser(): bool
     {
         /** @var string[] */
@@ -218,24 +165,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         }
 
         return in_array($this->{Fortify::username()}, $superUsers);
-    }
-
-    /**
-     * Get all of the media for the User
-     *
-     * @return HasMany<Media, $this>
-     */
-    public function media(): HasMany
-    {
-        return $this->hasMany(Media::class, 'creator_id');
-    }
-
-    /**
-     * @return HasMany<Page, $this>
-     */
-    public function pages(): HasMany
-    {
-        return $this->hasMany(Page::class, 'creator_id');
     }
 
     /**

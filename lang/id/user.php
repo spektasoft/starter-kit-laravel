@@ -9,7 +9,7 @@ return [
     ],
     'account_cannot_be_deleted' => 'Akun tidak dapat dihapus saat sumber daya aktif masih ada.',
     'account_deletion_blocked_message' => 'Akun Anda belum dapat dihapus karena terhubung dengan data aktif:',
-        'delete_resources_first_message' => 'Harap hapus sumber daya ini terlebih dahulu sebelum mencoba menutup akun Anda.',
+    'delete_resources_first_message' => 'Harap hapus sumber daya ini terlebih dahulu sebelum mencoba menutup akun Anda.',
     'two_factor' => [
         'notifications' => [
             'security_error_title' => 'Kesalahan Keamanan',

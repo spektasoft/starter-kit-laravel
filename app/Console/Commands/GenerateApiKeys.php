@@ -2,7 +2,9 @@
 
 namespace App\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 
 class GenerateApiKeys extends Command
@@ -24,60 +26,77 @@ class GenerateApiKeys extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle(Filesystem $files): int
     {
-        $envPath = base_path('.env');
-        $currentEnvContent = file_exists($envPath) ? @file_get_contents($envPath) : '';
+        $envPath = app()->environmentFilePath();
 
-        if ($currentEnvContent === false) {
-            $this->error('Could not read .env file to check for existing API key. Proceeding without confirmation.');
-            $currentEnvContent = '';
+        try {
+            /** @var string|false $currentEnvContent */
+            $currentEnvContent = $files->exists($envPath)
+                ? @$files->get($envPath)
+                : '';
+        } catch (Exception) {
+            $this->error('Could not read environment file.');
+
+            return self::FAILURE;
         }
 
-        if (Str::contains($currentEnvContent, 'API_KEY=')) {
+        if ($currentEnvContent === false) {
+            $this->error('Could not read environment file.');
+
+            return self::FAILURE;
+        }
+
+        if (preg_match('/^API_KEY=/m', $currentEnvContent)) {
             if (! $this->confirm('An API key already exists. Do you want to overwrite it?')) {
                 $this->info('API key generation cancelled.');
 
-                return;
+                return self::SUCCESS;
             }
         }
 
         $key = Str::random(32);
 
-        $this->setKeyInEnvironmentFile($key);
+        if (! $this->setKeyInEnvironmentFile($files, $envPath, $currentEnvContent, $key)) {
+            $this->error('Could not write environment file.');
+
+            return self::FAILURE;
+        }
 
         $this->info('API key generated successfully.');
+
+        return self::SUCCESS;
     }
 
     /**
-     * Set the API key in the environment file.
-     *
-     * @param  string  $key
-     * @return void
+     * Set the API key using the previously read environment content.
      */
-    protected function setKeyInEnvironmentFile($key)
-    {
-        $path = base_path('.env');
-
-        if (file_exists($path)) {
-            $currentContent = @file_get_contents($path);
-
-            if ($currentContent === false) {
-                $this->error('Could not read .env file.');
-
-                return;
-            }
-
-            if (preg_match('/^API_KEY=/m', $currentContent)) {
-                $currentContent = preg_replace(
-                    '/^API_KEY=.*$/m',
-                    'API_KEY='.$key,
-                    $currentContent
-                );
-            } else {
-                $currentContent .= PHP_EOL.'API_KEY='.$key;
-            }
-            file_put_contents($path, $currentContent);
+    protected function setKeyInEnvironmentFile(
+        Filesystem $files,
+        string $path,
+        string $currentContent,
+        string $key
+    ): bool {
+        if (preg_match('/^API_KEY=/m', $currentContent)) {
+            $currentContent = preg_replace(
+                '/^API_KEY=.*$/m',
+                'API_KEY='.$key,
+                $currentContent
+            );
+        } else {
+            $currentContent .= PHP_EOL.'API_KEY='.$key;
         }
+
+        if ($currentContent === null) {
+            return false;
+        }
+
+        try {
+            $bytesWritten = @$files->put($path, $currentContent);
+        } catch (Exception) {
+            return false;
+        }
+
+        return $bytesWritten === strlen($currentContent);
     }
 }

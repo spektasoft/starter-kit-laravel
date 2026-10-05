@@ -4,6 +4,7 @@ namespace App\Filament\Forms\Components;
 
 use App\Filament\Forms\Components\RichEditor\RestrictedAttachCuratorMediaPlugin;
 use App\PathGenerators\AuthenticatedUserPathGenerator;
+use Awcodes\Curator\Facades\Curator;
 use Filament\Forms\Components\RichEditor;
 use Illuminate\Support\Facades\App;
 
@@ -13,7 +14,18 @@ class CuratorEnabledRichEditor extends RichEditor
     {
         $static = parent::make($name);
 
-        $static->fileAttachmentsDirectory(function () {
+        static::applyCuratorConfiguration($static);
+
+        return $static;
+    }
+
+    /**
+     * Applies Curator media integration to an existing editor instance,
+     * preserving any configuration already chained onto it.
+     */
+    public static function applyCuratorConfiguration(RichEditor $editor): RichEditor
+    {
+        $editor->fileAttachmentsDirectory(function () {
             $generator = App::make(AuthenticatedUserPathGenerator::class);
 
             /** @var ?string */
@@ -21,12 +33,14 @@ class CuratorEnabledRichEditor extends RichEditor
 
             return $generator->getPath($defaultDirectory);
         })
+            ->fileAttachmentsDisk(fn (): string => (string) Curator::getDiskName())
+            ->fileAttachmentsVisibility(fn (): string => (string) Curator::getVisibility())
             ->enableToolbarButtons([
                 'attachCuratorMedia',
             ])->plugins([
                 RestrictedAttachCuratorMediaPlugin::make(),
             ]);
 
-        return $static;
+        return $editor;
     }
 }

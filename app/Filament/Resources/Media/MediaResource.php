@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Media;
 
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
+use App\Filament\Resources\Media\Pages\CreateMedia;
 use App\Filament\Resources\Media\Pages\EditMedia;
 use App\Filament\Resources\Media\Pages\ListMedia;
 use App\Models\Media;
@@ -60,6 +61,7 @@ class MediaResource extends CuratorMediaResource
         return [
             ...parent::getPages(),
             'index' => ListMedia::route('/'),
+            'create' => CreateMedia::route('/create'),
             'edit' => EditMedia::route('/{record}/edit'),
         ];
     }

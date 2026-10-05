@@ -16,7 +16,7 @@ class ForgotPasswordTest extends TestCase
 
     public function test_forgot_password_can_be_rendered(): void
     {
-        /** @var Testable */
+        /** @var Testable<ForgotPassword> */
         $testable = Livewire::test(ForgotPassword::class);
         $testable->assertStatus(200);
     }
@@ -31,7 +31,7 @@ class ForgotPasswordTest extends TestCase
 
     public function test_email_is_required(): void
     {
-        /** @var Testable */
+        /** @var Testable<ForgotPassword> */
         $testable = Livewire::test(ForgotPassword::class);
 
         /** @var ForgotPassword */
@@ -46,7 +46,7 @@ class ForgotPasswordTest extends TestCase
 
     public function test_email_must_be_valid_email(): void
     {
-        /** @var Testable */
+        /** @var Testable<ForgotPassword> */
         $testable = Livewire::test(ForgotPassword::class);
 
         /** @var ForgotPassword */
@@ -61,7 +61,7 @@ class ForgotPasswordTest extends TestCase
 
     public function test_forgot_password_form_redirects_to_password_email_route(): void
     {
-        /** @var Testable */
+        /** @var Testable<ForgotPassword> */
         $testable = Livewire::test(ForgotPassword::class);
 
         User::factory()->create([

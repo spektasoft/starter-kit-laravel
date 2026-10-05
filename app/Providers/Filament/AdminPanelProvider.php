@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Colors\Color;
+use App\Filament\Livewire\DatabaseNotifications;
 use App\Filament\Pages\Backups;
 use App\Filament\Resources\Media\MediaResource;
 use App\Filament\Resources\Pages\PageResource;
@@ -82,7 +83,7 @@ class AdminPanelProvider extends PanelProvider
                 EnsureEmailIsVerifiedWithFortify::class,
                 Authenticate::class,
             ])
-            ->databaseNotifications()
+            ->databaseNotifications(livewireComponent: DatabaseNotifications::class)
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label(fn () => __('Administration')),

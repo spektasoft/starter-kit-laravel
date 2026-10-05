@@ -6,6 +6,7 @@ use App\Filament\Resources\Imports\ImportResource;
 use App\Filament\Resources\Media\MediaResource;
 use App\Filament\Resources\Pages\PageResource;
 use App\Filament\Resources\Permissions\PermissionResource;
+use App\Models\Permission;
 use BezhanSalleh\FilamentShield\Resources\Roles\RoleResource;
 use Filament\Pages\Dashboard;
 use Filament\Widgets\AccountWidget;
@@ -259,7 +260,7 @@ return [
     |
     */
 
-    'custom_permissions' => [],
+    'custom_permissions' => Permission::$customPermissions,
 
     /*
     |--------------------------------------------------------------------------

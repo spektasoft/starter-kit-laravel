@@ -27,7 +27,7 @@ class VerifyEmailTest extends TestCase
         $user = User::factory()->unverified()->create();
         $this->actingAs($user);
 
-        /** @var Testable */
+        /** @var Testable<VerifyEmail> */
         $testable = Livewire::test(VerifyEmail::class);
 
         $testable->assertStatus(200);
@@ -103,7 +103,7 @@ class VerifyEmailTest extends TestCase
         $user = User::factory()->unverified()->create();
         $this->actingAs($user);
 
-        /** @var Testable */
+        /** @var Testable<VerifyEmail> */
         $testable = Livewire::test(VerifyEmail::class);
         $testable->assertStatus(200);
         $testable->assertFormExists();

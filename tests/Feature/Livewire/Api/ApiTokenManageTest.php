@@ -212,7 +212,7 @@ class ApiTokenManageTest extends TestCase
             'abilities' => ['create', 'read'],
         ]);
 
-        /** @var Testable */
+        /** @var Testable<ApiTokenManage> */
         $testable = Livewire::test(ApiTokenManage::class);
         $testable->selectTableRecords($user->tokens->pluck('id')->toArray())
             ->callAction(TestAction::make('delete')->table()->bulk());

@@ -54,7 +54,7 @@ class ArtisanController
                 'output' => $output,
             ]);
         } catch (Exception $e) {
-            Log::error("Artisan command '{$command}' failed via API. Error: {$e->getMessage()}. Output: " . Artisan::output());
+            Log::error("Artisan command '{$command}' failed via API. Error: {$e->getMessage()}. Output: ".Artisan::output());
             Log::critical("CRITICAL: Artisan command '{$command}' failed via API. Error: {$e->getMessage()}.");
 
             return response()->json([

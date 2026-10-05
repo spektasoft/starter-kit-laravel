@@ -6,42 +6,80 @@ use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\UserResource;
+use App\Models\Media;
 use App\Models\Page;
-use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
 use Filament\GlobalSearch\GlobalSearchResult;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Jetstream\Features;
 use Laravel\Jetstream\Jetstream;
 use Livewire\Livewire;
-use Tests\TestCase;
 
-class UserResourceTest extends TestCase
+class UserResourceTest extends UserResourceTestCase
 {
-    use RefreshDatabase;
-
-    protected function setUp(): void
+    public function test_profile_photo_field_and_column_follow_jetstream_features(): void
     {
-        parent::setUp();
-        config(['auth.super_users' => ['super@example.com', 'super2@example.com']]);
         $user = User::factory()->create();
-        $this->actingAs($user);
-        Permission::firstOrCreate(['name' => 'view_any_user']);
-        $user->givePermissionTo('view_any_user');
-        Permission::firstOrCreate(['name' => 'view_user']);
-        $user->givePermissionTo('view_user');
-        Permission::firstOrCreate(['name' => 'create_user']);
-        $user->givePermissionTo('create_user');
-        Permission::firstOrCreate(['name' => 'update_user']);
-        $user->givePermissionTo('update_user');
-        Permission::firstOrCreate(['name' => 'delete_user']);
-        $user->givePermissionTo('delete_user');
-        Permission::firstOrCreate(['name' => 'delete_any_user']);
-        $user->givePermissionTo('delete_any_user');
+
+        config(['jetstream.features' => [Features::profilePhotos()]]);
+        Livewire::test(CreateUser::class)->assertFormFieldExists('profile_photo_media_id');
+        Livewire::test(EditUser::class, ['record' => $user->id])
+            ->assertFormFieldExists('profile_photo_media_id');
+        Livewire::test(ListUsers::class)->assertTableColumnExists('profile_photo_media_id');
+
+        config(['jetstream.features' => []]);
+        Livewire::test(CreateUser::class)->assertFormFieldDoesNotExist('profile_photo_media_id');
+        Livewire::test(EditUser::class, ['record' => $user->id])
+            ->assertFormFieldDoesNotExist('profile_photo_media_id');
+        Livewire::test(ListUsers::class)->assertTableColumnDoesNotExist('profile_photo_media_id');
+    }
+
+    public function test_editing_with_blank_password_preserves_the_existing_password(): void
+    {
+        $user = User::factory()->create();
+        $hash = $user->password;
+
+        Livewire::test(EditUser::class, ['record' => $user->id])
+            ->fillForm(['name' => 'Updated name', 'password' => ''])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('Updated name', $user->refresh()->name);
+        $this->assertSame($hash, $user->password);
+    }
+
+    public function test_editing_with_a_new_password_persists_a_hash(): void
+    {
+        $user = User::factory()->create();
+        $hash = $user->password;
+
+        Livewire::test(EditUser::class, ['record' => $user->id])
+            ->fillForm(['password' => 'new-password-123'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertNotSame($hash, $user->refresh()->password);
+        $this->assertTrue(Hash::check('new-password-123', $user->password));
+    }
+
+    public function test_profile_photo_media_attribute_is_saved_when_enabled(): void
+    {
+        config(['jetstream.features' => [Features::profilePhotos()]]);
+        $user = User::factory()->create();
+        $authenticatedUser = User::auth();
+        $this->assertInstanceOf(User::class, $authenticatedUser);
+        $media = Media::factory()->create(['creator_id' => $authenticatedUser->id]);
+
+        Livewire::test(EditUser::class, ['record' => $user->id])
+            ->set('data.profile_photo_media_id', [$media->toArray()])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame($media->id, $user->refresh()->profile_photo_media_id);
     }
 
     public function test_user_list_page_can_be_rendered(): void
@@ -186,28 +224,6 @@ class UserResourceTest extends TestCase
         $this->assertTrue($table->getColumn('updated_at')?->isToggledHidden());
     }
 
-    public function test_super_users_are_not_listed_for_non_super_admin(): void
-    {
-        // setUp() user is a non-super-admin
-        config(['auth.super_users' => ['super@example.com']]);
-        $superUser = User::factory()->create(['email' => 'super@example.com']);
-
-        Livewire::test(ListUsers::class)
-            ->assertCanNotSeeTableRecords([$superUser]);
-    }
-
-    public function test_super_users_are_listed_for_super_admin(): void
-    {
-        config(['auth.super_users' => ['super1@example.com', 'super2@example.com']]);
-        $superAdmin = User::factory()->create(['email' => 'super1@example.com']);
-        $otherSuperUser = User::factory()->create(['email' => 'super2@example.com']);
-        $this->actingAs($superAdmin);
-
-        $livewire = Livewire::test(ListUsers::class);
-        $livewire->assertCanSeeTableRecords([$otherSuperUser]);
-        $livewire->assertTableColumnStateSet('roles', '["Super User"]', $otherSuperUser);
-    }
-
     public function test_roles_column_displays_assigned_roles_correctly(): void
     {
         $user = User::factory()->create();
@@ -245,69 +261,6 @@ class UserResourceTest extends TestCase
         }
     }
 
-    public function test_eloquent_query_excludes_authenticated_user(): void
-    {
-        $authenticatedUser = User::factory()->create();
-        $this->actingAs($authenticatedUser);
-
-        $otherUser = User::factory()->create();
-
-        $query = UserResource::getEloquentQuery();
-        $users = $query->get();
-
-        $this->assertFalse($users->contains($authenticatedUser));
-        $this->assertTrue($users->contains($otherUser));
-    }
-
-    public function test_eloquent_query_excludes_super_users_if_not_super_user(): void
-    {
-        // Authenticate as a regular user
-        $regularUser = User::factory()->create();
-        $this->actingAs($regularUser);
-
-        // Create a super user
-        /** @var array<?string> */
-        $config = config('auth.super_users');
-        $superUserEmail = $config[0] ?? 'superuser@example.com';
-        $superUser = User::factory()->create(['email' => $superUserEmail]);
-
-        // Create another regular user
-        $anotherRegularUser = User::factory()->create();
-
-        $query = UserResource::getEloquentQuery();
-        $users = $query->get();
-
-        $this->assertFalse($users->contains($superUser));
-        $this->assertTrue($users->contains($anotherRegularUser));
-        $this->assertFalse($users->contains($regularUser)); // Authenticated user is also excluded
-    }
-
-    public function test_eloquent_query_includes_super_users_if_authenticated_as_super_user(): void
-    {
-        // Authenticate as a super user
-        /** @var array<?string> */
-        $config = config('auth.super_users');
-        $superUserEmail = $config[0] ?? 'superuser@example.com';
-        $authenticatedSuperUser = User::factory()->create(['email' => $superUserEmail]);
-        $this->actingAs($authenticatedSuperUser);
-
-        // Create another super user
-        /** @var string|null */
-        $anotherSuperUserEmail = $config[1] ?? 'another_superuser@example.com';
-        $anotherSuperUser = User::factory()->create(['email' => $anotherSuperUserEmail]);
-
-        // Create a regular user
-        $regularUser = User::factory()->create();
-
-        $query = UserResource::getEloquentQuery();
-        $users = $query->get();
-
-        // The authenticated super user should still be excluded by the `where('id', '!=', User::auth()?->id)` clause
-        $this->assertFalse($users->contains($authenticatedSuperUser));
-        $this->assertTrue($users->contains($anotherSuperUser));
-        $this->assertTrue($users->contains($regularUser));
-    }
-
     public function test_cannot_delete_a_user_that_is_referenced(): void
     {
         // Assuming a User has a relationship with another model, e.g., Page
@@ -317,51 +270,6 @@ class UserResourceTest extends TestCase
             ->assertTableActionHidden('delete', $userToDelete);
 
         $this->assertModelExists($userToDelete);
-    }
-
-    public function test_cannot_render_create_page_without_permission(): void
-    {
-        $user = User::factory()->create(); // User without 'create_user' permission
-        $this->actingAs($user);
-
-        $this->get(UserResource::getUrl('create'))->assertForbidden();
-    }
-
-    public function test_cannot_render_edit_page_without_permission(): void
-    {
-        $user = User::factory()->create(); // User without 'update_user' permission
-        $this->actingAs($user);
-        $userToEdit = User::factory()->create();
-
-        $this->get(UserResource::getUrl('edit', ['record' => $userToEdit]))->assertForbidden();
-    }
-
-    public function test_cannot_delete_user_without_permission(): void
-    {
-        $user = User::factory()->create();
-        $this->actingAs($user); // User without 'delete_user' permission
-        $user->givePermissionTo('view_any_user');
-        $userToDelete = User::factory()->create();
-
-        $listUsers = Livewire::test(ListUsers::class);
-        $listUsers->assertTableActionHidden('delete', $userToDelete);
-    }
-
-    public function test_cannot_bulk_delete_users_without_permission(): void
-    {
-        $user = User::factory()->create();
-        $this->actingAs($user); // User without 'delete_user' permission
-        $user->givePermissionTo('view_any_user');
-        $user->givePermissionTo('delete_any_user');
-        $usersToDelete = User::factory(2)->create();
-
-        $initialCount = User::count();
-
-        $listUsers = Livewire::test(ListUsers::class);
-        $listUsers->selectTableRecords($usersToDelete->pluck('id')->toArray())
-            ->callAction(TestAction::make('delete')->table()->bulk());
-
-        $this->assertEquals($initialCount, User::count());
     }
 
     public function test_user_global_search_is_configured_correctly(): void

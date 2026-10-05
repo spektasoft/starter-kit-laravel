@@ -3,11 +3,11 @@
 namespace Tests\Feature\Filament\Resources;
 
 use App\Filament\Resources\Media\MediaResource;
+use App\Filament\Resources\Media\Pages\CreateMedia;
 use App\Filament\Resources\Media\Pages\ListMedia;
 use App\Models\Media;
 use App\Models\Permission;
 use App\Models\User;
-use Awcodes\Curator\Resources\Media\Pages\CreateMedia;
 use Filament\Facades\Filament;
 use Filament\GlobalSearch\GlobalSearchResult;
 use Illuminate\Foundation\Testing\RefreshDatabase;
